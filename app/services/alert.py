@@ -127,8 +127,6 @@ class AlertService:
                 f"Alert Generated\n"
                 f"{alert_number}"
             )
-            print(log_msg)
-            
             try:
                 current_app.logger.info(log_msg)
             except Exception:

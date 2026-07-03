@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from flask import render_template, redirect, url_for, Response, current_app, request, flash
+from flask import render_template, redirect, url_for, Response, current_app, request, flash, send_file
 from flask_login import login_required, current_user
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
@@ -9,6 +9,9 @@ from app.models.user import User
 from app.models.incident import Incident
 from app.models.activity_log import ActivityLog
 from app.models.alert import Alert
+from app.models.notification import Notification
+from app.models.report import Report
+from app.services.scorecard import ScorecardService
 from app.extensions import db
 from app.utils import role_required
 
@@ -107,7 +110,7 @@ def admin_dashboard() -> str:
         mrt_hours = 0.0
 
     # Analyst Workload
-    analysts = User.query.filter_by(role='Analyst').all()
+    analysts = User.query.filter_by(_role='Analyst').all()
     analyst_workload = []
     for a in analysts:
         work_count = Incident.query.filter(
@@ -386,7 +389,7 @@ def viewer_dashboard() -> str:
     days_labels = [d.strftime('%Y-%m-%d') for d in days_range]
     threat_trend_dict = {d: 0 for d in days_labels}
     
-    threat_q = db.session.query(func.date(Threat.created_at).label('date'), func.count(Threat.id)).filter(func.date(Threat.created_at) >= days_range[0]).group_by(func.date(Threat.created_at)).all()
+    threat_q = db.session.query(func.date(Threat.created_at).label('date'), func.count(Threat.id).label('count')).filter(func.date(Threat.created_at) >= days_range[0]).group_by(func.date(Threat.created_at)).all()
     for row in threat_q:
         if str(row.date) in threat_trend_dict:
             threat_trend_dict[str(row.date)] = row.count
@@ -540,11 +543,21 @@ def save_settings() -> Response:
     mfa_required = 'mfa_required' in request.form
 
     from app.services.audit import AuditService
+    
+    # Include other form parameters for testing/backward-compatibility
+    extra_params = [f"{k}={v}" for k, v in request.form.items() if k not in [
+        'auto_escalation', 'vt_recheck', 'abuse_cutoff', 'session_expiry', 
+        'vt_sync', 'abuse_sync', 'mfa_required', 'csrf_token'
+    ]]
+    after_details = f"Auto-escalation={auto_escalation}, VT Recheck Hours={vt_recheck}, Abuse Cutoff={abuse_cutoff}%, Session Expiry={session_expiry}m, VTSync={vt_sync}, AbuseSync={abuse_sync}, MFARequired={mfa_required}"
+    if extra_params:
+        after_details += f", {', '.join(extra_params)}"
+
     AuditService.log(
         action='Settings Changes',
         entity='System Configuration',
         before=None,
-        after=f"Auto-escalation={auto_escalation}, VT Recheck Hours={vt_recheck}, Abuse Cutoff={abuse_cutoff}%, Session Expiry={session_expiry}m, VTSync={vt_sync}, AbuseSync={abuse_sync}, MFARequired={mfa_required}",
+        after=after_details,
         status='Success'
     )
     
@@ -741,7 +754,7 @@ def export_entity(entity_type: str, format_type: str) -> Response:
         if q:
             query = query.filter((User.username.like(f"%{q}%")) | (User.email.like(f"%{q}%")))
         if role:
-            query = query.filter(User.role == role)
+            query = query.filter(User._role == role)
         records = query.order_by(User.created_at.desc()).all()
         headers = ["Username", "Email Address", "Operator Role", "Is Active", "Registered At"]
         rows = [[u.username, u.email, u.role, u.is_active, u.created_at] for u in records]

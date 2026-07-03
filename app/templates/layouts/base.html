@@ -82,7 +82,7 @@
                     {% endif %}
                     <div class="ms-auto d-flex align-items-center gap-3 mt-3 mt-lg-0">
                         <!-- Search Bar -->
-                        <form action="{{ url_for('dashboard.search') }}" method="GET" class="search-box position-relative d-none d-md-block m-0">
+                        <form action="{{ url_for('dashboard.global_search') }}" method="GET" class="search-box position-relative d-none d-md-block m-0">
                             <i class="bi bi-search search-icon" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4); pointer-events: none;"></i>
                             <input type="text" name="q" class="form-control form-control-dark" style="padding-left: 36px;" placeholder="Search threats, logs, IP..." value="{{ request.args.get('q', '') }}">
                         </form>
@@ -101,6 +101,7 @@
                                     <span class="fw-semibold font-outfit small text-light">Notifications</span>
                                     {% if unread_count > 0 %}
                                     <form action="{{ url_for('notifications.mark_all_read') }}" method="POST" class="m-0">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                         <button type="submit" class="btn btn-link btn-sm text-accent-glow p-0 text-decoration-none small" style="font-size: 0.75rem;">Mark all as read</button>
                                     </form>
                                     {% endif %}

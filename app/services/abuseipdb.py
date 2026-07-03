@@ -120,7 +120,7 @@ def enrich_ip(threat: Threat) -> AbuseIPDBEnrichment:
         return enrichment
         
     except Exception as e:
-        print("AbuseIPDB ERROR:", e)
+        current_app.logger.error(f"AbuseIPDB ERROR: {e}")
         enrichment.status = 'failed'
         # Map specific exceptions to standard user facing error messages
         error_msg = str(e)

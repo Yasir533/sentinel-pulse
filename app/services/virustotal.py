@@ -105,7 +105,7 @@ def enrich_threat(threat: Threat) -> VTEnrichment:
         return enrichment
         
     except Exception as e:
-        print("VirusTotal ERROR:", e)   
+        current_app.logger.error(f"VirusTotal ERROR: {e}")
     enrichment.status = 'failed'
     enrichment.error_message = str(e)
     db.session.commit()

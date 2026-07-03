@@ -258,6 +258,7 @@
                 <!-- Resolve Action -->
                 {% if incident.status not in ['Resolved', 'Closed'] %}
                 <form action="{{ url_for('incidents.edit_incident', incident_id=incident.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="status" value="Resolved">
                     <input type="hidden" name="resolution_notes" value="Incident escalated status changed to Resolved by operator. Heuristic risk mitigated.">
                     <button type="submit" class="btn btn-outline-success w-100 d-flex align-items-center justify-content-center gap-2">
@@ -269,6 +270,7 @@
                 <!-- Close Action -->
                 {% if incident.status == 'Resolved' %}
                 <form action="{{ url_for('incidents.edit_incident', incident_id=incident.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="status" value="Closed">
                     <input type="hidden" name="resolution_notes" value="{% if incident.resolution_notes %}{{ incident.resolution_notes }}{% else %}Incident dossier closed by operator.{% endif %}">
                     <button type="submit" class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2">
@@ -325,6 +327,7 @@
                 <div class="mt-4 pt-3 border-top border-secondary-subtle border-opacity-25">
                     <!-- Delete Button Form -->
                     <form action="{{ url_for('incidents.delete_incident', incident_id=incident.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to permanently purge this incident escalation dossier from the database?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2">
                             <i class="bi bi-trash"></i> Purge Dossier
                         </button>

@@ -17,12 +17,14 @@
         {% if current_user.role in ['Admin', 'Analyst'] %}
             {% if alert.status == 'New' %}
             <form action="{{ url_for('alerts.acknowledge_alert', alert_id=alert.id) }}" method="POST" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="btn btn-success d-flex align-items-center gap-2 font-outfit fw-semibold">
                     <i class="bi bi-check2-circle"></i> Acknowledge Alert
                 </button>
             </form>
             {% elif alert.status == 'Acknowledged' %}
             <form action="{{ url_for('alerts.investigate_alert', alert_id=alert.id) }}" method="POST" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="btn btn-warning text-dark d-flex align-items-center gap-2 font-outfit fw-semibold">
                     <i class="bi bi-hourglass-split"></i> Investigate Alert
                 </button>
@@ -32,12 +34,14 @@
             {% if current_user.role == 'Admin' %}
                 {% if alert.status == 'Investigating' %}
                 <form action="{{ url_for('alerts.resolve_alert', alert_id=alert.id) }}" method="POST" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn btn-info text-dark d-flex align-items-center gap-2 font-outfit fw-semibold">
                         <i class="bi bi-check-all"></i> Resolve Alert
                     </button>
                 </form>
                 {% elif alert.status == 'Resolved' %}
                 <form action="{{ url_for('alerts.archive_alert', alert_id=alert.id) }}" method="POST" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn btn-secondary text-light d-flex align-items-center gap-2 font-outfit fw-semibold">
                         <i class="bi bi-archive"></i> Archive Alert
                     </button>

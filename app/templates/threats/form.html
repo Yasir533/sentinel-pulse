@@ -26,6 +26,7 @@
             </div>
             <div class="card-body p-4">
                 <form action="{% if threat %}{{ url_for('threats.edit_threat', threat_id=threat.id) }}{% else %}{{ url_for('threats.new_threat') }}{% endif %}" method="POST" class="needs-validation" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="row g-3">
                         <!-- Threat Type -->
                         <div class="col-md-6">

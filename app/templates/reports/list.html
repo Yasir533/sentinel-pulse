@@ -27,6 +27,7 @@
         
         {% if current_user.role == 'Admin' %}
         <form action="{{ url_for('reports.generate_report') }}" method="POST" id="generate-report-form" class="d-flex align-items-center gap-2">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <select name="report_type" class="form-select form-select-sm form-control-dark" style="width: auto;" required>
                 <option value="" disabled selected>Select Report Type</option>
                 <option value="Executive Security Report">Executive Security Report</option>
@@ -159,6 +160,7 @@
                                         <td class="pe-3 text-end">
                                             {% if current_user.role == 'Admin' %}
                                             <form action="{{ url_for('reports.delete_schedule', schedule_id=s.id) }}" method="POST" class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                 <button type="submit" class="btn btn-outline-danger btn-xs py-0.5 px-2" style="font-size: 0.72rem;" onclick="return confirm('Cancel this schedule?');">
                                                     <i class="bi bi-trash-fill"></i> Remove
                                                 </button>
@@ -190,6 +192,7 @@
             <div class="card-body">
                 {% if current_user.role == 'Admin' %}
                 <form action="{{ url_for('reports.new_schedule') }}" method="POST" class="d-flex flex-column gap-3">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div>
                         <label class="form-label text-secondary small fw-semibold">Report Type</label>
                         <select name="report_type" class="form-select form-control-dark" required>

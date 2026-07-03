@@ -59,6 +59,7 @@ class ScorecardService:
         return {
             'score': score,
             'status': status,
+            'rating': status,
             'badge_class': badge_class,
             'threat_exposure': critical_high_threats,
             'open_alerts': open_alerts,

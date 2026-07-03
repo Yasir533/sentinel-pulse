@@ -48,12 +48,10 @@ class NotificationService:
         except Exception:
             pass
 
-        print("Creating notification...")
-        print(f"Current User ID: {curr_id}")
-        print(f"Current Username: {curr_name}")
-        print(f"Current Role: {curr_role}")
-        print(f"Recipient User IDs: {[user_id]}")
-        print(f"Inserted User IDs: {user_id}")
+        from flask import current_app
+        current_app.logger.info(
+            f"Creating notification NTF. User: {curr_name} (ID: {curr_id}, Role: {curr_role}), Recipient User ID: {user_id}"
+        )
 
         notification_number = cls.generate_next_notification_number()
         notif = Notification(
@@ -154,13 +152,10 @@ class NotificationService:
         except Exception:
             pass
 
-        print("Creating notification...")
-        print(f"Current User ID: {curr_id}")
-        print(f"Current Username: {curr_name}")
-        print(f"Current Role: {curr_role}")
-        print(f"Recipient User IDs: {recipient_ids}")
-        for r_id in recipient_ids:
-            print(f"Inserted User IDs: {r_id}")
+        from flask import current_app
+        current_app.logger.info(
+            f"Broadcasting notification. User: {curr_name} (ID: {curr_id}, Role: {curr_role}), Recipient User IDs: {recipient_ids}"
+        )
 
         for r_id in recipient_ids:
             notification_number = f"{prefix}{next_seq:04d}"

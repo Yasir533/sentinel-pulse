@@ -26,6 +26,12 @@ class User(db.Model, UserMixin):
     def role(self, value: str) -> None:
         """Set the user role, trimming any leading/trailing whitespace and capitalizing."""
         self._role = value.strip().capitalize() if value else 'Viewer'
+
+    @role.expression
+    def role(cls):
+        """Database expression for the role hybrid property."""
+        return cls._role
+
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     last_login_at = db.Column(db.DateTime, nullable=True)

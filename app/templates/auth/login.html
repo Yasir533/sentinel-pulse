@@ -28,6 +28,7 @@
             </div>
             <div class="card-body p-4">
                 <form action="{{ url_for('auth.login') }}" method="POST" class="needs-validation" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <!-- Username or Email Field -->
                     <div class="mb-3">
                         <label for="username_or_email" class="form-label text-secondary small fw-semibold">Username or Email Address</label>

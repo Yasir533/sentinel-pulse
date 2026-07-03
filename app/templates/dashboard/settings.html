@@ -16,11 +16,12 @@
                 <h5 class="mb-0 font-outfit text-light"><i class="bi bi-sliders text-accent-glow me-2"></i>Engine Parameters</h5>
             </div>
             <div class="card-body p-4">
-                <form onsubmit="event.preventDefault(); alert('Configuration updated successfully!');">
+                <form action="{{ url_for('dashboard.save_settings') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="row g-3 mb-4">
                         <div class="col-12 col-md-6">
                             <label class="form-label text-secondary small fw-semibold">Auto-escalation Threshold</label>
-                            <select class="form-select form-control-dark" style="background-color: var(--bg-dark-core); border: 1px solid var(--border-color); color: var(--text-primary);">
+                            <select name="auto_escalation" class="form-select form-control-dark" style="background-color: var(--bg-dark-core); border: 1px solid var(--border-color); color: var(--text-primary);">
                                 <option value="Medium">Medium & Above Risk</option>
                                 <option value="High" selected>High & Above Risk</option>
                                 <option value="Critical">Critical Risk Only</option>
@@ -28,18 +29,18 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label text-secondary small fw-semibold">VT Analysis Re-check Interval (Hours)</label>
-                            <input type="number" class="form-control form-control-dark" style="background-color: var(--bg-dark-core); border: 1px solid var(--border-color); color: var(--text-primary);" value="24" min="1" max="168">
+                            <input type="number" name="vt_recheck" class="form-control form-control-dark" style="background-color: var(--bg-dark-core); border: 1px solid var(--border-color); color: var(--text-primary);" value="24" min="1" max="168">
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label text-secondary small fw-semibold">AbuseIPDB Confidence Cut-off</label>
                             <div class="input-group">
-                                <input type="number" class="form-control form-control-dark" style="background-color: var(--bg-dark-core); border: 1px solid var(--border-color); color: var(--text-primary);" value="50" min="0" max="100">
+                                <input type="number" name="abuse_cutoff" class="form-control form-control-dark" style="background-color: var(--bg-dark-core); border: 1px solid var(--border-color); color: var(--text-primary);" value="50" min="0" max="100">
                                 <span class="input-group-text bg-secondary border border-secondary-subtle text-light">%</span>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label text-secondary small fw-semibold">Session Idle Expiry (Minutes)</label>
-                            <input type="number" class="form-control form-control-dark" style="background-color: var(--bg-dark-core); border: 1px solid var(--border-color); color: var(--text-primary);" value="60" min="5" max="1440">
+                            <input type="number" name="session_expiry" class="form-control form-control-dark" style="background-color: var(--bg-dark-core); border: 1px solid var(--border-color); color: var(--text-primary);" value="60" min="5" max="1440">
                         </div>
                     </div>
                     
@@ -47,15 +48,15 @@
                         <h6 class="font-outfit text-light mb-2"><i class="bi bi-braces text-accent-glow me-1.5"></i>API Integrations</h6>
                         <div class="d-flex flex-column gap-2.5">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="vtSync" checked>
+                                <input class="form-check-input" type="checkbox" role="switch" id="vtSync" name="vt_sync" checked>
                                 <label class="form-check-input-label text-secondary small" for="vtSync">Automatically run VirusTotal Enrichment on IOC ingestion</label>
                             </div>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="abuseSync" checked>
+                                <input class="form-check-input" type="checkbox" role="switch" id="abuseSync" name="abuse_sync" checked>
                                 <label class="form-check-input-label text-secondary small" for="abuseSync">Automatically run AbuseIPDB IP reputation lookup</label>
                             </div>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="logEnforce">
+                                <input class="form-check-input" type="checkbox" role="switch" id="logEnforce" name="mfa_required">
                                 <label class="form-check-input-label text-secondary small" for="logEnforce">Require MFA verification for Admin role transitions</label>
                             </div>
                         </div>

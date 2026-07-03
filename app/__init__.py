@@ -112,6 +112,34 @@ def create_app(config_name=None):
             'notifications': []
         }
 
+    # Custom CSRF Protection
+    import secrets
+    from flask import session, request, abort
+
+    def generate_csrf_token():
+        if 'csrf_token' not in session:
+            session['csrf_token'] = secrets.token_hex(32)
+        return session['csrf_token']
+
+    @app.context_processor
+    def inject_csrf_token():
+        return dict(csrf_token=generate_csrf_token)
+
+    @app.before_request
+    def check_csrf():
+        if request.method in ['POST', 'PUT', 'DELETE', 'PATCH']:
+            # Skip during testing if CSRF protection is disabled
+            if app.config.get('TESTING') and not app.config.get('WTF_CSRF_ENABLED', True):
+                return
+            if request.blueprint == 'api':
+                return
+            
+            token = request.form.get('csrf_token') or request.headers.get('X-CSRF-Token')
+            expected_token = session.get('csrf_token')
+            
+            if not expected_token or not token or not secrets.compare_digest(expected_token, token):
+                abort(400, "CSRF token missing or invalid")
+
     return app
 
 

@@ -88,6 +88,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="editUserForm" method="POST" action="">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="modal-body text-light">
                     <div class="mb-3">
                         <label for="editUsername" class="form-label text-secondary small">Username</label>

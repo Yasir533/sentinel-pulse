@@ -15,6 +15,8 @@ class BaseConfig:
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
     
     # SQLAlchemy
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -70,6 +72,7 @@ class ProductionConfig(BaseConfig):
     """Production configuration."""
     DEBUG = False
     TESTING = False
+    SESSION_COOKIE_SECURE = True
     
     # Ensure production environment has actual environment variables set
     @classmethod

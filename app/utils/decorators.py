@@ -6,15 +6,6 @@ def role_required(*roles):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-
-            print("=" * 60)
-            print("Authenticated :", current_user.is_authenticated)
-            print("Username      :", current_user.username)
-            print("Role          :", repr(current_user.role))
-            print("Allowed Roles :", roles)
-            print("Comparison    :", current_user.role in roles)
-            print("=" * 60)
-
             if not current_user.is_authenticated:
                 flash("Authentication required.", "warning")
                 return redirect(url_for("auth.login"))

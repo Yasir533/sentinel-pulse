@@ -5,16 +5,18 @@ from app.models.audit_log import AuditLog
 
 class AuditService:
     @staticmethod
-    def log(action: str, entity: str, before: str = None, after: str = None, status: str = 'Success', username: str = None, role: str = None) -> AuditLog:
+    def log(action: str, entity: str, before: str = None, after: str = None, status: str = 'Success', username: str = None, role: str = None, ip_address: str = None) -> AuditLog:
         """
         Create a SOC compliance audit log record.
         Automatically grabs IP and current operator context if available.
         """
-        ip_addr = '127.0.0.1'
-        if has_request_context():
-            ip_addr = request.headers.get('X-Forwarded-For', request.remote_addr or '127.0.0.1')
-            if ',' in ip_addr:
-                ip_addr = ip_addr.split(',')[0].strip()
+        ip_addr = ip_address
+        if not ip_addr:
+            ip_addr = '127.0.0.1'
+            if has_request_context():
+                ip_addr = request.headers.get('X-Forwarded-For', request.remote_addr or '127.0.0.1')
+                if ',' in ip_addr:
+                    ip_addr = ip_addr.split(',')[0].strip()
 
         # Resolve operator username & role
         if not username:

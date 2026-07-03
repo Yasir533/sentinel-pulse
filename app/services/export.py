@@ -185,3 +185,61 @@ class ExportService:
         pdf_bytes = buffer.getvalue()
         buffer.close()
         return pdf_bytes
+
+    @classmethod
+    def export_to_csv(cls, entity_type: str, filters: dict) -> bytes:
+        """Fetch entity data and export to CSV format bytes."""
+        headers, rows = cls._get_entity_data(entity_type, filters)
+        csv_str = cls.export_csv(headers, rows)
+        return csv_str.encode('utf-8')
+
+    @classmethod
+    def export_to_xlsx(cls, entity_type: str, filters: dict) -> bytes:
+        """Fetch entity data and export to Excel format bytes."""
+        headers, rows = cls._get_entity_data(entity_type, filters)
+        return cls.export_xlsx(entity_type.capitalize(), headers, rows)
+
+    @classmethod
+    def export_to_pdf(cls, entity_type: str, filters: dict) -> bytes:
+        """Fetch entity data and export to PDF format bytes."""
+        headers, rows = cls._get_entity_data(entity_type, filters)
+        return cls.export_pdf(entity_type.capitalize(), headers, rows)
+
+    @staticmethod
+    def _get_entity_data(entity_type: str, filters: dict) -> tuple[list, list]:
+        """Dynamically fetch columns and rows for the specified entity type for exporting."""
+        from app.models.threat import Threat
+        from app.models.alert import Alert
+        from app.models.incident import Incident
+        from app.models.user import User
+        from app.models.audit_log import AuditLog
+        from app.models.notification import Notification
+
+        if entity_type == 'threats':
+            records = Threat.query.all()
+            headers = ["Ingestion Date", "Threat Type", "IOC Type", "Indicator Value", "Severity", "Status", "Source Feed"]
+            rows = [[t.created_at, t.threat_type, t.ioc_type, t.ioc_value, t.severity, t.status, t.source] for t in records]
+        elif entity_type == 'alerts':
+            records = Alert.query.all()
+            headers = ["Alert Number", "Triggered Timestamp", "Message", "Severity", "Status"]
+            rows = [[a.alert_number, a.created_at, a.message, a.severity, a.status] for a in records]
+        elif entity_type == 'incidents':
+            records = Incident.query.all()
+            headers = ["Incident Title", "Created At", "Description", "Severity", "Status"]
+            rows = [[i.title, i.created_at, i.description, i.severity, i.status] for i in records]
+        elif entity_type == 'users':
+            records = User.query.all()
+            headers = ["Username", "Email Address", "Operator Role", "Is Active", "Registered At"]
+            rows = [[u.username, u.email, u.role, u.is_active, u.created_at] for u in records]
+        elif entity_type == 'notifications':
+            records = Notification.query.all()
+            headers = ["Timestamp", "Notification message", "Priority", "Status"]
+            rows = [[n.created_at, n.message, n.priority, n.status] for n in records]
+        elif entity_type == 'audit_logs':
+            records = AuditLog.query.all()
+            headers = ["Audit Date & Time", "Username", "Operator Role", "Remote IP", "Action Executed", "Target Entity", "Execution status"]
+            rows = [[l.timestamp, l.username, l.role, l.ip_address, l.action, l.entity, l.status] for l in records]
+        else:
+            headers, rows = [], []
+        return headers, rows
+

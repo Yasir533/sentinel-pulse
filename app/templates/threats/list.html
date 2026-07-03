@@ -173,6 +173,7 @@
                                 {% endif %}
                                 {% if current_user.role == 'Admin' %}
                                 <form action="{{ url_for('threats.delete_threat', threat_id=threat.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this record permanently?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete dossier">
                                         <i class="bi bi-trash"></i>
                                     </button>
