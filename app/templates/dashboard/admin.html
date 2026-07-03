@@ -1,0 +1,646 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Security Administration Console | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<!-- Top Header Row -->
+<div class="mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+        <h1 class="page-title font-outfit text-light mb-1">SOC Command & Administration</h1>
+        <p class="text-secondary small mb-0">Real-time platform metrics, analytics, and security health status overview.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <a href="{{ url_for('dashboard.list_audit_logs') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-shield-check me-1"></i>Audit Logs</a>
+        <a href="{{ url_for('reports.list_reports') }}" class="btn btn-primary btn-sm"><i class="bi bi-file-earmark-bar-graph me-1"></i>Executive Reports</a>
+    </div>
+</div>
+
+<!-- Scorecard & Core KPIs Row -->
+<div class="row g-4 mb-4">
+    <!-- Security Scorecard Gauge -->
+    <div class="col-12 col-xl-4">
+        <div class="card border border-secondary-subtle bg-panel h-100 p-3">
+            <h6 class="text-secondary font-outfit small mb-3"><i class="bi bi-speedometer2 text-accent-glow me-2"></i>Security Health Scorecard</h6>
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="position-relative d-flex justify-content-center align-items-center" style="width: 120px; height: 120px;">
+                    <!-- Circular Progress Ring SVG -->
+                    <svg width="120" height="120" class="position-absolute">
+                        <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="8"></circle>
+                        <circle cx="60" cy="60" r="50" fill="none" stroke="{% if scorecard.score >= 80 %}#198754{% elif scorecard.score >= 60 %}#ffc107{% else %}#dc3545{% endif %}" stroke-width="8" stroke-dasharray="314" stroke-dashoffset="{{ 314 - (314 * scorecard.score / 100) }}" stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-in-out;"></circle>
+                    </svg>
+                    <div class="text-center" style="z-index: 1;">
+                        <span class="fs-2 fw-bold text-light font-outfit">{{ scorecard.score }}</span>
+                        <small class="text-muted d-block" style="font-size: 0.65rem;">/ 100</small>
+                    </div>
+                </div>
+                <div class="flex-grow-1 ps-4">
+                    <h5 class="font-outfit mb-1 text-light">Rating: 
+                        <span class="fw-bold {% if scorecard.rating == 'Excellent' or scorecard.rating == 'Good' %}text-success{% elif scorecard.rating == 'Fair' %}text-warning{% else %}text-danger{% endif %}">
+                            {{ scorecard.rating }}
+                        </span>
+                    </h5>
+                    <p class="text-muted small mb-0" style="line-height: 1.3;">Calculated from open critical alerts, unresolved incidents, system configuration health, and threat exposures.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Counters & Growth -->
+    <div class="col-12 col-xl-8">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3 h-100">
+            <!-- Counter 1 -->
+            <div class="col">
+                <div class="card card-stat h-100 border border-secondary-subtle">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted small">Total threats</span>
+                            <span class="badge bg-{{ 'success' if growth_pct <= 0 else 'danger' }}-subtle text-{{ 'success' if growth_pct <= 0 else 'danger' }} small border-0 font-monospace">
+                                {% if growth_pct > 0 %}+{% endif %}{{ growth_pct }}% wk
+                            </span>
+                        </div>
+                        <h3 class="mb-0 text-light font-outfit fw-bold">{{ total_threats }}</h3>
+                    </div>
+                </div>
+            </div>
+            <!-- Counter 2 -->
+            <div class="col">
+                <div class="card card-stat h-100 border border-secondary-subtle">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted small">Open Incidents</span>
+                            <span class="badge bg-primary-subtle text-primary border-0 small">Active</span>
+                        </div>
+                        <h3 class="mb-0 text-light font-outfit fw-bold">{{ open_incidents }}</h3>
+                    </div>
+                </div>
+            </div>
+            <!-- Counter 3 -->
+            <div class="col">
+                <div class="card card-stat h-100 border border-secondary-subtle">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted small">Critical Alerts</span>
+                            <span class="badge bg-danger-subtle text-danger border-0 small font-monospace">ALT</span>
+                        </div>
+                        <h3 class="mb-0 text-light font-outfit fw-bold">{{ critical_alerts }}</h3>
+                    </div>
+                </div>
+            </div>
+            <!-- Counter 4 -->
+            <div class="col">
+                <div class="card card-stat h-100 border border-secondary-subtle">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted small">Cycle Time</span>
+                            <span class="badge bg-secondary-subtle text-light border-0 small font-monospace">Avg Hrs</span>
+                        </div>
+                        <h3 class="mb-0 text-light font-outfit fw-bold">{{ mrt_hours }}h</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Visualizations Grid Row 1 -->
+<div class="row g-4 mb-4">
+    <!-- Chart: Severity Distribution -->
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card border border-secondary-subtle h-100 bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-pie-chart text-accent-glow me-2"></i>Severity Breakdown</h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center" style="position: relative; min-height: 250px;">
+                <canvas id="severityChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart: Threat Types -->
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card border border-secondary-subtle h-100 bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-shield-exclamation text-accent-glow me-2"></i>Threat Categories</h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center" style="position: relative; min-height: 250px;">
+                <canvas id="threatTypesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart: Ingestion Trends -->
+    <div class="col-12 col-lg-4">
+        <div class="card border border-secondary-subtle h-100 bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-graph-up text-accent-glow me-2"></i>Threat & Incident Ingestion</h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center" style="position: relative; min-height: 250px;">
+                <canvas id="ingestionTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Visualizations Grid Row 2 -->
+<div class="row g-4 mb-4">
+    <!-- Chart: Alert and Notification Ingestion -->
+    <div class="col-12 col-lg-6">
+        <div class="card border border-secondary-subtle h-100 bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-bell text-accent-glow me-2"></i>Alerts & Notifications Trends</h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center" style="position: relative; min-height: 250px;">
+                <canvas id="alertNotifTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart: Risk score brackets & Source breakdown -->
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card border border-secondary-subtle h-100 bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-bar-chart-steps text-accent-glow me-2"></i>Risk Distribution</h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center" style="position: relative; min-height: 250px;">
+                <canvas id="riskChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card border border-secondary-subtle h-100 bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-hdd-network text-accent-glow me-2"></i>IOC Sources</h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center" style="position: relative; min-height: 250px;">
+                <canvas id="sourceChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Operations & Compliance Layout Row -->
+<div class="row g-4 mb-4">
+    <!-- Critical Heatmap Matrix -->
+    <div class="col-12 col-xl-6">
+        <div class="card border border-secondary-subtle bg-panel h-100">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-grid-3x3-gap text-accent-glow me-2"></i>Critical Heatmap Matrix</h5>
+            </div>
+            <div class="card-body py-2">
+                <div class="table-responsive">
+                    <table class="table table-dark table-bordered mb-0 align-middle text-center small" style="border-color: rgba(255,255,255,0.08);">
+                        <thead>
+                            <tr class="text-secondary">
+                                <th>Category \ Severity</th>
+                                <th class="text-danger">Critical</th>
+                                <th class="text-warning">High</th>
+                                <th class="text-info">Medium</th>
+                                <th class="text-secondary">Low</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for type, counts in heatmap_data.items() %}
+                            <tr>
+                                <td class="text-start fw-semibold text-light">{{ type }}</td>
+                                <td style="background: rgba(220, 53, 69, {{ 0.05 + (counts['Critical'] * 0.15) if counts['Critical'] > 0 else 0 }});">{{ counts['Critical'] }}</td>
+                                <td style="background: rgba(255, 193, 7, {{ 0.05 + (counts['High'] * 0.15) if counts['High'] > 0 else 0 }});">{{ counts['High'] }}</td>
+                                <td style="background: rgba(13, 202, 240, {{ 0.05 + (counts['Medium'] * 0.15) if counts['Medium'] > 0 else 0 }});">{{ counts['Medium'] }}</td>
+                                <td style="background: rgba(108, 117, 125, {{ 0.05 + (counts['Low'] * 0.15) if counts['Low'] > 0 else 0 }});">{{ counts['Low'] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analyst Workloads -->
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card border border-secondary-subtle bg-panel h-100">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-person-badge text-accent-glow me-2"></i>Analyst Workloads</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush bg-transparent">
+                    {% if analyst_workload %}
+                        {% for work in analyst_workload %}
+                        <div class="list-group-item bg-transparent text-light border-secondary-subtle d-flex justify-content-between align-items-center py-2.5">
+                            <div>
+                                <span class="fw-semibold text-light d-block">{{ work.username }}</span>
+                                <small class="text-muted">SOC Operator</small>
+                            </div>
+                            <span class="badge bg-{{ 'danger' if work.count >= 4 else 'warning' if work.count >= 2 else 'success' }}-subtle text-{{ 'danger' if work.count >= 4 else 'warning' if work.count >= 2 else 'success' }}">
+                                {{ work.count }} cases
+                            </span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4 text-muted small">No active analysts configured.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOC Integrations status -->
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card border border-secondary-subtle bg-panel h-100">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-cpu text-accent-glow me-2"></i>Platform Health</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-column gap-3 small">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-secondary"><i class="bi bi-database me-2"></i>DB Status</span>
+                        <span class="badge bg-success-subtle text-success border border-success border-opacity-25">{{ system_status['db_status'] }} ({{ system_status['db_latency'] }})</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-secondary"><i class="bi bi-shield-check me-2"></i>VirusTotal API</span>
+                        <span class="badge bg-success-subtle text-success border border-success border-opacity-25">{{ system_status['vt_status'] }} ({{ system_status['vt_latency'] }})</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-secondary"><i class="bi bi-globe me-2"></i>AbuseIPDB Intel</span>
+                        <span class="badge bg-success-subtle text-success border border-success border-opacity-25">{{ system_status['abuseipdb_status'] }} ({{ system_status['abuse_latency'] }})</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-secondary"><i class="bi bi-activity me-2"></i>Heuristics Core</span>
+                        <span class="badge bg-success-subtle text-success border border-success border-opacity-25">{{ system_status['heuristics'] }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-secondary"><i class="bi bi-bezier2 me-2"></i>Feed Sync</span>
+                        <span class="badge bg-success-subtle text-success border border-success border-opacity-25">{{ system_status['feed_sync'] }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Data Tables & Feeds -->
+<div class="row g-4">
+    <!-- Left column: Tables -->
+    <div class="col-12 col-xl-9 d-flex flex-column gap-4">
+        <!-- Latest 10 threats -->
+        <div class="card border border-secondary-subtle bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-list-stars text-accent-glow me-2"></i>Latest 10 Ingested Threats</h5>
+                <a href="{{ url_for('threats.list_threats') }}" class="badge bg-secondary-subtle border border-secondary text-light px-2 py-1.5 text-decoration-none hover-glow">View Registry</a>
+            </div>
+            <div class="card-body p-0">
+                {% if latest_threats %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped table-hover mb-0 align-middle small">
+                        <thead>
+                            <tr class="text-secondary" style="border-bottom: 2px solid var(--border-color);">
+                                <th class="ps-3">ID</th>
+                                <th>Type</th>
+                                <th>IOC Value</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                                <th class="pe-3">Recorded At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for threat in latest_threats %}
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td class="ps-3 font-outfit text-muted">#{{ threat.id }}</td>
+                                <td><span class="fw-semibold text-light">{{ threat.threat_type }}</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-1.5">
+                                        <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25" style="font-size: 0.65rem;">{{ threat.ioc_type }}</span>
+                                        <a href="{{ url_for('threats.view_threat', threat_id=threat.id) }}" class="text-accent-glow text-decoration-none font-outfit fw-medium" style="word-break: break-all;">{{ threat.ioc_value }}</a>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if threat.severity == 'Critical' %}
+                                        <span class="badge bg-danger text-light border border-danger border-opacity-25">Critical</span>
+                                    {% elif threat.severity == 'High' %}
+                                        <span class="badge bg-warning text-dark border border-warning border-opacity-25">High</span>
+                                    {% elif threat.severity == 'Medium' %}
+                                        <span class="badge bg-info text-dark border border-info border-opacity-25">Medium</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary text-light border border-secondary border-opacity-25">Low</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'primary' if threat.status == 'New' else 'warning' if threat.status == 'Under Investigation' else 'success' }}-subtle text-{{ 'primary' if threat.status == 'New' else 'warning' if threat.status == 'Under Investigation' else 'success' }}">
+                                        {{ threat.status }}
+                                    </span>
+                                </td>
+                                <td class="pe-3 text-muted">{{ threat.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else: %}
+                <div class="text-center py-4 text-muted">No threat indicators recorded.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Latest 5 incidents -->
+        <div class="card border border-secondary-subtle bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-exclamation-triangle text-accent-glow me-2"></i>Active Escalations Registry</h5>
+                <a href="{{ url_for('incidents.list_incidents') }}" class="badge bg-secondary-subtle border border-secondary text-light px-2 py-1.5 text-decoration-none hover-glow">View Incidents</a>
+            </div>
+            <div class="card-body p-0">
+                {% if latest_incidents %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped table-hover mb-0 align-middle small">
+                        <thead>
+                            <tr class="text-secondary" style="border-bottom: 2px solid var(--border-color);">
+                                <th class="ps-3">Incident #</th>
+                                <th>Title</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                                <th>Assigned To</th>
+                                <th class="pe-3">Escalated Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inc in latest_incidents %}
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td class="ps-3"><a href="{{ url_for('incidents.view_incident', incident_id=inc.id) }}" class="text-accent-glow fw-bold text-decoration-none">{{ inc.incident_number }}</a></td>
+                                <td><span class="text-light fw-bold">{{ inc.title }}</span></td>
+                                <td>
+                                    <span class="badge bg-{{ 'danger' if inc.severity == 'Critical' else 'warning' if inc.severity == 'High' else 'info' }}-subtle text-{{ 'danger' if inc.severity == 'Critical' else 'warning' if inc.severity == 'High' else 'info' }}">
+                                        {{ inc.severity }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25">{{ inc.status }}</span>
+                                </td>
+                                <td><span class="text-secondary">{{ inc.assignee.username if inc.assignee else 'Unassigned' }}</span></td>
+                                <td class="pe-3 text-muted">{{ inc.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else: %}
+                <div class="text-center py-4 text-muted">No security incidents logged.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right column: Notifications & Activity -->
+    <div class="col-12 col-xl-3 d-flex flex-column gap-4">
+        <!-- Live Notifications -->
+        <div class="card border border-secondary-subtle bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-bell text-accent-glow me-2"></i>My Real-time Feed</h5>
+            </div>
+            <div class="card-body p-0">
+                <div id="dashboard-notif-widget-list" class="list-group list-group-flush bg-transparent overflow-y-auto" style="max-height: 380px;">
+                    {% if recent_notifications %}
+                        {% for notif in recent_notifications %}
+                        <div class="list-group-item bg-transparent text-light border-secondary-subtle px-3 py-3 notification-item {% if notif.status == 'Unread' %}unread-highlight{% endif %}" data-id="{{ notif.id }}" style="border-radius: 0 !important;">
+                            <div class="d-flex align-items-start gap-2">
+                                <span class="badge bg-{{ notif.priority_class }} p-1 mt-0.5 rounded-circle" style="width: 8px; height: 8px;"></span>
+                                <div class="flex-grow-1 min-w-0">
+                                    <div class="d-flex justify-content-between align-items-center mb-0.5">
+                                        <span class="fw-semibold text-light text-truncate font-outfit small" style="max-width: 140px;">{{ notif.title }}</span>
+                                        <span class="badge bg-{{ notif.priority_class }} text-dark" style="font-size: 0.6rem;">{{ notif.priority }}</span>
+                                    </div>
+                                    <p class="text-secondary mb-1 text-truncate-2 small" style="font-size: 0.72rem; line-height: 1.2; white-space: normal;">{{ notif.message }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted" style="font-size: 0.65rem;">{{ notif.relative_time }}</span>
+                                        {% if notif.status == 'Unread' %}
+                                        <span class="unread-dot bg-danger d-inline-block rounded-circle" style="width: 6px; height: 6px;"></span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4 text-muted small">No notifications available.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card border border-secondary-subtle bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-clock-history text-accent-glow me-2"></i>Recent Activity</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush bg-transparent overflow-y-auto" style="max-height: 380px;">
+                    {% for act in recent_activity %}
+                    <div class="list-group-item bg-transparent text-light border-secondary-subtle px-3 py-3" style="border-radius: 0 !important;">
+                        <div class="d-flex align-items-start gap-2">
+                            <span class="badge {{ act.badge_class }} p-1 mt-0.5 rounded-circle">
+                                <i class="bi {{ act.icon }} fs-7"></i>
+                            </span>
+                            <div>
+                                <p class="mb-0 small text-light">{{ act.message }}</p>
+                                <span class="text-muted" style="font-size: 0.7rem;">{{ act.timestamp.strftime('%Y-%m-%d %H:%M') }} UTC</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 1. Severity Distribution
+    const severityCtx = document.getElementById('severityChart').getContext('2d');
+    new Chart(severityCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Critical', 'High', 'Medium', 'Low'],
+            datasets: [{
+                data: [
+                    {{ severity_counts['Critical'] }},
+                    {{ severity_counts['High'] }},
+                    {{ severity_counts['Medium'] }},
+                    {{ severity_counts['Low'] }}
+                ],
+                backgroundColor: ['#dc3545', '#ffc107', '#0dcaf0', '#6c757d'],
+                borderColor: '#101626',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#9ca3af', font: { family: 'Outfit', size: 9 } }
+                }
+            },
+            cutout: '70%'
+        }
+    });
+
+    // 2. Threat Types Distribution
+    const threatTypesCtx = document.getElementById('threatTypesChart').getContext('2d');
+    new Chart(threatTypesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ threat_types_data.keys() | list | tojson }},
+            datasets: [{
+                data: {{ threat_types_data.values() | list | tojson }},
+                backgroundColor: ['#0d6efd', '#20c997', '#6f42c1', '#fd7e14', '#0dcaf0', '#e83e8c'],
+                borderColor: '#101626',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#9ca3af', font: { family: 'Outfit', size: 9 } }
+                }
+            },
+            cutout: '70%'
+        }
+    });
+
+    // 3. Threats and Incidents Trend
+    const ingestionTrendCtx = document.getElementById('ingestionTrendChart').getContext('2d');
+    new Chart(ingestionTrendCtx, {
+        type: 'line',
+        data: {
+            labels: {{ trend_labels | tojson }},
+            datasets: [
+                {
+                    label: 'Threats',
+                    data: {{ threat_trend_values | tojson }},
+                    borderColor: '#00f0ff',
+                    backgroundColor: 'rgba(0, 240, 255, 0.04)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: '#00f0ff',
+                    pointRadius: 2
+                },
+                {
+                    label: 'Incidents',
+                    data: {{ incident_trend_values | tojson }},
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.04)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: '#3b82f6',
+                    pointRadius: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { ticks: { color: '#9ca3af', font: { family: 'Inter', size: 9 } }, grid: { display: false } },
+                y: { ticks: { color: '#9ca3af', stepSize: 1 }, beginAtZero: true }
+            },
+            plugins: { legend: { labels: { color: '#9ca3af', font: { size: 9 } } } }
+        }
+    });
+
+    // 4. Alerts and Notifications Trends
+    const alertNotifTrendCtx = document.getElementById('alertNotifTrendChart').getContext('2d');
+    new Chart(alertNotifTrendCtx, {
+        type: 'line',
+        data: {
+            labels: {{ trend_labels | tojson }},
+            datasets: [
+                {
+                    label: 'Alerts',
+                    data: {{ alert_trend_values | tojson }},
+                    borderColor: '#ffc107',
+                    backgroundColor: 'rgba(255, 193, 7, 0.04)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: '#ffc107',
+                    pointRadius: 2
+                },
+                {
+                    label: 'Notifications',
+                    data: {{ notification_trend_values | tojson }},
+                    borderColor: '#6f42c1',
+                    backgroundColor: 'rgba(111, 66, 193, 0.04)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: '#6f42c1',
+                    pointRadius: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { ticks: { color: '#9ca3af', font: { family: 'Inter', size: 9 } }, grid: { display: false } },
+                y: { ticks: { color: '#9ca3af', stepSize: 1 }, beginAtZero: true }
+            },
+            plugins: { legend: { labels: { color: '#9ca3af', font: { size: 9 } } } }
+        }
+    });
+
+    // 5. Risk Confidence Brackets
+    const riskCtx = document.getElementById('riskChart').getContext('2d');
+    new Chart(riskCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ risk_brackets.keys() | list | tojson }},
+            datasets: [{
+                data: {{ risk_brackets.values() | list | tojson }},
+                backgroundColor: '#20c997',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { ticks: { color: '#9ca3af', font: { size: 8 } }, grid: { display: false } },
+                y: { ticks: { color: '#9ca3af', stepSize: 1 }, beginAtZero: true }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // 6. Threat Intel Source Pie Chart
+    const sourceCtx = document.getElementById('sourceChart').getContext('2d');
+    new Chart(sourceCtx, {
+        type: 'pie',
+        data: {
+            labels: {{ sources_data.keys() | list | tojson }},
+            datasets: [{
+                data: {{ sources_data.values() | list | tojson }},
+                backgroundColor: ['#fd7e14', '#0d6efd', '#20c997', '#6f42c1', '#e83e8c'],
+                borderColor: '#101626',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#9ca3af', font: { size: 8 } }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

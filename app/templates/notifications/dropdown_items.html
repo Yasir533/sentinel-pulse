@@ -1,0 +1,26 @@
+{% if notifications %}
+    {% for notif in notifications %}
+        <a href="{{ notif.link_url }}" class="list-group-item list-group-item-action bg-panel text-light border-bottom border-secondary border-opacity-25 p-2.5 notification-item {% if notif.status == 'Unread' %}unread-highlight{% endif %}" data-id="{{ notif.id }}" style="border-radius: 0 !important;">
+            <div class="d-flex align-items-start gap-2">
+                <div class="notif-icon text-{{ notif.color_class }}">
+                    <i class="bi {{ notif.icon_class }} fs-6"></i>
+                </div>
+                <div class="flex-grow-1 min-w-0">
+                    <div class="d-flex justify-content-between align-items-center mb-0.5">
+                        <span class="fw-semibold text-truncate font-outfit small text-light" style="max-width: 140px;">{{ notif.title }}</span>
+                        <span class="badge bg-{{ notif.priority_class }} text-dark" style="font-size: 0.6rem;">{{ notif.priority }}</span>
+                    </div>
+                    <p class="text-secondary mb-1 text-truncate-2 small" style="font-size: 0.75rem; line-height: 1.2; white-space: normal;">{{ notif.message }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small" style="font-size: 0.65rem;">{{ notif.relative_time }}</span>
+                        {% if notif.status == 'Unread' %}
+                            <span class="unread-dot bg-danger d-inline-block rounded-circle" style="width: 6px; height: 6px;"></span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </a>
+    {% endfor %}
+{% else %}
+    <div class="text-center py-4 text-muted small">No notifications yet.</div>
+{% endif %}

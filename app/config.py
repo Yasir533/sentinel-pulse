@@ -1,0 +1,90 @@
+import os
+import secrets
+from datetime import timedelta
+
+# Resolve base directory of the application
+BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+
+class BaseConfig:
+    """Base Configuration holding settings common to all environments."""
+    # Security Keys
+    SECRET_KEY = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or secrets.token_hex(32)
+    
+    # Session / Token Expirations
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+    PERMANENT_SESSION_LIFETIME = timedelta(days=7)
+    
+    # SQLAlchemy
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
+    # Database default (SQLite in instance folder)
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or f"sqlite:///{os.path.join(BASE_DIR, 'instance', 'sentinel_pulse.db')}"
+    # Ensure relative SQLite URIs resolve to absolute path within instance folder
+    db_url = os.environ.get('DATABASE_URL')
+    if db_url and db_url.startswith('sqlite:///'):
+        path_part = db_url.replace('sqlite:///', '')
+        if not os.path.isabs(path_part):
+            SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.abspath(os.path.join(BASE_DIR, path_part))}"
+
+    # VirusTotal Integration Configuration
+    VIRUSTOTAL_API_KEY = os.environ.get('VIRUSTOTAL_API_KEY', '')
+
+    # AbuseIPDB Integration Configuration
+    ABUSEIPDB_API_KEY = os.environ.get('ABUSEIPDB_API_KEY', '')
+
+
+    # Mail Server Configuration
+    MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+    MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'True').lower() in ('true', '1', 't')
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'sentinel-pulse@yourdomain.com')
+
+    # Celery Configuration
+    CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+    CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+    
+    # CORS Configuration
+    CORS_RESOURCES = {r"/api/*": {"origins": "*"}}
+
+
+class DevelopmentConfig(BaseConfig):
+    """Development configuration."""
+    DEBUG = True
+    ENV = 'development'
+
+
+class TestingConfig(BaseConfig):
+    """Testing configuration."""
+    TESTING = True
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    WTF_CSRF_ENABLED = False
+    JWT_COOKIE_CSRF_PROTECT = False
+
+
+class ProductionConfig(BaseConfig):
+    """Production configuration."""
+    DEBUG = False
+    TESTING = False
+    
+    # Ensure production environment has actual environment variables set
+    @classmethod
+    def init_app(cls, app):
+        # We can add checks here to warn if keys are not explicitly set in the env
+        if os.environ.get('SECRET_KEY') is None:
+            app.logger.warning("SECRET_KEY environment variable is not set. Using auto-generated key.")
+        if os.environ.get('JWT_SECRET_KEY') is None:
+            app.logger.warning("JWT_SECRET_KEY environment variable is not set. Using auto-generated key.")
+
+
+# Map configurations by environment string
+config_by_name = {
+    'development': DevelopmentConfig,
+    'testing': TestingConfig,
+    'production': ProductionConfig,
+    'default': DevelopmentConfig
+}

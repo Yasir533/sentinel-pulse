@@ -1,0 +1,106 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Log In | Sentinel Pulse Console{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-12 col-md-8 col-lg-5">
+        <div class="card bg-panel border border-secondary-subtle" style="box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle text-center py-4">
+                <div class="brand-logo-icon mb-2">
+                    <svg width="50" height="50" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 8px var(--accent-glow, #00f0ff));">
+                        <defs>
+                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="var(--accent-glow, #00f0ff)" />
+                                <stop offset="100%" stop-color="var(--accent-blue, #0052cc)" />
+                            </linearGradient>
+                        </defs>
+                        <polygon points="50,3 90,26 90,74 50,97 10,74 10,26" stroke="url(#logoGradient)" stroke-width="6" stroke-linejoin="round" fill="rgba(var(--accent-glow-rgb, 0, 240, 255), 0.05)" />
+                        <path d="M50,18 C65,18 73,23 73,35 C73,58 50,82 50,82 C50,82 27,58 27,35 C27,23 35,18 50,18 Z" fill="url(#logoGradient)" fill-opacity="0.15" stroke="url(#logoGradient)" stroke-width="3" />
+                        <path d="M22,50 L38,50 L44,32 L50,68 L56,42 L62,55 L68,50 L78,50" stroke="url(#logoGradient)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="50" cy="30" r="3.5" fill="#ffffff" />
+                        <circle cx="44" cy="32" r="3" fill="var(--accent-glow, #00f0ff)" />
+                        <circle cx="56" cy="42" r="3" fill="var(--accent-glow, #00f0ff)" />
+                    </svg>
+                </div>
+                <h3 class="font-outfit fw-bold text-light mb-1">Access Sentinel Console</h3>
+                <p class="text-muted small mb-0">Enter credentials to establish a secure operator session.</p>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ url_for('auth.login') }}" method="POST" class="needs-validation" novalidate>
+                    <!-- Username or Email Field -->
+                    <div class="mb-3">
+                        <label for="username_or_email" class="form-label text-secondary small fw-semibold">Username or Email Address</label>
+                        <div class="position-relative">
+                            <input type="text" 
+                                   class="form-control form-control-dark ps-3" 
+                                   id="username_or_email" 
+                                   name="username_or_email" 
+                                   placeholder="operator@sentinelpulse.local" 
+                                   required 
+                                   value="{{ request.form.get('username_or_email', '') }}">
+                            <div class="invalid-feedback">
+                                Please enter your username or email address.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label text-secondary small fw-semibold">Password</label>
+                        <input type="password" 
+                               class="form-control form-control-dark ps-3" 
+                               id="password" 
+                               name="password" 
+                               placeholder="••••••••" 
+                               required>
+                        <div class="invalid-feedback">
+                            Password is required to authenticate.
+                        </div>
+                    </div>
+
+                    <!-- Remember Me Checkbox -->
+                    <div class="mb-4 d-flex justify-content-between align-items-center">
+                        <div class="form-check">
+                            <input class="form-check-input bg-dark border-secondary" type="checkbox" id="remember_me" name="remember_me" value="true">
+                            <label class="form-check-label text-secondary small" for="remember_me">
+                                Keep session active (Remember Me)
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary py-2 fw-semibold font-outfit d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-box-arrow-in-right"></i> Authenticate Credentials
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-transparent border-top border-secondary-subtle text-center py-3">
+                <p class="text-secondary small mb-0">
+                    New operator? <a href="{{ url_for('auth.register') }}" class="text-accent-glow text-decoration-none fw-semibold">Register security account</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Enable Bootstrap client-side form validation
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (forms) {
+                forms.addEventListener('submit', function (event) {
+                    if (!forms.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    forms.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
+{% endblock %}

@@ -1,0 +1,245 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Incident Registry | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<!-- Page Heading -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="page-title mb-1 text-light">Incident Management Control</h1>
+        <p class="text-muted mb-0">Track and respond to active threat indicators and security dossiers.</p>
+    </div>
+    {% if current_user.role in ['Admin', 'Analyst'] %}
+    <div>
+        <a href="{{ url_for('incidents.new_incident') }}" class="btn btn-primary d-flex align-items-center gap-2 font-outfit">
+            <i class="bi bi-plus-lg"></i> + Escalate Incident
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Search & Filters Card -->
+<div class="card bg-panel border border-secondary-subtle mb-4">
+    <div class="card-body p-3">
+        <form method="GET" action="{{ url_for('incidents.list_incidents') }}" class="row g-2 align-items-end">
+            <!-- Search Text -->
+            <div class="col-12 col-md-3">
+                <label for="q" class="form-label text-secondary small fw-semibold">Search Keywords</label>
+                <input type="text" class="form-control form-control-dark text-light border-secondary bg-dark" id="q" name="q" placeholder="Search Title, IOC, number..." value="{{ search_query }}">
+            </div>
+
+            <!-- Severity Filter -->
+            <div class="col-6 col-md-1.5">
+                <label for="severity" class="form-label text-secondary small fw-semibold">Severity</label>
+                <select class="form-select form-control-dark bg-dark text-light border-secondary" id="severity" name="severity">
+                    <option value="">All Severities</option>
+                    {% for s in severities %}
+                        <option value="{{ s }}" {% if selected_severity == s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Status Filter -->
+            <div class="col-6 col-md-1.5">
+                <label for="status" class="form-label text-secondary small fw-semibold">Status</label>
+                <select class="form-select form-control-dark bg-dark text-light border-secondary" id="status" name="status">
+                    <option value="">All Statuses</option>
+                    {% for st in statuses %}
+                        <option value="{{ st }}" {% if selected_status == st %}selected{% endif %}>{{ st }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Threat Type Filter -->
+            <div class="col-6 col-md-1.5">
+                <label for="threat_type" class="form-label text-secondary small fw-semibold">Threat Type</label>
+                <select class="form-select form-control-dark bg-dark text-light border-secondary" id="threat_type" name="threat_type">
+                    <option value="">All Types</option>
+                    {% for t in threat_types %}
+                        <option value="{{ t }}" {% if selected_threat_type == t %}selected{% endif %}>{{ t }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- IOC Type Filter -->
+            <div class="col-6 col-md-1.5">
+                <label for="ioc_type" class="form-label text-secondary small fw-semibold">IOC Type</label>
+                <select class="form-select form-control-dark bg-dark text-light border-secondary" id="ioc_type" name="ioc_type">
+                    <option value="">All IOC Types</option>
+                    <option value="IP Address" {% if selected_ioc_type == "IP Address" %}selected{% endif %}>IP Address</option>
+                    <option value="Domain" {% if selected_ioc_type == "Domain" %}selected{% endif %}>Domain</option>
+                    <option value="URL" {% if selected_ioc_type == "URL" %}selected{% endif %}>URL</option>
+                    <option value="MD5" {% if selected_ioc_type == "MD5" %}selected{% endif %}>MD5 Hash</option>
+                    <option value="SHA256" {% if selected_ioc_type == "SHA256" %}selected{% endif %}>SHA-256 Hash</option>
+                    <option value="Email" {% if selected_ioc_type == "Email" %}selected{% endif %}>Email Address</option>
+                    <option value="Username" {% if selected_ioc_type == "Username" %}selected{% endif %}>Username</option>
+                    <option value="File Path" {% if selected_ioc_type == "File Path" %}selected{% endif %}>File Path</option>
+                    <option value="Other" {% if selected_ioc_type == "Other" %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+
+            <!-- Assigned Analyst Filter -->
+            <div class="col-6 col-md-1.5">
+                <label for="assigned_to" class="form-label text-secondary small fw-semibold">Assigned Analyst</label>
+                <select class="form-select form-control-dark bg-dark text-light border-secondary" id="assigned_to" name="assigned_to">
+                    <option value="">All Analysts</option>
+                    {% for u in users %}
+                        <option value="{{ u.id }}" {% if selected_analyst == u.id|string %}selected{% endif %}>{{ u.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Sort By -->
+            <div class="col-6 col-md-1.5">
+                <label for="sort_by" class="form-label text-secondary small fw-semibold">Sort By</label>
+                <select class="form-select form-control-dark bg-dark text-light border-secondary" id="sort_by" name="sort_by">
+                    <option value="created_at_desc" {% if sort_by == 'created_at_desc' %}selected{% endif %}>Date (Newest)</option>
+                    <option value="created_at_asc" {% if sort_by == 'created_at_asc' %}selected{% endif %}>Date (Oldest)</option>
+                    <option value="severity_desc" {% if sort_by == 'severity_desc' %}selected{% endif %}>Severity (Highest)</option>
+                </select>
+            </div>
+
+            <!-- Date Range: Start -->
+            <div class="col-6 col-md-1">
+                <label for="start_date" class="form-label text-secondary small fw-semibold">From</label>
+                <input type="date" class="form-control form-control-dark text-light border-secondary bg-dark" id="start_date" name="start_date" value="{{ start_date }}" style="font-size: 0.8rem; padding: 0.375rem 0.5rem;">
+            </div>
+
+            <!-- Date Range: End -->
+            <div class="col-6 col-md-1">
+                <label for="end_date" class="form-label text-secondary small fw-semibold">To</label>
+                <input type="date" class="form-control form-control-dark text-light border-secondary bg-dark" id="end_date" name="end_date" value="{{ end_date }}" style="font-size: 0.8rem; padding: 0.375rem 0.5rem;">
+            </div>
+
+            <!-- Actions -->
+            <div class="col-12 col-md-auto ms-md-auto d-flex gap-2">
+                <button type="submit" class="btn btn-outline-info flex-grow-1 flex-md-grow-0 d-flex align-items-center justify-content-center gap-1">
+                    <i class="bi bi-filter"></i> Apply
+                </button>
+                <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-outline-secondary flex-grow-1 flex-md-grow-0 d-flex align-items-center justify-content-center">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Incidents Table Card -->
+<div class="card bg-panel border border-secondary-subtle">
+    <div class="card-body p-0">
+        {% if incidents %}
+        <div class="table-responsive">
+            <table class="table table-dark table-striped table-hover mb-0 align-middle">
+                <thead>
+                    <tr class="text-secondary small" style="border-bottom: 2px solid var(--border-color);">
+                        <th class="ps-4">Incident Number</th>
+                        <th>Title</th>
+                        <th>Threat Type</th>
+                        <th>IOC Type</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Assigned Analyst</th>
+                        <th>Created By</th>
+                        <th>Created Date</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inc in incidents %}
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td class="ps-4 font-outfit text-accent-glow fw-semibold">
+                            <a href="{{ url_for('incidents.view_incident', incident_id=inc.id) }}" class="text-decoration-none text-accent-glow">{{ inc.incident_number }}</a>
+                        </td>
+                        <td>
+                            <span class="text-light fw-medium">{{ inc.title }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25 small" style="font-size: 0.65rem;">{{ inc.threat.threat_type }}</span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-1.5">
+                                <span class="badge bg-dark border border-secondary border-opacity-50 text-light small" style="font-size: 0.65rem;">{{ inc.threat.ioc_type }}</span>
+                                <a href="{{ url_for('threats.view_threat', threat_id=inc.threat.id) }}" class="text-secondary text-decoration-none font-outfit small" style="word-break: break-all;">{{ inc.threat.ioc_value }}</a>
+                            </div>
+                        </td>
+                        <td>
+                            {% if inc.severity == 'Critical' %}
+                                <span class="badge bg-danger text-light border border-danger border-opacity-25" style="box-shadow: 0 0 8px rgba(220, 53, 69, 0.2);">Critical</span>
+                            {% elif inc.severity == 'High' %}
+                                <span class="badge text-light border border-opacity-25" style="background-color: #fd7e14; border-color: #fd7e14; box-shadow: 0 0 8px rgba(253, 126, 20, 0.2);">High</span>
+                            {% elif inc.severity == 'Medium' %}
+                                <span class="badge bg-warning text-dark border border-warning border-opacity-25">Medium</span>
+                            {% else %}
+                                <span class="badge bg-success text-light border border-success border-opacity-25">Low</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if inc.status == 'Open' %}
+                                <span class="badge bg-primary text-light border border-primary border-opacity-25">Open</span>
+                            {% elif inc.status == 'In Progress' %}
+                                <span class="badge bg-info text-dark border border-info border-opacity-25">In Progress</span>
+                            {% elif inc.status == 'Under Investigation' %}
+                                <span class="badge bg-warning text-dark border border-warning border-opacity-25">Under Investigation</span>
+                            {% elif inc.status == 'Resolved' %}
+                                <span class="badge bg-success text-light border border-success border-opacity-25" style="box-shadow: 0 0 8px rgba(25, 135, 84, 0.2);">Resolved</span>
+                            {% else %}
+                                <span class="badge bg-dark text-muted border border-secondary border-opacity-25">Closed</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if inc.assignee %}
+                                <span class="text-light fw-medium">{{ inc.assignee.username }}</span>
+                            {% else %}
+                                <span class="text-muted italic">Unassigned</span>
+                            {% endif %}
+                        </td>
+                        <td><span class="text-secondary small">{{ inc.creator.username }}</span></td>
+                        <td><span class="text-muted small">{{ inc.created_at.strftime('%Y-%m-%d %H:%M') }}</span></td>
+                        <td class="text-end pe-4">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{{ url_for('incidents.view_incident', incident_id=inc.id) }}" class="btn btn-icon-only btn-outline-info" title="View incident details"><i class="bi bi-eye"></i></a>
+                                {% if current_user.role in ['Admin', 'Analyst'] %}
+                                <a href="{{ url_for('incidents.edit_incident', incident_id=inc.id) }}" class="btn btn-icon-only btn-outline-warning" title="Edit incident"><i class="bi bi-pencil"></i></a>
+                                {% endif %}
+                                {% if current_user.role == 'Admin' %}
+                                <form action="{{ url_for('incidents.delete_incident', incident_id=inc.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this incident dossier?');">
+                                    <button type="submit" class="btn btn-icon-only btn-outline-danger" title="Delete incident"><i class="bi bi-trash"></i></button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if pagination and pagination.pages > 1 %}
+        <div class="card-footer bg-transparent border-top border-secondary-subtle py-3 d-flex justify-content-between align-items-center">
+            <span class="text-muted small">Showing {{ incidents|length }} of {{ pagination.total }} incidents</span>
+            <nav aria-label="Incident pagination">
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                        <a class="page-link bg-dark border-secondary text-light" href="{{ url_for('incidents.list_incidents', page=pagination.prev_num, q=search_query, severity=selected_severity, status=selected_status, assigned_to=selected_analyst, start_date=start_date, end_date=end_date, threat_type=selected_threat_type, sort_by=sort_by) }}"><i class="bi bi-chevron-left"></i></a>
+                    </li>
+                    {% for p in pagination.iter_pages() %}
+                        {% if p %}
+                            <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                                <a class="page-link {% if p == pagination.page %}bg-primary text-light border-primary{% else %}bg-dark border-secondary text-light{% endif %}" href="{{ url_for('incidents.list_incidents', page=p, q=search_query, severity=selected_severity, status=selected_status, assigned_to=selected_analyst, start_date=start_date, end_date=end_date, threat_type=selected_threat_type, sort_by=sort_by) }}">{{ p }}</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link bg-dark border-secondary text-muted">...</span></li>
+                        {% endif %}
+                    {% endfor %}
+                    <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                        <a class="page-link bg-dark border-secondary text-light" href="{{ url_for('incidents.list_incidents', page=pagination.next_num, q=search_query, severity=selected_severity, status=selected_status, assigned_to=selected_analyst, start_date=start_date, end_date=end_date, threat_type=selected_threat_type, sort_by=sort_by) }}"><i class="bi bi-chevron-right"></i></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="text-center py-5 text-muted small">No security incidents active in the queue. System clear.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

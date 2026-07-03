@@ -1,0 +1,247 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}SOC Reports | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="page-title font-outfit text-light mb-1">SOC Reports</h1>
+    <p class="text-secondary small mb-0">Review threat intelligence summaries, incident resolution summaries, and database logs.</p>
+</div>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show" role="alert" style="background: rgba(15, 23, 42, 0.9); border-color: rgba(255,255,255,0.1);">
+                <span class="text-light">{{ message }}</span>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<!-- Available Reports Card -->
+<div class="card border border-secondary-subtle bg-panel mb-4">
+    <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h5 class="mb-0 font-outfit text-light"><i class="bi bi-file-earmark-bar-graph text-accent-glow me-2"></i>Available Reports</h5>
+        
+        {% if current_user.role == 'Admin' %}
+        <form action="{{ url_for('reports.generate_report') }}" method="POST" id="generate-report-form" class="d-flex align-items-center gap-2">
+            <select name="report_type" class="form-select form-select-sm form-control-dark" style="width: auto;" required>
+                <option value="" disabled selected>Select Report Type</option>
+                <option value="Executive Security Report">Executive Security Report</option>
+                <option value="Threat Intelligence Report">Threat Intelligence Report</option>
+                <option value="Incident Summary Report">Incident Summary Report</option>
+                <option value="Alert Summary Report">Alert Summary Report</option>
+                <option value="Notification Report">Notification Report</option>
+                <option value="Analyst Activity Report">Analyst Activity Report</option>
+                <option value="User Activity Report">User Activity Report</option>
+                <option value="Audit Report">Audit Report</option>
+                <option value="IOC Report">IOC Report</option>
+                <option value="Monthly SOC Report">Monthly SOC Report</option>
+                <option value="Weekly SOC Report">Weekly SOC Report</option>
+                <option value="Daily SOC Report">Daily SOC Report</option>
+            </select>
+            <button type="submit" id="generate-btn" class="btn btn-primary btn-sm d-flex align-items-center gap-1">
+                <span id="btn-text">Generate Report</span>
+                <span id="btn-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+            </button>
+        </form>
+        {% endif %}
+    </div>
+    
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-dark table-striped table-hover mb-0 align-middle small">
+                <thead>
+                    <tr class="text-secondary" style="border-bottom: 2px solid var(--border-color);">
+                        <th class="ps-3">Report Number</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Created By</th>
+                        <th>Timestamp</th>
+                        <th class="pe-3 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if reports %}
+                        {% for report in reports %}
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td class="ps-3"><a href="{{ url_for('reports.preview_report', report_id=report.id) }}" class="text-accent-glow fw-bold text-decoration-none">{{ report.report_number }}</a></td>
+                                <td><span class="text-light fw-bold">{{ report.title }}</span></td>
+                                <td><span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25">{{ report.report_type }}</span></td>
+                                <td><span class="text-secondary">{{ report.creator.username if report.creator else 'System' }}</span></td>
+                                <td><span class="text-muted">{{ report.created_at.strftime('%Y-%m-%d %H:%M') }}</span></td>
+                                <td class="pe-3 text-end">
+                                    <div class="d-inline-flex gap-1 justify-content-end align-items-center">
+                                        <a href="{{ url_for('reports.preview_report', report_id=report.id) }}" class="btn btn-outline-info btn-xs px-2 py-0.5" style="font-size: 0.75rem;"><i class="bi bi-eye me-1"></i>Preview</a>
+                                        <div class="dropdown d-inline-block">
+                                            <button class="btn btn-outline-secondary btn-xs dropdown-toggle px-2 py-0.5" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.75rem;">
+                                                <i class="bi bi-download me-1"></i>Download
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" style="background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255,255,255,0.1);">
+                                                <li><a class="dropdown-item small" href="{{ url_for('reports.download_pdf', report_id=report.id) }}"><i class="bi bi-file-pdf text-danger me-2"></i>PDF Report</a></li>
+                                                <li><a class="dropdown-item small" href="{{ url_for('reports.download_excel', report_id=report.id) }}"><i class="bi bi-file-excel text-success me-2"></i>Excel Spread</a></li>
+                                                <li><a class="dropdown-item small" href="{{ url_for('reports.download_csv', report_id=report.id) }}"><i class="bi bi-filetype-csv text-warning me-2"></i>CSV Log</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else: %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No reports generated yet. Click "Generate Report" above to compile data.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    {% if pagination and pagination.pages > 1 %}
+    <div class="card-footer bg-transparent border-top border-secondary-subtle py-3 d-flex justify-content-between align-items-center">
+        <span class="text-muted small">Showing page {{ pagination.page }} of {{ pagination.pages }}</span>
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                    <a class="page-link bg-dark border-secondary text-light" href="{% if pagination.has_prev %}{{ url_for('reports.list_reports', page=pagination.prev_num) }}{% else %}#{% endif %}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo; Prev</span>
+                    </a>
+                </li>
+                {% for p in pagination.iter_pages(left_edge=1, left_current=2, right_current=2, right_edge=1) %}
+                    {% if p %}
+                        <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                            <a class="page-link {% if p == pagination.page %}bg-primary border-primary text-white{% else %}bg-dark border-secondary text-light{% endif %}" href="{{ url_for('reports.list_reports', page=p) }}">{{ p }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link bg-dark border-secondary text-muted">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                    <a class="page-link bg-dark border-secondary text-light" href="{% if pagination.has_next %}{{ url_for('reports.list_reports', page=pagination.next_num) }}{% else %}#{% endif %}" aria-label="Next">
+                        <span aria-hidden="true">Next &raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Scheduled Reports Section -->
+<div class="row g-4">
+    <!-- List of Active Schedules -->
+    <div class="col-12 col-lg-8">
+        <div class="card border border-secondary-subtle bg-panel h-100">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-clock-history text-accent-glow me-2"></i>Report Delivery Schedules</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped table-hover mb-0 align-middle small">
+                        <thead>
+                            <tr class="text-secondary" style="border-bottom: 2px solid var(--border-color);">
+                                <th class="ps-3">Report Type</th>
+                                <th>Frequency</th>
+                                <th>Delivery Email</th>
+                                <th class="pe-3 text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if schedules %}
+                                {% for s in schedules %}
+                                    <tr style="border-bottom: 1px solid var(--border-color);">
+                                        <td class="ps-3 text-light fw-semibold">{{ s.report_type }}</td>
+                                        <td><span class="badge bg-primary-subtle text-primary border border-primary border-opacity-25">{{ s.frequency }}</span></td>
+                                        <td class="text-secondary font-monospace">{{ s.email_recipient }}</td>
+                                        <td class="pe-3 text-end">
+                                            {% if current_user.role == 'Admin' %}
+                                            <form action="{{ url_for('reports.delete_schedule', schedule_id=s.id) }}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-danger btn-xs py-0.5 px-2" style="font-size: 0.72rem;" onclick="return confirm('Cancel this schedule?');">
+                                                    <i class="bi bi-trash-fill"></i> Remove
+                                                </button>
+                                            </form>
+                                            {% else %}
+                                            <span class="text-muted small">Read-only</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">No report delivery schedules established.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Schedule Form (Admin Only) -->
+    <div class="col-12 col-lg-4">
+        <div class="card border border-secondary-subtle bg-panel h-100">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-calendar-plus text-accent-glow me-2"></i>Schedule Automation</h5>
+            </div>
+            <div class="card-body">
+                {% if current_user.role == 'Admin' %}
+                <form action="{{ url_for('reports.new_schedule') }}" method="POST" class="d-flex flex-column gap-3">
+                    <div>
+                        <label class="form-label text-secondary small fw-semibold">Report Type</label>
+                        <select name="report_type" class="form-select form-control-dark" required>
+                            <option value="Executive Security Report">Executive Security Report</option>
+                            <option value="Threat Intelligence Report">Threat Intelligence Report</option>
+                            <option value="Incident Summary Report">Incident Summary Report</option>
+                            <option value="Alert Summary Report">Alert Summary Report</option>
+                            <option value="Monthly SOC Report">Monthly SOC Report</option>
+                            <option value="Weekly SOC Report">Weekly SOC Report</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label text-secondary small fw-semibold">Frequency</label>
+                        <select name="frequency" class="form-select form-control-dark" required>
+                            <option value="Daily">Daily</option>
+                            <option value="Weekly">Weekly</option>
+                            <option value="Monthly">Monthly</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label text-secondary small fw-semibold">Recipient Email</label>
+                        <input type="email" name="email_recipient" class="form-control form-control-dark" placeholder="e.g. secops@company.com" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm mt-2"><i class="bi bi-check2-circle me-1"></i>Establish Schedule</button>
+                </form>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-lock-fill fs-2 text-secondary mb-2 d-block"></i>
+                    <p class="text-muted small mb-0">Only Administrators are authorized to establish automated report delivery schedules.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS Form Loading Spinner Hook -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('generate-report-form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const btn = document.getElementById('generate-btn');
+            const text = document.getElementById('btn-text');
+            const spinner = document.getElementById('btn-spinner');
+            if (btn && text && spinner) {
+                btn.disabled = true;
+                text.textContent = 'Generating...';
+                spinner.classList.remove('d-none');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

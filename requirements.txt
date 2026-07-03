@@ -1,0 +1,22 @@
+# Flask Core & Extensions
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+Flask-Migrate==4.0.7
+Flask-Login==0.6.3
+Flask-JWT-Extended==4.6.0
+Flask-CORS==4.0.1
+Flask-Mail==0.10.0
+requests==2.34.2
+
+# Task Queue (Celery) & Redis client
+Celery==5.4.0
+redis==5.0.4
+
+# Database Drivers
+psycopg2-binary==2.9.9
+
+# Environment Configuration
+python-dotenv==1.0.1
+
+# Testing
+pytest==8.2.1

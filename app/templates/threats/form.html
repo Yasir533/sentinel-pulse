@@ -1,0 +1,154 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}{% if threat %}Edit Threat{% else %}Create Threat{% endif %} | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="page-title mb-1 text-light">{% if threat %}Edit Threat Indicator{% else %}Create Threat Indicator{% endif %}</h1>
+        <p class="text-muted mb-0">{% if threat %}Modify threat metrics and details for existing security indicator.{% else %}Record new security indicator of compromise (IOC).{% endif %}</p>
+    </div>
+    <div>
+        <a href="{{ url_for('threats.list_threats') }}" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+            <i class="bi bi-arrow-left"></i> Back to Threat Feed
+        </a>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="card bg-panel border border-secondary-subtle">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light">
+                    <i class="bi {% if threat %}bi-pencil-square{% else %}bi-plus-circle{% endif %} text-accent-glow me-2"></i>
+                    {% if threat %}Threat Details - ID: {{ threat.id }}{% else %}New Threat Intelligence Record{% endif %}
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form action="{% if threat %}{{ url_for('threats.edit_threat', threat_id=threat.id) }}{% else %}{{ url_for('threats.new_threat') }}{% endif %}" method="POST" class="needs-validation" novalidate>
+                    <div class="row g-3">
+                        <!-- Threat Type -->
+                        <div class="col-md-6">
+                            <label for="threat_type" class="form-label text-secondary small fw-semibold">Threat Type</label>
+                            <select class="form-select form-control-dark ps-3 bg-dark border-secondary text-light" id="threat_type" name="threat_type" required>
+                                <option value="" disabled {% if not threat %}selected{% endif %}>Select Type...</option>
+                                {% for t in threat_types %}
+                                    <option value="{{ t }}" {% if threat and threat.threat_type == t %}selected{% endif %}>{{ t }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select a valid threat type.
+                            </div>
+                        </div>
+
+                        <!-- Severity -->
+                        <div class="col-md-6">
+                            <label for="severity" class="form-label text-secondary small fw-semibold">Severity</label>
+                            <select class="form-select form-control-dark ps-3 bg-dark border-secondary text-light" id="severity" name="severity" required>
+                                <option value="" disabled {% if not threat %}selected{% endif %}>Select Severity...</option>
+                                {% for s in severities %}
+                                    <option value="{{ s }}" {% if threat and threat.severity == s %}selected{% endif %}>{{ s }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select a severity level.
+                            </div>
+                        </div>
+
+                        <!-- IOC Type -->
+                        <div class="col-md-6">
+                            <label for="ioc_type" class="form-label text-secondary small fw-semibold">IOC Type</label>
+                            <select class="form-select form-control-dark ps-3 bg-dark border-secondary text-light" id="ioc_type" name="ioc_type" required>
+                                <option value="" disabled {% if not threat %}selected{% endif %}>Select IOC Type...</option>
+                                <option value="IP Address" {% if threat and threat.ioc_type == "IP Address" %}selected{% endif %}>IP Address</option>
+                                <option value="Domain" {% if threat and threat.ioc_type == "Domain" %}selected{% endif %}>Domain</option>
+                                <option value="URL" {% if threat and threat.ioc_type == "URL" %}selected{% endif %}>URL</option>
+                                <option value="MD5" {% if threat and threat.ioc_type == "MD5" %}selected{% endif %}>MD5 Hash</option>
+                                <option value="SHA256" {% if threat and threat.ioc_type == "SHA256" %}selected{% endif %}>SHA-256 Hash</option>
+                                <option value="Email" {% if threat and threat.ioc_type == "Email" %}selected{% endif %}>Email Address</option>
+                                <option value="Username" {% if threat and threat.ioc_type == "Username" %}selected{% endif %}>Username</option>
+                                <option value="File Path" {% if threat and threat.ioc_type == "File Path" %}selected{% endif %}>File Path</option>
+                                <option value="Other" {% if threat and threat.ioc_type == "Other" %}selected{% endif %}>Other</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select the type of IOC.
+                            </div>
+                        </div>
+
+                        <!-- IOC Value -->
+                        <div class="col-md-6">
+                            <label for="ioc_value" class="form-label text-secondary small fw-semibold">IOC Value</label>
+                            <input type="text" class="form-control form-control-dark ps-3 text-light" id="ioc_value" name="ioc_value" placeholder="e.g. 192.168.1.100 or baddomain.com" required value="{% if threat %}{{ threat.ioc_value }}{% endif %}">
+                            <div class="invalid-feedback">
+                                Please enter the IOC string value.
+                            </div>
+                        </div>
+
+                        <!-- Source -->
+                        <div class="col-md-6">
+                            <label for="source" class="form-label text-secondary small fw-semibold">Source / Intel Feed</label>
+                            <input type="text" class="form-control form-control-dark ps-3 text-light" id="source" name="source" placeholder="e.g. Internal Analytics, AlienVault, OTX" required value="{% if threat %}{{ threat.source }}{% else %}Internal Observation{% endif %}">
+                            <div class="invalid-feedback">
+                                Please enter the threat intelligence source.
+                            </div>
+                        </div>
+
+                        <!-- Confidence Score -->
+                        <div class="col-md-6">
+                            <label for="confidence_score" class="form-label text-secondary small fw-semibold">Confidence Score (0-100)</label>
+                            <input type="number" class="form-control form-control-dark ps-3 text-light" id="confidence_score" name="confidence_score" min="0" max="100" placeholder="e.g. 85" required value="{% if threat %}{{ threat.confidence_score }}{% else %}50{% endif %}">
+                            <div class="invalid-feedback">
+                                Please enter a confidence score between 0 and 100.
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="col-md-12">
+                            <label for="status" class="form-label text-secondary small fw-semibold">Status</label>
+                            <select class="form-select form-control-dark ps-3 bg-dark border-secondary text-light" id="status" name="status" required>
+                                {% for st in statuses %}
+                                    <option value="{{ st }}" {% if threat and threat.status == st %}selected{% elif not threat and st == 'New' %}selected{% endif %}>{{ st }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Please specify threat status.
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-md-12">
+                            <label for="description" class="form-label text-secondary small fw-semibold">Detailed Description</label>
+                            <textarea class="form-control form-control-dark ps-3 text-light" id="description" name="description" rows="4" placeholder="Describe threat behavior, context, and potential mitigation strategies...">{% if threat %}{{ threat.description }}{% endif %}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-4 border-top border-secondary-subtle border-opacity-25 pt-3">
+                        <a href="{{ url_for('threats.list_threats') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold font-outfit d-flex align-items-center gap-2">
+                            <i class="bi bi-save"></i> {% if threat %}Update Intelligence{% else %}Record Intelligence{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Enable Bootstrap client-side form validation
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Access Denied | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5 my-5">
+    <div class="col-12 col-md-8 col-lg-6 text-center">
+        <div class="error-code-container mb-4">
+            <h1 class="display-1 font-outfit text-danger fw-bold" style="text-shadow: 0 0 15px rgba(220, 53, 69, 0.4);">403</h1>
+        </div>
+        <h3 class="fw-semibold mb-3 text-danger">Access Level Insufficient</h3>
+        <p class="text-muted mb-4">Your current security clearance level does not permit access to this section of the Sentinel Pulse platform. Please contact a system administrator if you believe this is an error.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary d-flex align-items-center gap-2">
+                <i class="bi bi-house-door"></i> Return to Console
+            </a>
+            <button class="btn btn-outline-secondary" onclick="window.history.back()">
+                Go Back
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Internal Server Error | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5 my-5">
+    <div class="col-12 col-md-8 col-lg-6 text-center">
+        <div class="error-code-container mb-4">
+            <h1 class="display-1 font-outfit text-danger fw-bold">500</h1>
+        </div>
+        <h3 class="fw-semibold mb-3">Internal Engine Malfunction</h3>
+        <p class="text-muted mb-4">A critical process in our telemetry or data pipelines experienced an unhandled exception. The threat response team has been alerted.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary d-flex align-items-center gap-2">
+                <i class="bi bi-house-door"></i> Return to Console
+            </a>
+            <button class="btn btn-outline-secondary" onclick="window.location.reload()">
+                Retry Operation
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

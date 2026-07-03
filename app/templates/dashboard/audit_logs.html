@@ -1,0 +1,104 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Audit Logs | Admin Console{% endblock %}
+
+{% block content %}
+<div class="mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+        <h1 class="page-title font-outfit text-light mb-1">SOC Compliance Audit Log</h1>
+        <p class="text-secondary small mb-0">Review action logs, operator configurations adjustments, and data updates history.</p>
+    </div>
+    
+    <div class="dropdown">
+        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-download me-1"></i>Export Logs
+        </button>
+        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" style="background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255,255,255,0.1);">
+            <li><a class="dropdown-item small" href="{{ url_for('dashboard.export_entity', entity_type='audit_logs', format_type='pdf') }}"><i class="bi bi-file-pdf text-danger me-2"></i>PDF Registry</a></li>
+            <li><a class="dropdown-item small" href="{{ url_for('dashboard.export_entity', entity_type='audit_logs', format_type='xlsx') }}"><i class="bi bi-file-excel text-success me-2"></i>Excel Spread</a></li>
+            <li><a class="dropdown-item small" href="{{ url_for('dashboard.export_entity', entity_type='audit_logs', format_type='csv') }}"><i class="bi bi-filetype-csv text-warning me-2"></i>CSV Sheet</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="card border border-secondary-subtle bg-panel">
+    <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+        <h5 class="mb-0 font-outfit text-light"><i class="bi bi-shield-check text-accent-glow me-2"></i>System Audit Registry</h5>
+    </div>
+    
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-dark table-striped table-hover mb-0 align-middle small" style="font-size: 0.8rem;">
+                <thead>
+                    <tr class="text-secondary" style="border-bottom: 2px solid var(--border-color);">
+                        <th class="ps-3">Timestamp (UTC)</th>
+                        <th>Operator</th>
+                        <th>Role</th>
+                        <th>IP Address</th>
+                        <th>Action</th>
+                        <th>Entity</th>
+                        <th>Before</th>
+                        <th>After</th>
+                        <th class="pe-3 text-end">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if logs %}
+                        {% for log in logs %}
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td class="ps-3 text-muted">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td class="text-light fw-bold">{{ log.username }}</td>
+                                <td><span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25">{{ log.role }}</span></td>
+                                <td class="text-secondary font-monospace">{{ log.ip_address or 'N/A' }}</td>
+                                <td><span class="fw-bold text-accent-glow">{{ log.action }}</span></td>
+                                <td class="text-light">{{ log.entity }}</td>
+                                <td class="text-muted text-truncate" style="max-width: 150px;" title="{{ log.before_state }}">{{ log.before_state or '-' }}</td>
+                                <td class="text-secondary text-truncate" style="max-width: 200px;" title="{{ log.after_state }}">{{ log.after_state or '-' }}</td>
+                                <td class="pe-3 text-end">
+                                    <span class="badge bg-{{ 'success' if log.status == 'Success' else 'danger' }}-subtle text-{{ 'success' if log.status == 'Success' else 'danger' }}">
+                                        {{ log.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else: %}
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-4">No audit logs available in registry.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    {% if pagination and pagination.pages > 1 %}
+    <div class="card-footer bg-transparent border-top border-secondary-subtle py-3 d-flex justify-content-between align-items-center">
+        <span class="text-muted small">Showing page {{ pagination.page }} of {{ pagination.pages }}</span>
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                    <a class="page-link bg-dark border-secondary text-light" href="{% if pagination.has_prev %}{{ url_for('dashboard.list_audit_logs', page=pagination.prev_num) }}{% else %}#{% endif %}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo; Prev</span>
+                    </a>
+                </li>
+                {% for p in pagination.iter_pages(left_edge=1, left_current=2, right_current=2, right_edge=1) %}
+                    {% if p %}
+                        <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                            <a class="page-link {% if p == pagination.page %}bg-primary border-primary text-white{% else %}bg-dark border-secondary text-light{% endif %}" href="{{ url_for('dashboard.list_audit_logs', page=p) }}">{{ p }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link bg-dark border-secondary text-muted">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                    <a class="page-link bg-dark border-secondary text-light" href="{% if pagination.has_next %}{{ url_for('dashboard.list_audit_logs', page=pagination.next_num) }}{% else %}#{% endif %}" aria-label="Next">
+                        <span aria-hidden="true">Next &raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

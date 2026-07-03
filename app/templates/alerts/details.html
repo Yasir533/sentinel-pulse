@@ -1,0 +1,411 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Alert Details | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<!-- Page Heading -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="page-title mb-1 text-light">Security Alert Details</h1>
+        <p class="text-muted mb-0">System warning generated from high-risk threat telemetry.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('alerts.list_alerts') }}" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+            <i class="bi bi-arrow-left"></i> Back to Queue
+        </a>
+        
+        {% if current_user.role in ['Admin', 'Analyst'] %}
+            {% if alert.status == 'New' %}
+            <form action="{{ url_for('alerts.acknowledge_alert', alert_id=alert.id) }}" method="POST" class="d-inline">
+                <button type="submit" class="btn btn-success d-flex align-items-center gap-2 font-outfit fw-semibold">
+                    <i class="bi bi-check2-circle"></i> Acknowledge Alert
+                </button>
+            </form>
+            {% elif alert.status == 'Acknowledged' %}
+            <form action="{{ url_for('alerts.investigate_alert', alert_id=alert.id) }}" method="POST" class="d-inline">
+                <button type="submit" class="btn btn-warning text-dark d-flex align-items-center gap-2 font-outfit fw-semibold">
+                    <i class="bi bi-hourglass-split"></i> Investigate Alert
+                </button>
+            </form>
+            {% endif %}
+            
+            {% if current_user.role == 'Admin' %}
+                {% if alert.status == 'Investigating' %}
+                <form action="{{ url_for('alerts.resolve_alert', alert_id=alert.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-info text-dark d-flex align-items-center gap-2 font-outfit fw-semibold">
+                        <i class="bi bi-check-all"></i> Resolve Alert
+                    </button>
+                </form>
+                {% elif alert.status == 'Resolved' %}
+                <form action="{{ url_for('alerts.archive_alert', alert_id=alert.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-secondary text-light d-flex align-items-center gap-2 font-outfit fw-semibold">
+                        <i class="bi bi-archive"></i> Archive Alert
+                    </button>
+                </form>
+                {% endif %}
+            {% endif %}
+            
+            {% if not incident_exists %}
+            <a href="{{ url_for('incidents.new_incident', threat_id=alert.threat_id) }}" class="btn btn-warning text-dark fw-semibold d-flex align-items-center gap-2 font-outfit">
+                <i class="bi bi-file-earmark-medical"></i> Create Incident
+            </a>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Main Dossier & Enrichment Information -->
+    <div class="col-12 col-lg-8">
+        <!-- Alert Properties Dossier -->
+        <div class="card bg-panel border border-secondary-subtle mb-4">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 font-outfit text-light">
+                    <i class="bi bi-info-square text-accent-glow me-2"></i> Alert Metadata
+                </h5>
+                <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25 px-2 py-1 rounded small">ID: #{{ alert.id }}</span>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-4 mb-3">
+                    <div class="col-12 col-sm-6">
+                        <span class="text-muted small text-uppercase tracking-wider d-block mb-1">Alert Number</span>
+                        <span class="fs-4 fw-bold text-accent-glow font-outfit">{{ alert.alert_number }}</span>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <span class="text-muted small text-uppercase tracking-wider d-block mb-1">Alert Message</span>
+                        <span class="text-light">{{ alert.message or 'No alert message.' }}</span>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <span class="text-muted small text-uppercase tracking-wider d-block mb-1">Severity</span>
+                        {% if alert.severity == 'Critical' %}
+                            <span class="badge bg-danger text-light px-3 py-2 w-100 font-outfit border border-danger border-opacity-25" style="box-shadow: 0 0 10px rgba(220, 53, 69, 0.2);">Critical</span>
+                        {% elif alert.severity == 'High' %}
+                            <span class="badge text-light px-3 py-2 w-100 font-outfit border border-opacity-25" style="background-color: #f97316; border-color: #f97316; box-shadow: 0 0 10px rgba(249, 115, 22, 0.2);">High</span>
+                        {% elif alert.severity == 'Medium' %}
+                            <span class="badge bg-warning text-dark px-3 py-2 w-100 font-outfit border border-warning border-opacity-25">Medium</span>
+                        {% else %}
+                            <span class="badge bg-success text-light px-3 py-2 w-100 font-outfit border border-success border-opacity-25">Low</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <span class="text-muted small text-uppercase tracking-wider d-block mb-1">Alert Status</span>
+                        {% if alert.status == 'New' %}
+                            <span class="badge bg-primary text-light px-3 py-2 w-100 font-outfit border border-primary border-opacity-25">New</span>
+                        {% elif alert.status == 'Acknowledged' %}
+                            <span class="badge bg-success text-light px-3 py-2 w-100 font-outfit border border-success border-opacity-25">Acknowledged</span>
+                        {% elif alert.status == 'Investigating' %}
+                            <span class="badge bg-warning text-dark px-3 py-2 w-100 font-outfit border border-warning border-opacity-25">Investigating</span>
+                        {% elif alert.status == 'Resolved' %}
+                            <span class="badge bg-secondary text-light px-3 py-2 w-100 font-outfit border border-secondary border-opacity-25">Resolved</span>
+                        {% else %}
+                            <span class="badge bg-dark text-muted px-3 py-2 w-100 font-outfit border border-secondary border-opacity-25">{{ alert.status }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <span class="text-muted small text-uppercase tracking-wider d-block mb-1">Created Time</span>
+                        <span class="text-secondary fw-medium d-block mt-2">{{ alert.created_at.strftime('%Y-%m-%d %H:%M:%S UTC') if alert.created_at else 'N/A' }}</span>
+                    </div>
+                </div>
+                
+                {% if alert.acknowledged_at %}
+                <div class="mt-4 pt-3 border-top border-secondary-subtle border-opacity-25 small text-secondary">
+                    <i class="bi bi-info-circle me-1"></i> Acknowledged on <strong>{{ alert.acknowledged_at.strftime('%Y-%m-%d %H:%M UTC') }}</strong> by <strong>{{ alert.acknowledged_by_user.username if alert.acknowledged_by_user else 'System' }}</strong>
+                </div>
+                {% endif %}
+                
+                {% if alert.resolved_at %}
+                <div class="{% if alert.acknowledged_at %}mt-2{% else %}mt-4 pt-3 border-top border-secondary-subtle border-opacity-25{% endif %} small text-secondary">
+                    <i class="bi bi-check-circle-fill text-success me-1"></i> Resolved on <strong>{{ alert.resolved_at.strftime('%Y-%m-%d %H:%M UTC') }}</strong>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- VirusTotal Enrichment Card -->
+        <div class="card bg-panel border border-secondary-subtle mb-4">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 font-outfit text-light">
+                    <i class="bi bi-shield-shaded text-accent-glow me-2"></i> VirusTotal Intel Enrichment
+                </h5>
+                {% if alert.threat.vt_enrichment %}
+                <span class="badge {% if alert.threat.vt_enrichment.status == 'success' %}bg-success-subtle text-success border-success{% elif alert.threat.vt_enrichment.status == 'failed' %}bg-danger-subtle text-danger border-danger{% else %}bg-warning-subtle text-warning border-warning{% endif %} border border-opacity-25 px-2 py-1 rounded small text-uppercase">
+                    {{ alert.threat.vt_enrichment.status }}
+                </span>
+                {% else %}
+                <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25 px-2 py-1 rounded small text-uppercase">
+                    No Analysis
+                </span>
+                {% endif %}
+            </div>
+            <div class="card-body p-4">
+                {% if not alert.threat.vt_enrichment %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-shield-slash text-muted display-6 mb-3 d-block"></i>
+                        <h6 class="text-light mb-1">No VirusTotal Analysis Available</h6>
+                    </div>
+                {% elif alert.threat.vt_enrichment.status == 'pending' %}
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-accent-glow mb-3" role="status" style="width: 2rem; height: 2rem;"></div>
+                        <h6 class="text-light mb-1">Awaiting Telemetry Report</h6>
+                    </div>
+                {% elif alert.threat.vt_enrichment.status == 'failed' %}
+                    <div class="alert alert-danger border border-danger border-opacity-25 bg-dark bg-opacity-30 d-flex align-items-start gap-3 mb-0" role="alert">
+                        <i class="bi bi-exclamation-octagon-fill fs-5 text-danger"></i>
+                        <div>
+                            <h6 class="alert-heading fw-semibold text-danger mb-1">Analysis Enrichment Failed</h6>
+                            <p class="mb-0 small text-secondary">{{ alert.threat.vt_enrichment.error_message }}</p>
+                        </div>
+                    </div>
+                {% elif alert.threat.vt_enrichment.status == 'success' %}
+                    <!-- Analysis Stats Grid -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6 col-sm-3">
+                            <div class="p-3 bg-dark bg-opacity-20 rounded border border-secondary border-opacity-10 text-center">
+                                <span class="d-block display-6 fw-bold text-danger font-outfit">{{ alert.threat.vt_enrichment.malicious_count }}</span>
+                                <span class="text-muted small text-uppercase tracking-wider">Malicious</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <div class="p-3 bg-dark bg-opacity-20 rounded border border-secondary border-opacity-10 text-center">
+                                <span class="d-block display-6 fw-bold text-warning font-outfit">{{ alert.threat.vt_enrichment.suspicious_count }}</span>
+                                <span class="text-muted small text-uppercase tracking-wider">Suspicious</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <div class="p-3 bg-dark bg-opacity-20 rounded border border-secondary border-opacity-10 text-center">
+                                <span class="d-block display-6 fw-bold text-success font-outfit">{{ alert.threat.vt_enrichment.harmless_count }}</span>
+                                <span class="text-muted small text-uppercase tracking-wider">Harmless</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <div class="p-3 bg-dark bg-opacity-20 rounded border border-secondary border-opacity-10 text-center">
+                                <span class="d-block display-6 fw-bold text-secondary font-outfit">{{ alert.threat.vt_enrichment.undetected_count }}</span>
+                                <span class="text-muted small text-uppercase tracking-wider">Undetected</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reputation & Engine Detections -->
+                    <div class="row g-4">
+                        <div class="col-12 col-md-6">
+                            <h6 class="text-uppercase tracking-wider text-muted small mb-2">Community Reputation</h6>
+                            <div class="p-3 bg-dark bg-opacity-20 rounded border border-secondary border-opacity-10 d-flex align-items-center justify-content-between">
+                                <div>
+                                    <span class="fs-4 fw-bold font-outfit {% if alert.threat.vt_enrichment.reputation > 0 %}text-success{% elif alert.threat.vt_enrichment.reputation < 0 %}text-danger{% else %}text-secondary{% endif %}">
+                                        {{ alert.threat.vt_enrichment.reputation }}
+                                    </span>
+                                    <span class="text-muted small ms-1">points</span>
+                                </div>
+                                <i class="bi {% if alert.threat.vt_enrichment.reputation > 0 %}bi-hand-thumbs-up text-success{% elif alert.threat.vt_enrichment.reputation < 0 %}bi-hand-thumbs-down text-danger{% else %}bi-dash-circle text-secondary{% endif %} fs-4"></i>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <h6 class="text-uppercase tracking-wider text-muted small mb-2">Detection Ratio</h6>
+                            <div class="p-3 bg-dark bg-opacity-20 rounded border border-secondary border-opacity-10">
+                                {% set total_engines = alert.threat.vt_enrichment.malicious_count + alert.threat.vt_enrichment.suspicious_count + alert.threat.vt_enrichment.harmless_count + alert.threat.vt_enrichment.undetected_count %}
+                                {% set detected_engines = alert.threat.vt_enrichment.malicious_count + alert.threat.vt_enrichment.suspicious_count %}
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <span class="small font-outfit text-light fw-medium">{{ detected_engines }} / {{ total_engines }} engines</span>
+                                    <span class="small text-muted">flagged malicious</span>
+                                </div>
+                                <div class="progress bg-dark border border-secondary border-opacity-10" style="height: 6px; border-radius: 3px;">
+                                    {% set percent = (detected_engines / total_engines * 100) if total_engines > 0 else 0 %}
+                                    <div class="progress-bar {% if percent >= 50 %}bg-danger{% elif percent > 0 %}bg-warning{% else %}bg-success{% endif %}" role="progressbar" style="width: {{ percent }}%; border-radius: 3px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if alert.threat.ioc_type == 'IP Address' %}
+        <!-- AbuseIPDB Enrichment Card -->
+        <div class="card bg-panel border border-secondary-subtle">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 font-outfit text-light">
+                    <i class="bi bi-globe text-accent-glow me-2"></i> AbuseIPDB Intelligence
+                </h5>
+                {% if alert.threat.abuseipdb_enrichment %}
+                <span class="badge {% if alert.threat.abuseipdb_enrichment.status == 'success' %}bg-success-subtle text-success border-success{% elif alert.threat.abuseipdb_enrichment.status == 'failed' %}bg-danger-subtle text-danger border-danger{% else %}bg-warning-subtle text-warning border-warning{% endif %} border border-opacity-25 px-2 py-1 rounded small text-uppercase">
+                    {{ alert.threat.abuseipdb_enrichment.status }}
+                </span>
+                {% endif %}
+            </div>
+            <div class="card-body p-4">
+                {% if not alert.threat.abuseipdb_enrichment %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-globe-americas text-muted display-6 mb-3 d-block"></i>
+                        <h6 class="text-light mb-1">No AbuseIPDB Analysis Available</h6>
+                    </div>
+                {% elif alert.threat.abuseipdb_enrichment.status == 'pending' %}
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-accent-glow mb-3" role="status" style="width: 2rem; height: 2rem;"></div>
+                        <h6 class="text-light mb-1">Awaiting Telemetry Report</h6>
+                    </div>
+                {% elif alert.threat.abuseipdb_enrichment.status == 'failed' %}
+                    <div class="alert alert-danger border border-danger border-opacity-25 bg-dark bg-opacity-30 d-flex align-items-start gap-3 mb-0" role="alert">
+                        <i class="bi bi-exclamation-octagon-fill fs-5 text-danger"></i>
+                        <div>
+                            <h6 class="alert-heading fw-semibold text-danger mb-1">Analysis Enrichment Failed</h6>
+                            <p class="mb-0 small text-secondary">{{ alert.threat.abuseipdb_enrichment.error_message }}</p>
+                        </div>
+                    </div>
+                {% elif alert.threat.abuseipdb_enrichment.status == 'success' %}
+                    {% set score = alert.threat.abuseipdb_enrichment.abuse_confidence_score %}
+                    {% if score <= 20 %}
+                        {% set score_color = 'text-success' %}
+                        {% set score_bg = 'bg-success' %}
+                    {% elif score <= 60 %}
+                        {% set score_color = 'text-warning' %}
+                        {% set score_bg = 'bg-warning' %}
+                    {% else %}
+                        {% set score_color = 'text-danger' %}
+                        {% set score_bg = 'bg-danger' %}
+                    {% endif %}
+                    
+                    <div class="row g-4">
+                        <!-- Confidence Score Gauge -->
+                        <div class="col-12 col-md-4 text-center d-flex flex-column justify-content-center align-items-center border-end border-secondary border-opacity-10">
+                            <div class="mb-4">
+                                <span class="text-muted small text-uppercase tracking-wider mb-2 d-block">Abuse Confidence Score</span>
+                                <span class="display-4 fw-bold {{ score_color }} font-outfit">{{ score }}%</span>
+                                <div class="progress mx-auto bg-dark border border-secondary border-opacity-25 mt-2" style="height: 8px; width: 140px; border-radius: 4px;">
+                                    <div class="progress-bar {{ score_bg }}" role="progressbar" style="width: {{ score }}%; border-radius: 4px;"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Risk Level -->
+                            {% set risk = alert.threat.abuseipdb_enrichment.risk_level %}
+                            <div class="mb-3">
+                                <span class="text-muted small text-uppercase tracking-wider mb-2 d-block">Risk Level</span>
+                                <span class="badge bg-{{ risk.badge }} {% if risk.badge == 'warning' %}text-dark{% else %}text-light{% endif %} px-3 py-2 font-outfit border border-{{ risk.badge }} border-opacity-25 text-uppercase" style="font-size: 0.85rem;">
+                                    <i class="bi {{ risk.icon }} me-1.5"></i>{{ risk.label }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Geo & ISP Info -->
+                        <div class="col-12 col-md-8">
+                            <div class="row g-3 small">
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Country</span>
+                                    <span class="text-light fw-semibold">
+                                        {% if alert.threat.abuseipdb_enrichment.country_code %}
+                                            {{ alert.threat.abuseipdb_enrichment.country_name or '' }} ({{ alert.threat.abuseipdb_enrichment.country_code }})
+                                        {% else %}
+                                            <em class="text-muted">Unknown</em>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted d-block">ISP</span>
+                                    <span class="text-light fw-semibold">{{ alert.threat.abuseipdb_enrichment.isp or 'N/A' }}</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Domain</span>
+                                    <span class="text-light fw-semibold">{{ alert.threat.abuseipdb_enrichment.domain or 'N/A' }}</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Usage Type</span>
+                                    <span class="text-light fw-semibold">{{ alert.threat.abuseipdb_enrichment.usage_type or 'N/A' }}</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Total Reports</span>
+                                    <span class="text-light fw-semibold">{{ alert.threat.abuseipdb_enrichment.total_reports or 0 }} reports</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Last Reported</span>
+                                    <span class="text-light fw-semibold">
+                                        {% if alert.threat.abuseipdb_enrichment.last_reported_at %}
+                                            {{ alert.threat.abuseipdb_enrichment.last_reported_at.strftime('%Y-%m-%d %H:%M:%S UTC') }}
+                                        {% else %}
+                                            <em class="text-muted">Never Reported</em>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Right Sidebar AI Summary & Threat Dossier Info -->
+    <div class="col-12 col-lg-4">
+        <!-- AI Threat Summary Card -->
+        <div class="card bg-panel border border-secondary-subtle mb-4">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light">
+                    <i class="bi bi-cpu text-accent-glow me-2"></i> AI Threat Summary
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <h6 class="text-uppercase tracking-wider text-muted small mb-2">Overall Risk</h6>
+                    <div>
+                        <span class="badge bg-{{ overall_risk.badge }} {% if overall_risk.badge == 'warning' %}text-dark{% else %}text-light{% endif %} px-3 py-2 font-outfit border border-{{ overall_risk.badge }} border-opacity-25 text-uppercase" style="font-size: 0.85rem;">
+                            {{ overall_risk.label }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="text-uppercase tracking-wider text-muted small mb-2">Summary</h6>
+                    <p class="text-secondary small mb-0">{{ summary }}</p>
+                </div>
+
+                <div class="mb-0">
+                    <h6 class="text-uppercase tracking-wider text-muted small mb-2">Recommendations</h6>
+                    <ul class="mb-0 text-secondary ps-3 small">
+                        {% for rec in recommendations %}
+                            <li class="mb-1">{{ rec }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="mt-4 pt-3 border-top border-secondary-subtle border-opacity-25">
+                    <h6 class="text-uppercase tracking-wider text-muted small mb-2">Recommended Action</h6>
+                    <p class="text-secondary small mb-0 font-outfit text-light fw-medium">
+                        <i class="bi bi-shield-exclamation text-warning me-1.5"></i>
+                        {{ alert.severity }} Alert Generated
+                    </p>
+                    <span class="text-muted small mt-1 d-block">
+                        This indicator warrants analysis and security containment action.
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Threat Dossier Log Card -->
+        <div class="card bg-panel border border-secondary-subtle">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h6 class="mb-0 text-light font-outfit"><i class="bi bi-clock-history me-2 text-accent-glow"></i>Linked Threat Dossier</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-column gap-3 small">
+                    <div>
+                        <span class="text-muted d-block">Threat Indicator</span>
+                        <span class="text-light fw-bold fs-7 font-outfit text-break">{{ alert.threat.ioc_value }}</span>
+                    </div>
+                    <div>
+                        <span class="text-muted d-block">Threat Type</span>
+                        <span class="text-light fw-semibold">{{ alert.threat.threat_type }}</span>
+                    </div>
+                    <div>
+                        <span class="text-muted d-block">Source Feed</span>
+                        <span class="text-light fw-semibold">{{ alert.threat.source }}</span>
+                    </div>
+                    <div>
+                        <span class="text-muted d-block">Ingestion Timestamp</span>
+                        <span class="text-light fw-semibold">{{ alert.threat.created_at.strftime('%Y-%m-%d %H:%M:%S UTC') if alert.threat.created_at else 'N/A' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

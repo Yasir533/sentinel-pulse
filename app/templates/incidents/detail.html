@@ -1,0 +1,338 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Incident Dossier | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<!-- Page Heading -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="page-title mb-1 text-light">Incident Investigation Dossier</h1>
+        <p class="text-muted mb-0">Operator dossier managing quarantine and mitigation workflows.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+            <i class="bi bi-arrow-left"></i> Back to Queue
+        </a>
+        {% if current_user.role in ['Admin', 'Analyst'] %}
+        <a href="{{ url_for('incidents.edit_incident', incident_id=incident.id) }}" class="btn btn-primary d-flex align-items-center gap-2">
+            <i class="bi bi-pencil-square"></i> Edit Dossier
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Main Dossier Panel -->
+    <div class="col-12 col-lg-8">
+        <div class="card bg-panel border border-secondary-subtle mb-4">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 font-outfit text-light">
+                    <i class="bi bi-shield-alert text-accent-glow me-2"></i> Escalated Incident Details
+                </h5>
+                <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25 px-2 py-1 rounded small">ID: #{{ incident.id }}</span>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <h6 class="text-uppercase tracking-wider text-muted small mb-1">Dossier Title</h6>
+                    <span class="fs-4 fw-bold text-light font-outfit">{{ incident.title }}</span>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="text-uppercase tracking-wider text-muted small mb-1">Incident Assessment & Description</h6>
+                    <div class="p-3 bg-dark bg-opacity-20 rounded border border-secondary border-opacity-10 text-secondary">
+                        {% if incident.description %}
+                            {{ incident.description|replace('\n', '<br>')|safe }}
+                        {% else %}
+                            <em class="text-muted">No description provided.</em>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <h6 class="text-uppercase tracking-wider text-muted small mb-1">Resolution & Mitigation Action Log</h6>
+                    <div class="p-3 bg-dark bg-opacity-20 rounded border border-secondary border-opacity-10 text-secondary">
+                        {% if incident.resolution_notes %}
+                            {{ incident.resolution_notes|replace('\n', '<br>')|safe }}
+                        {% else %}
+                            <em class="text-muted">No resolution notes logged. Investigation active.</em>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Linked Threat Intel Dossier Summary (Reused design to prevent duplicate data) -->
+        <h4 class="font-outfit text-light mt-5 mb-3"><i class="bi bi-shield-exclamation text-accent-glow me-2"></i>Linked Heuristics & Threat Intelligence</h4>
+
+        <!-- Threat Info Card -->
+        <div class="card bg-panel border border-secondary-subtle mb-4">
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <span class="text-muted d-block small text-uppercase">IOC VALUE</span>
+                        <a href="{{ url_for('threats.view_threat', threat_id=threat.id) }}" class="text-accent-glow font-outfit fs-5 fw-bold text-decoration-none hover-glow">{{ threat.ioc_value }}</a>
+                    </div>
+                    <div class="col-sm-3">
+                        <span class="text-muted d-block small text-uppercase">IOC TYPE</span>
+                        <span class="badge bg-dark border border-secondary border-opacity-50 text-light py-1.5 px-2.5 mt-1">{{ threat.ioc_type }}</span>
+                    </div>
+                    <div class="col-sm-3">
+                        <span class="text-muted d-block small text-uppercase">THREAT TYPE</span>
+                        <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25 py-1.5 px-2.5 mt-1">{{ threat.threat_type }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VirusTotal Section if exists -->
+        {% if vt %}
+        <div class="card bg-panel border border-secondary-subtle mb-4">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 font-outfit text-light">
+                    <i class="bi bi-shield-shaded text-accent-glow me-2"></i> VirusTotal Intel Report
+                </h5>
+                <span class="badge {% if vt.status == 'success' %}bg-success-subtle text-success border-success{% elif vt.status == 'failed' %}bg-danger-subtle text-danger border-danger{% else %}bg-warning-subtle text-warning border-warning{% endif %} border border-opacity-25 px-2 py-1 rounded small text-uppercase">
+                    {{ vt.status }}
+                </span>
+            </div>
+            <div class="card-body p-4">
+                {% if vt.status == 'success' %}
+                    <div class="row g-3 text-center mb-2">
+                        <div class="col-6 col-sm-3">
+                            <span class="d-block fs-4 fw-bold text-danger font-outfit">{{ vt.malicious_count }}</span>
+                            <span class="text-muted small text-uppercase tracking-wider">Malicious</span>
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <span class="d-block fs-4 fw-bold text-warning font-outfit">{{ vt.suspicious_count }}</span>
+                            <span class="text-muted small text-uppercase tracking-wider">Suspicious</span>
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <span class="d-block fs-4 fw-bold text-success font-outfit">{{ vt.harmless_count }}</span>
+                            <span class="text-muted small text-uppercase tracking-wider">Harmless</span>
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <span class="d-block fs-4 fw-bold text-secondary font-outfit">{{ vt.undetected_count }}</span>
+                            <span class="text-muted small text-uppercase tracking-wider">Undetected</span>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-muted text-center py-2">VirusTotal report currently unavailable (status: {{ vt.status }}).</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- AbuseIPDB Section if exists -->
+        {% if abuse and threat.ioc_type == 'IP Address' %}
+        <div class="card bg-panel border border-secondary-subtle mb-4">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 font-outfit text-light">
+                    <i class="bi bi-globe text-accent-glow me-2"></i> AbuseIPDB Intel Report
+                </h5>
+                <span class="badge {% if abuse.status == 'success' %}bg-success-subtle text-success border-success{% elif abuse.status == 'failed' %}bg-danger-subtle text-danger border-danger{% else %}bg-warning-subtle text-warning border-warning{% endif %} border border-opacity-25 px-2 py-1 rounded small text-uppercase">
+                    {{ abuse.status }}
+                </span>
+            </div>
+            <div class="card-body p-4">
+                {% if abuse.status == 'success' %}
+                    {% set score = abuse.abuse_confidence_score %}
+                    {% if score <= 20 %}
+                        {% set score_color = 'text-success' %}
+                    {% elif score <= 60 %}
+                        {% set score_color = 'text-warning' %}
+                    {% else %}
+                        {% set score_color = 'text-danger' %}
+                    {% endif %}
+                    
+                    <div class="row g-3">
+                        <div class="col-sm-4 text-center border-end border-secondary border-opacity-10">
+                            <span class="text-muted small text-uppercase tracking-wider d-block">Confidence Score</span>
+                            <span class="fs-2 fw-bold {{ score_color }} font-outfit">{{ score }}%</span>
+                        </div>
+                        
+                        <div class="col-sm-8 px-sm-4">
+                            <div class="row g-2 small">
+                                <div class="col-6">
+                                    <span class="text-muted">Country:</span>
+                                    <span class="text-light fw-semibold">{{ abuse.country_name or 'Unknown' }}</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted">Total Reports:</span>
+                                    <span class="text-light fw-semibold">{{ abuse.total_reports or 0 }}</span>
+                                </div>
+                                <div class="col-12">
+                                    <span class="text-muted">ISP:</span>
+                                    <span class="text-light fw-semibold">{{ abuse.isp or 'N/A' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-muted text-center py-2">AbuseIPDB report currently unavailable (status: {{ abuse.status }}).</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- AI Threat Summary Section -->
+        <div class="card bg-panel border border-secondary-subtle">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light">
+                    <i class="bi bi-cpu text-accent-glow me-2"></i> AI Threat Summary
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-3">
+                    <span class="text-muted small text-uppercase tracking-wider mb-1 d-block">Overall Heuristics Risk</span>
+                    <span class="badge bg-{{ overall_risk.badge }} {% if overall_risk.badge == 'warning' %}text-dark{% else %}text-light{% endif %} px-2.5 py-1.5 font-outfit border border-{{ overall_risk.badge }} border-opacity-25 text-uppercase">
+                        {{ overall_risk.label }}
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <span class="text-muted small text-uppercase tracking-wider mb-1 d-block">Analysis Summary</span>
+                    <p class="text-secondary small mb-0">{{ summary }}</p>
+                </div>
+
+                <div>
+                    <span class="text-muted small text-uppercase tracking-wider mb-1 d-block">Recommended Playbooks</span>
+                    <ul class="mb-0 text-secondary ps-3 small">
+                        {% for rec in recommendations %}
+                            <li class="mb-1">{{ rec }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Metadata & Control Panel -->
+    <div class="col-12 col-lg-4">
+        
+        <!-- Status & Severity Widgets -->
+        <div class="card bg-panel border border-secondary-subtle mb-4">
+            <div class="card-body p-4">
+                <!-- Severity Display -->
+                <div class="mb-3">
+                    <label class="text-muted small text-uppercase tracking-wider mb-1">Dossier Severity</label>
+                    <div>
+                        {% if incident.severity == 'Critical' %}
+                            <span class="badge bg-danger text-light px-3 py-2 w-100 fs-6 font-outfit border border-danger border-opacity-25" style="box-shadow: 0 0 10px rgba(220, 53, 69, 0.2);">Critical</span>
+                        {% elif incident.severity == 'High' %}
+                            <span class="badge text-light px-3 py-2 w-100 fs-6 font-outfit border border-opacity-25" style="background-color: #fd7e14; border-color: #fd7e14; box-shadow: 0 0 10px rgba(253, 126, 20, 0.2);">High</span>
+                        {% elif incident.severity == 'Medium' %}
+                            <span class="badge bg-warning text-dark px-3 py-2 w-100 fs-6 font-outfit border border-warning border-opacity-25">Medium</span>
+                        {% else %}
+                            <span class="badge bg-success text-light px-3 py-2 w-100 fs-6 font-outfit border border-success border-opacity-25">Low</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Status Display -->
+                <div class="mb-0">
+                    <label class="text-muted small text-uppercase tracking-wider mb-1">Investigation Status</label>
+                    <div>
+                        {% if incident.status == 'Open' %}
+                            <span class="badge bg-primary text-light px-3 py-2 w-100 fs-6 font-outfit border border-primary border-opacity-25">Open</span>
+                        {% elif incident.status == 'In Progress' %}
+                            <span class="badge bg-info text-dark px-3 py-2 w-100 fs-6 font-outfit border border-info border-opacity-25">In Progress</span>
+                        {% elif incident.status == 'Under Investigation' %}
+                            <span class="badge bg-warning text-dark px-3 py-2 w-100 fs-6 font-outfit border border-warning border-opacity-25">Under Investigation</span>
+                        {% elif incident.status == 'Resolved' %}
+                            <span class="badge bg-success text-light px-3 py-2 w-100 fs-6 font-outfit border border-success border-opacity-25" style="box-shadow: 0 0 10px rgba(25, 135, 84, 0.2);">Resolved</span>
+                        {% else %}
+                            <span class="badge bg-dark text-muted px-3 py-2 w-100 fs-6 font-outfit border border-secondary border-opacity-25">Closed</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflow Control Panel -->
+        {% if current_user.role in ['Admin', 'Analyst'] %}
+        <div class="card bg-panel border border-secondary-subtle mb-4">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h6 class="mb-0 text-light font-outfit"><i class="bi bi-activity me-2 text-accent-glow"></i>Workflow Operations</h6>
+            </div>
+            <div class="card-body d-flex flex-column gap-2.5">
+                <!-- Resolve Action -->
+                {% if incident.status not in ['Resolved', 'Closed'] %}
+                <form action="{{ url_for('incidents.edit_incident', incident_id=incident.id) }}" method="POST">
+                    <input type="hidden" name="status" value="Resolved">
+                    <input type="hidden" name="resolution_notes" value="Incident escalated status changed to Resolved by operator. Heuristic risk mitigated.">
+                    <button type="submit" class="btn btn-outline-success w-100 d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-check-circle-fill"></i> Resolve Incident
+                    </button>
+                </form>
+                {% endif %}
+
+                <!-- Close Action -->
+                {% if incident.status == 'Resolved' %}
+                <form action="{{ url_for('incidents.edit_incident', incident_id=incident.id) }}" method="POST">
+                    <input type="hidden" name="status" value="Closed">
+                    <input type="hidden" name="resolution_notes" value="{% if incident.resolution_notes %}{{ incident.resolution_notes }}{% else %}Incident dossier closed by operator.{% endif %}">
+                    <button type="submit" class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-folder-check"></i> Close Incident
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Metadata Dossier Card -->
+        <div class="card bg-panel border border-secondary-subtle">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h6 class="mb-0 text-light font-outfit"><i class="bi bi-clock-history me-2 text-accent-glow"></i>Dossier Timeline</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-column gap-3 small">
+                    <div>
+                        <span class="text-muted d-block">Incident Number</span>
+                        <span class="text-light fw-semibold">{{ incident.incident_number }}</span>
+                    </div>
+                    <div>
+                        <span class="text-muted d-block">Assigned Analyst</span>
+                        <span class="text-light fw-semibold">
+                            {% if incident.assignee %}
+                                {{ incident.assignee.username }} ({{ incident.assignee.role }})
+                            {% else %}
+                                <em class="text-warning"><i class="bi bi-person-exclamation me-1"></i>Unassigned</em>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-muted d-block">Escalated By Operator</span>
+                        <span class="text-light fw-semibold">{{ incident.creator.username }} ({{ incident.creator.role }})</span>
+                    </div>
+                    <div>
+                        <span class="text-muted d-block">Escalation Timestamp</span>
+                        <span class="text-light fw-semibold">{{ incident.created_at.strftime('%Y-%m-%d %H:%M:%S UTC') }}</span>
+                    </div>
+                    <div>
+                        <span class="text-muted d-block">Last Updated</span>
+                        <span class="text-light fw-semibold">{{ incident.updated_at.strftime('%Y-%m-%d %H:%M:%S UTC') }}</span>
+                    </div>
+                    {% if incident.resolved_at %}
+                    <div>
+                        <span class="text-success d-block"><i class="bi bi-calendar-check me-1"></i>Resolved Timestamp</span>
+                        <span class="text-success fw-semibold">{{ incident.resolved_at.strftime('%Y-%m-%d %H:%M:%S UTC') }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if current_user.role == 'Admin' %}
+                <div class="mt-4 pt-3 border-top border-secondary-subtle border-opacity-25">
+                    <!-- Delete Button Form -->
+                    <form action="{{ url_for('incidents.delete_incident', incident_id=incident.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to permanently purge this incident escalation dossier from the database?');">
+                        <button type="submit" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-trash"></i> Purge Dossier
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

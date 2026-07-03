@@ -1,0 +1,168 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Search Results | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="page-title font-outfit text-light mb-1">Global Search Results</h1>
+    <p class="text-secondary small mb-0">Search results for query: <strong class="text-accent-glow">"{{ query }}"</strong></p>
+</div>
+
+<div class="row g-4">
+    <!-- Threats Grid -->
+    <div class="col-12 col-xl-6">
+        <div class="card border border-secondary-subtle bg-panel h-100">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-virus text-info me-2"></i>Matching Threats ({{ results['threats']|length }})</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush bg-transparent">
+                    {% if results['threats'] %}
+                        {% for t in results['threats'] %}
+                        <a href="{{ url_for('threats.view_threat', threat_id=t.id) }}" class="list-group-item list-group-item-action bg-transparent text-light border-secondary-subtle py-2.5">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-accent-glow">{{ t.ioc_value }}</span>
+                                <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25">{{ t.threat_type }}</span>
+                            </div>
+                            <small class="text-muted">Severity: {{ t.severity }} | Source: {{ t.source }}</small>
+                        </a>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4 text-muted small">No matching threat indicators.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts Grid -->
+    <div class="col-12 col-xl-6">
+        <div class="card border border-secondary-subtle bg-panel h-100">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-alarm text-warning me-2"></i>Matching Alerts ({{ results['alerts']|length }})</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush bg-transparent">
+                    {% if results['alerts'] %}
+                        {% for a in results['alerts'] %}
+                        <a href="{{ url_for('alerts.view_alert', alert_id=a.id) }}" class="list-group-item list-group-item-action bg-transparent text-light border-secondary-subtle py-2.5">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-light">{{ a.alert_number }}</span>
+                                <span class="badge bg-{{ 'danger' if a.severity == 'Critical' else 'warning' if a.severity == 'High' else 'info' }} text-dark">{{ a.severity }}</span>
+                            </div>
+                            <small class="text-muted">{{ a.message }}</small>
+                        </a>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4 text-muted small">No matching alerts.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incidents Grid -->
+    <div class="col-12 col-xl-6">
+        <div class="card border border-secondary-subtle bg-panel h-100">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-exclamation-triangle text-primary me-2"></i>Matching Incidents ({{ results['incidents']|length }})</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush bg-transparent">
+                    {% if results['incidents'] %}
+                        {% for inc in results['incidents'] %}
+                        <a href="{{ url_for('incidents.view_incident', incident_id=inc.id) }}" class="list-group-item list-group-item-action bg-transparent text-light border-secondary-subtle py-2.5">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-light">{{ inc.incident_number }}: {{ inc.title }}</span>
+                                <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25">{{ inc.status }}</span>
+                            </div>
+                            <small class="text-muted">{{ inc.description }}</small>
+                        </a>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4 text-muted small">No matching incidents.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Grid -->
+    <div class="col-12 col-xl-6">
+        <div class="card border border-secondary-subtle bg-panel h-100">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-file-earmark-bar-graph text-accent-glow me-2"></i>Matching Reports ({{ results['reports']|length }})</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush bg-transparent">
+                    {% if results['reports'] %}
+                        {% for r in results['reports'] %}
+                        <a href="{{ url_for('reports.preview_report', report_id=r.id) }}" class="list-group-item list-group-item-action bg-transparent text-light border-secondary-subtle py-2.5">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-light">{{ r.report_number }} - {{ r.title }}</span>
+                                <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25">{{ r.report_type }}</span>
+                            </div>
+                            <small class="text-muted">Generated: {{ r.created_at.strftime('%Y-%m-%d') }}</small>
+                        </a>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4 text-muted small">No matching reports.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Grid -->
+    <div class="col-12 col-xl-6">
+        <div class="card border border-secondary-subtle bg-panel h-100">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-people text-light me-2"></i>Matching Operators ({{ results['users']|length }})</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush bg-transparent">
+                    {% if results['users'] %}
+                        {% for u in results['users'] %}
+                        <div class="list-group-item bg-transparent text-light border-secondary-subtle py-2.5">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-light">{{ u.username }}</span>
+                                <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25">{{ u.role }}</span>
+                            </div>
+                            <small class="text-muted">Email: {{ u.email }} | Active: {{ u.is_active }}</small>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4 text-muted small">No matching user accounts.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Grid -->
+    <div class="col-12 col-xl-6">
+        <div class="card border border-secondary-subtle bg-panel h-100">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-bell text-light me-2"></i>Matching Notifications ({{ results['notifications']|length }})</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush bg-transparent">
+                    {% if results['notifications'] %}
+                        {% for n in results['notifications'] %}
+                        <div class="list-group-item bg-transparent text-light border-secondary-subtle py-2.5">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-light small">{{ n.message }}</span>
+                                <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25">{{ n.status }}</span>
+                            </div>
+                            <small class="text-muted">Priority: {{ n.priority }} | Date: {{ n.created_at.strftime('%Y-%m-%d') }}</small>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4 text-muted small">No matching notifications.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

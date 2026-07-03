@@ -1,0 +1,190 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Create Incident Dossier | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="page-title mb-1 text-light">Escalate Security Incident</h1>
+        <p class="text-muted mb-0">Establish formal incident dossier linked to a detected threat indicator.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+            <i class="bi bi-arrow-left"></i> Back to Incident Queue
+        </a>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-9">
+        <div class="card bg-panel border border-secondary-subtle">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light">
+                    <i class="bi bi-file-earmark-medical text-accent-glow me-2"></i>
+                    New Incident Escalate Dossier
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form action="{% if threat %}{{ url_for('incidents.new_incident', threat_id=threat.id) }}{% else %}{{ url_for('incidents.new_incident') }}{% endif %}" method="POST" class="needs-validation" novalidate>
+                    
+                    <!-- Core Auto-Populated Fields -->
+                    <div class="row g-3 mb-4 bg-dark bg-opacity-20 p-3 rounded border border-secondary border-opacity-10">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Incident Number</label>
+                            <input type="text" class="form-control form-control-dark bg-dark border-secondary text-light font-outfit" value="{{ next_incident_number }}" readonly style="opacity: 0.85;">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Created By</label>
+                            <input type="text" class="form-control form-control-dark bg-dark border-secondary text-light" value="{{ current_user.username }}" readonly style="opacity: 0.85;">
+                        </div>
+
+                        <!-- Threat Selection / Link -->
+                        <div class="col-md-12">
+                            {% if threat %}
+                                <label class="form-label text-muted small fw-semibold">Linked Threat Indicator</label>
+                                <div class="p-2.5 bg-dark rounded border border-secondary border-opacity-20 d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25">{{ threat.threat_type }}</span>
+                                        <span class="text-accent-glow font-outfit fw-medium">{{ threat.ioc_value }}</span>
+                                    </div>
+                                    <span class="text-secondary small font-outfit">Threat ID: #{{ threat.id }}</span>
+                                </div>
+                                <input type="hidden" name="threat_id" value="{{ threat.id }}">
+                            {% else %}
+                                <label for="threat_id" class="form-label text-secondary small fw-semibold">Link Threat Indicator</label>
+                                <select class="form-select form-control-dark ps-3 bg-dark border-secondary text-light font-outfit" id="threat_id" name="threat_id" required>
+                                    <option value="" disabled selected>Select Threat Indicator...</option>
+                                    {% for t in available_threats %}
+                                        <option value="{{ t.id }}" data-type="{{ t.threat_type }}" data-ioc-type="{{ t.ioc_type }}" data-ioc-value="{{ t.ioc_value }}" data-severity="{{ t.severity }}">{{ t.ioc_value }} ({{ t.threat_type }})</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Please select a threat indicator to link.</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Heuristic Details of Threat -->
+                        <div class="col-md-4">
+                            <label class="form-label text-muted small fw-semibold">Threat Type</label>
+                            <input type="text" class="form-control form-control-dark bg-dark border-secondary text-secondary" id="threat_type_display" value="{% if threat %}{{ threat.threat_type }}{% endif %}" readonly style="opacity: 0.7;">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label text-muted small fw-semibold">IOC Type & Value</label>
+                            <input type="text" class="form-control form-control-dark bg-dark border-secondary text-secondary" id="ioc_display" value="{% if threat %}{{ threat.ioc_type }}: {{ threat.ioc_value }}{% endif %}" readonly style="opacity: 0.7;">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label text-muted small fw-semibold">Threat Severity / AI Risk</label>
+                            <input type="text" class="form-control form-control-dark bg-dark border-secondary text-secondary font-outfit" id="ai_risk_display" value="{% if threat %}{{ threat.severity }}{% endif %}" readonly style="opacity: 0.7;">
+                        </div>
+                    </div>
+
+                    <!-- User input fields -->
+                    <div class="row g-3">
+                        <!-- Title -->
+                        <div class="col-md-12">
+                            <label for="title" class="form-label text-secondary small fw-semibold">Incident Dossier Title</label>
+                            <input type="text" class="form-control form-control-dark ps-3 text-light" id="title" name="title" placeholder="e.g. Critical Ransomware Threat Escalation - Host #45" required>
+                            <div class="invalid-feedback">Please enter a dossier title.</div>
+                        </div>
+
+                        <!-- Severity -->
+                        <div class="col-md-4">
+                            <label for="severity" class="form-label text-secondary small fw-semibold">Incident Severity</label>
+                            <select class="form-select form-control-dark ps-3 bg-dark border-secondary text-light" id="severity" name="severity" required>
+                                {% for s in severities %}
+                                    <option value="{{ s }}" {% if s == 'Medium' %}selected{% endif %}>{{ s }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Please select a severity.</div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="col-md-4">
+                            <label for="status" class="form-label text-secondary small fw-semibold">Incident Status</label>
+                            <select class="form-select form-control-dark ps-3 bg-dark border-secondary text-light" id="status" name="status" required>
+                                {% for st in statuses %}
+                                    <option value="{{ st }}" {% if st == 'Open' %}selected{% endif %}>{{ st }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Please specify status.</div>
+                        </div>
+
+                        <!-- Assigned Analyst -->
+                        <div class="col-md-4">
+                            <label for="assigned_to" class="form-label text-secondary small fw-semibold">Assigned Analyst</label>
+                            <select class="form-select form-control-dark ps-3 bg-dark border-secondary text-light" id="assigned_to" name="assigned_to">
+                                <option value="" selected>Unassigned (Queue)</option>
+                                {% for u in users %}
+                                    <option value="{{ u.id }}">{{ u.username }} ({{ u.role }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-md-12">
+                            <label for="description" class="form-label text-secondary small fw-semibold">Dossier Description & Assessment Details</label>
+                            <textarea class="form-control form-control-dark ps-3 text-light" id="description" name="description" rows="4" placeholder="Detail the threat scenario, affected systems, and active response/quarantine procedures..."></textarea>
+                        </div>
+
+                        <!-- Resolution Notes -->
+                        <div class="col-md-12">
+                            <label for="resolution_notes" class="form-label text-secondary small fw-semibold">Initial Resolution / Mitigation Notes</label>
+                            <textarea class="form-control form-control-dark ps-3 text-light" id="resolution_notes" name="resolution_notes" rows="3" placeholder="Specify any initial actions taken (IP blocked, host quarantined, credentials reset) if resolving immediately..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-4 border-top border-secondary-subtle border-opacity-25 pt-3">
+                        <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold font-outfit d-flex align-items-center gap-2">
+                            <i class="bi bi-save"></i> Escalate Incident
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    // Enable Bootstrap validation
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })();
+
+    // Update dynamic fields on threat dropdown selection
+    {% if not threat %}
+    const threatSelect = document.getElementById('threat_id');
+    if (threatSelect) {
+        threatSelect.addEventListener('change', function() {
+            const selected = this.options[this.selectedIndex];
+            if (selected.value) {
+                document.getElementById('threat_type_display').value = selected.getAttribute('data-type') || '';
+                const iocVal = selected.getAttribute('data-ioc-value') || '';
+                const iocType = selected.getAttribute('data-ioc-type') || '';
+                document.getElementById('ioc_display').value = iocType + ': ' + iocVal;
+                document.getElementById('ai_risk_display').value = selected.getAttribute('data-severity') || '';
+            } else {
+                document.getElementById('threat_type_display').value = '';
+                document.getElementById('ioc_display').value = '';
+                document.getElementById('ai_risk_display').value = '';
+            }
+        });
+    }
+    {% endif %}
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,621 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Security Dashboard | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<!-- Page Heading -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="page-title mb-1 text-light">Observability Control Center</h1>
+        <p class="text-muted mb-0">Real-time status feed and security state visualization.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary d-flex align-items-center gap-2" onclick="location.reload();">
+            <i class="bi bi-arrow-clockwise"></i> Refresh Control Feed
+        </button>
+        {% if current_user.role in ['Admin', 'Analyst'] %}
+        <a href="{{ url_for('threats.new_threat') }}" class="btn btn-primary d-flex align-items-center gap-2 font-outfit">
+            <i class="bi bi-plus-lg"></i> + Add Threat
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Threat Level Stats Row -->
+<div class="row g-4 mb-4">
+    <!-- Total Threats -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card card-stat h-100 border border-secondary-subtle">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon-wrapper bg-primary-subtle text-primary rounded-3">
+                    <i class="bi bi-shield-slash fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="card-subtitle text-muted mb-1 small">Total Threats Logged</h6>
+                    <h3 class="card-title mb-0 font-outfit text-light">{{ total_threats }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Critical Threats -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card card-stat h-100 border border-secondary-subtle">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon-wrapper bg-danger-subtle text-danger rounded-3" style="filter: drop-shadow(0 0 5px rgba(220, 53, 69, 0.2));">
+                    <i class="bi bi-bug fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="card-subtitle text-muted mb-1 small">Critical Severity</h6>
+                    <h3 class="card-title mb-0 font-outfit text-danger">{{ critical_threats }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- High Threats -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card card-stat h-100 border border-secondary-subtle">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon-wrapper bg-warning-subtle text-warning rounded-3">
+                    <i class="bi bi-exclamation-triangle fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="card-subtitle text-muted mb-1 small">High Severity</h6>
+                    <h3 class="card-title mb-0 font-outfit text-warning">{{ high_threats }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resolved Threats -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card card-stat h-100 border border-secondary-subtle">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon-wrapper bg-success-subtle text-success rounded-3">
+                    <i class="bi bi-check-circle fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="card-subtitle text-muted mb-1 small">Resolved Heuristics</h6>
+                    <h3 class="card-title mb-0 font-outfit text-success">{{ resolved_threats }}</h3>
+                </div>
+        </div>
+    </div>
+</div>
+
+<!-- Incident Level Stats Row -->
+<div class="row g-4 mb-4">
+    <!-- Open Incidents -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card card-stat h-100 border border-secondary-subtle">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon-wrapper bg-primary-subtle text-primary rounded-3">
+                    <i class="bi bi-exclamation-triangle fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="card-subtitle text-muted mb-1 small">Open Incidents</h6>
+                    <h3 class="card-title mb-0 font-outfit text-light">{{ open_incidents }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Resolved Incidents -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card card-stat h-100 border border-secondary-subtle">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon-wrapper bg-success-subtle text-success rounded-3">
+                    <i class="bi bi-check-circle fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="card-subtitle text-muted mb-1 small">Resolved Incidents</h6>
+                    <h3 class="card-title mb-0 font-outfit text-success">{{ resolved_incidents }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Critical Incidents -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card card-stat h-100 border border-secondary-subtle">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon-wrapper bg-danger-subtle text-danger rounded-3" style="filter: drop-shadow(0 0 5px rgba(220, 53, 69, 0.2));">
+                    <i class="bi bi-shield-fill-x fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="card-subtitle text-muted mb-1 small">Critical Incidents</h6>
+                    <h3 class="card-title mb-0 font-outfit text-danger">{{ critical_incidents }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Closed Incidents -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card card-stat h-100 border border-secondary-subtle">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon-wrapper bg-secondary-subtle text-light rounded-3">
+                    <i class="bi bi-folder-check fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="card-subtitle text-muted mb-1 small">Closed Incidents</h6>
+                    <h3 class="card-title mb-0 font-outfit text-light">{{ closed_incidents }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Visualizations and Activity Feed Grid -->
+<div class="row g-4 mb-4">
+    <!-- Chart: Severity Distribution -->
+    <div class="col-12 col-lg-4">
+        <div class="card border border-secondary-subtle h-100 bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-pie-chart text-accent-glow me-2"></i>Severity Distribution</h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center" style="position: relative; min-height: 260px;">
+                {% if total_threats > 0 %}
+                    <canvas id="severityChart"></canvas>
+                {% else %}
+                    <div class="text-center text-muted py-5 small">No threat data logged for visualization.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart: Trend Analysis -->
+    <div class="col-12 col-lg-5">
+        <div class="card border border-secondary-subtle h-100 bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-graph-up text-accent-glow me-2"></i>7-Day Ingestion Trend</h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center" style="position: relative; min-height: 260px;">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feed: Recent Activity -->
+    <div class="col-12 col-lg-3">
+        <div class="card border border-secondary-subtle h-100 bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-clock-history text-accent-glow me-2"></i>Recent Activity</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush bg-transparent overflow-y-auto" style="max-height: 280px;">
+                    {% for act in recent_activity %}
+                    <div class="list-group-item bg-transparent text-light border-secondary-subtle px-3 py-3">
+                        <div class="d-flex align-items-start gap-2">
+                            <span class="badge {{ act.badge_class }} p-1 mt-0.5 rounded-circle">
+                                <i class="bi {{ act.icon }} fs-7"></i>
+                            </span>
+                            <div>
+                                <p class="mb-0 small text-light">{{ act.message }}</p>
+                                <span class="text-muted" style="font-size: 0.7rem;">{{ act.timestamp.strftime('%Y-%m-%d %H:%M') }} UTC</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Incident Charts Row -->
+<div class="row g-4 mb-4">
+    <!-- Chart: Incident Status Distribution -->
+    <div class="col-12 col-lg-6">
+        <div class="card border border-secondary-subtle h-100 bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-pie-chart text-accent-glow me-2"></i>Incident Status Breakdown</h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center" style="position: relative; min-height: 260px;">
+                <canvas id="incidentStatusChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart: Incident Severity Distribution -->
+    <div class="col-12 col-lg-6">
+        <div class="card border border-secondary-subtle h-100 bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-bar-chart text-accent-glow me-2"></i>Incident Severity Breakdown</h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center" style="position: relative; min-height: 260px;">
+                <canvas id="incidentSeverityChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row: Detailed Tables and Status Widgets -->
+<div class="row g-4">
+    <!-- Table: Latest Ingested Threats -->
+    <div class="col-12 col-xl-9 d-flex flex-column gap-4">
+        <!-- Table: Latest Ingested Threats -->
+        <div class="card border border-secondary-subtle bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-list-stars text-accent-glow me-2"></i>Latest 10 Ingested Threats</h5>
+                <a href="{{ url_for('threats.list_threats') }}" class="badge bg-secondary-subtle border border-secondary text-light px-2 py-1.5 text-decoration-none hover-glow">View Full Registry</a>
+            </div>
+            <div class="card-body p-0">
+                {% if latest_threats %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped table-hover mb-0 align-middle small">
+                        <thead>
+                            <tr class="text-secondary" style="border-bottom: 2px solid var(--border-color);">
+                                <th class="ps-3">ID</th>
+                                <th>Type</th>
+                                <th>IOC Value</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                                <th>Confidence</th>
+                                <th>Recorded By</th>
+                                <th class="pe-3">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for threat in latest_threats %}
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td class="ps-3 font-outfit text-muted">#{{ threat.id }}</td>
+                                <td><span class="fw-semibold text-light">{{ threat.threat_type }}</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-1.5">
+                                        <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25" style="font-size: 0.65rem;">{{ threat.ioc_type }}</span>
+                                        <a href="{{ url_for('threats.view_threat', threat_id=threat.id) }}" class="text-accent-glow text-decoration-none font-outfit fw-medium" style="word-break: break-all;">{{ threat.ioc_value }}</a>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if threat.severity == 'Critical' %}
+                                        <span class="badge bg-danger text-light border border-danger border-opacity-25">Critical</span>
+                                    {% elif threat.severity == 'High' %}
+                                        <span class="badge bg-warning text-dark border border-warning border-opacity-25">High</span>
+                                    {% elif threat.severity == 'Medium' %}
+                                        <span class="badge bg-info text-dark border border-info border-opacity-25">Medium</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary text-light border border-secondary border-opacity-25">Low</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if threat.status == 'New' %}
+                                        <span class="badge bg-primary text-light border border-primary border-opacity-25">New</span>
+                                    {% elif threat.status == 'Investigating' %}
+                                        <span class="badge bg-warning text-dark border border-warning border-opacity-25">Investigating</span>
+                                    {% elif threat.status == 'Resolved' %}
+                                        <span class="badge bg-success text-light border border-success border-opacity-25">Resolved</span>
+                                    {% else %}
+                                        <span class="badge bg-dark text-muted border border-secondary border-opacity-25">False Positive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="font-outfit text-light">{{ threat.confidence_score }}%</span>
+                                </td>
+                                <td><span class="text-secondary">{{ threat.creator.username }}</span></td>
+                                <td class="pe-3"><span class="text-muted">{{ threat.created_at.strftime('%Y-%m-%d') }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted small">No security threats captured yet. Registry is clear.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Table: Latest 5 Security Incidents -->
+        <div class="card border border-secondary-subtle bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-list-task text-accent-glow me-2"></i>Latest 5 Security Incidents</h5>
+                <a href="{{ url_for('incidents.list_incidents') }}" class="badge bg-secondary-subtle border border-secondary text-light px-2 py-1.5 text-decoration-none hover-glow">View Incident Registry</a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_incidents %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped table-hover mb-0 align-middle small">
+                        <thead>
+                            <tr class="text-secondary" style="border-bottom: 2px solid var(--border-color);">
+                                <th class="ps-3">Incident Number</th>
+                                <th>Title</th>
+                                <th>Threat Value</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                                <th>Assigned Analyst</th>
+                                <th class="pe-3">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inc in recent_incidents %}
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td class="ps-3 font-outfit text-accent-glow fw-semibold">
+                                    <a href="{{ url_for('incidents.view_incident', incident_id=inc.id) }}" class="text-decoration-none text-accent-glow">{{ inc.incident_number }}</a>
+                                </td>
+                                <td><span class="text-light fw-medium">{{ inc.title }}</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-1.5">
+                                        <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25" style="font-size: 0.65rem;">{{ inc.threat.threat_type }}</span>
+                                        <span class="text-secondary font-outfit" style="word-break: break-all;">{{ inc.threat.ioc_value }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if inc.severity == 'Critical' %}
+                                        <span class="badge bg-danger text-light border border-danger border-opacity-25">Critical</span>
+                                    {% elif inc.severity == 'High' %}
+                                        <span class="badge text-light border border-opacity-25" style="background-color: #fd7e14; border-color: #fd7e14; box-shadow: 0 0 8px rgba(253, 126, 20, 0.2);">High</span>
+                                    {% elif inc.severity == 'Medium' %}
+                                        <span class="badge bg-warning text-dark border border-warning border-opacity-25">Medium</span>
+                                    {% else %}
+                                        <span class="badge bg-success text-light border border-success border-opacity-25">Low</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if inc.status == 'Open' %}
+                                        <span class="badge bg-primary text-light border border-primary border-opacity-25">Open</span>
+                                    {% elif inc.status == 'In Progress' %}
+                                        <span class="badge bg-info text-dark border border-info border-opacity-25">In Progress</span>
+                                    {% elif inc.status == 'Under Investigation' %}
+                                        <span class="badge bg-warning text-dark border border-warning border-opacity-25">Under Investigation</span>
+                                    {% elif inc.status == 'Resolved' %}
+                                        <span class="badge bg-success text-light border border-success border-opacity-25">Resolved</span>
+                                    {% else %}
+                                        <span class="badge bg-dark text-muted border border-secondary border-opacity-25">Closed</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if inc.assignee %}
+                                        <span class="text-light fw-medium">{{ inc.assignee.username }}</span>
+                                    {% else %}
+                                        <span class="text-muted italic">Unassigned</span>
+                                    {% endif %}
+                                </td>
+                                <td class="pe-3"><span class="text-muted">{{ inc.created_at.strftime('%Y-%m-%d') }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted small">No security incidents created yet. System clear.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Widgets & Operator Info -->
+    <div class="col-12 col-xl-3">
+        <div class="row g-4">
+            <!-- Widget: System Health -->
+            <div class="col-12">
+                <div class="card border border-secondary-subtle bg-panel">
+                    <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                        <h6 class="mb-0 text-light font-outfit"><i class="bi bi-cpu me-2 text-accent-glow"></i>Engine Telemetry</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-column gap-2.5 small">
+                            <div class="d-flex justify-content-between">
+                                <span class="text-secondary">Analysis Core</span>
+                                <span class="text-success fw-bold"><i class="bi bi-circle-fill text-success fs-8 me-1 align-middle"></i>{{ system_status['engine'] }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-secondary">Threat Database</span>
+                                <span class="text-success fw-bold"><i class="bi bi-circle-fill text-success fs-8 me-1 align-middle"></i>{{ system_status['db_status'] }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-secondary">Heuristics Engine</span>
+                                <span class="text-success fw-bold"><i class="bi bi-circle-fill text-success fs-8 me-1 align-middle"></i>{{ system_status['heuristics'] }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-secondary">API Sync Status</span>
+                                <span class="text-success fw-bold"><i class="bi bi-circle-fill text-success fs-8 me-1 align-middle"></i>{{ system_status['feed_sync'] }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-secondary">AbuseIPDB</span>
+                                {% if system_status['abuseipdb'] == 'Connected' %}
+                                    <span class="text-success fw-bold"><i class="bi bi-circle-fill text-success fs-8 me-1 align-middle"></i>Connected</span>
+                                {% else %}
+                                    <span class="text-danger fw-bold"><i class="bi bi-circle-fill text-danger fs-8 me-1 align-middle"></i>Unavailable</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Widget: DB & Session info -->
+            <div class="col-12">
+                <div class="card border border-secondary-subtle bg-panel">
+                    <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                        <h6 class="mb-0 text-light font-outfit"><i class="bi bi-database me-2 text-accent-glow"></i>Core Registry Details</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-column gap-2.5 small">
+                            <div class="d-flex justify-content-between">
+                                <span class="text-secondary">DB Driver Type</span>
+                                <span class="text-light fw-semibold">{{ system_status['db_type'] }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-secondary">Registered Operators</span>
+                                <span class="text-light fw-semibold">{{ system_status['user_count'] }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-secondary">Current User</span>
+                                <span class="text-accent-glow fw-semibold">{{ current_user.username }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-secondary">Clearance Role</span>
+                                <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25">{{ current_user.role }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 1. Severity Doughnut Chart
+    {% if total_threats > 0 %}
+    const severityCtx = document.getElementById('severityChart').getContext('2d');
+    const severityChart = new Chart(severityCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Critical', 'High', 'Medium', 'Low'],
+            datasets: [{
+                data: [
+                    {{ severity_counts['Critical'] }},
+                    {{ severity_counts['High'] }},
+                    {{ severity_counts['Medium'] }},
+                    {{ severity_counts['Low'] }}
+                ],
+                backgroundColor: ['#dc3545', '#ffc107', '#0dcaf0', '#6c757d'],
+                borderColor: '#101626',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        color: '#9ca3af',
+                        font: { family: 'Outfit', size: 11 }
+                    }
+                }
+            },
+            cutout: '65%'
+        }
+    });
+    {% endif %}
+
+    // 2. Trend Line Chart
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    const trendChart = new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: {{ trend_labels | tojson }},
+            datasets: [{
+                label: 'Threat Ingestions',
+                data: {{ trend_values | tojson }},
+                borderColor: '#00f0ff',
+                backgroundColor: 'rgba(0, 240, 255, 0.05)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.35,
+                pointBackgroundColor: '#00f0ff',
+                pointRadius: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                    ticks: { color: '#9ca3af', font: { family: 'Inter', size: 10 } }
+                },
+                y: {
+                    grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                    ticks: { 
+                        color: '#9ca3af', 
+                        font: { family: 'Inter', size: 10 },
+                        stepSize: 1
+                    },
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // 3. Incident Status Doughnut Chart
+    const incidentStatusCtx = document.getElementById('incidentStatusChart').getContext('2d');
+    const incidentStatusChart = new Chart(incidentStatusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Open', 'In Progress', 'Under Investigation', 'Resolved', 'Closed'],
+            datasets: [{
+                data: [
+                    {{ incident_status_counts['Open'] }},
+                    {{ incident_status_counts['In Progress'] }},
+                    {{ incident_status_counts['Under Investigation'] }},
+                    {{ incident_status_counts['Resolved'] }},
+                    {{ incident_status_counts['Closed'] }}
+                ],
+                backgroundColor: ['#0d6efd', '#0dcaf0', '#6f42c1', '#198754', '#6c757d'],
+                borderColor: '#101626',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        color: '#9ca3af',
+                        font: { family: 'Outfit', size: 11 }
+                    }
+                }
+            },
+            cutout: '65%'
+        }
+    });
+
+    // 4. Incident Severity Bar Chart
+    const incidentSeverityCtx = document.getElementById('incidentSeverityChart').getContext('2d');
+    const incidentSeverityChart = new Chart(incidentSeverityCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Critical', 'High', 'Medium', 'Low'],
+            datasets: [{
+                label: 'Incidents Count',
+                data: [
+                    {{ incidents_by_severity['Critical'] }},
+                    {{ incidents_by_severity['High'] }},
+                    {{ incidents_by_severity['Medium'] }},
+                    {{ incidents_by_severity['Low'] }}
+                ],
+                backgroundColor: ['#dc3545', '#fd7e14', '#ffc107', '#198754'],
+                borderWidth: 0,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#9ca3af', font: { family: 'Inter', size: 10 } }
+                },
+                y: {
+                    grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                    ticks: {
+                        color: '#9ca3af',
+                        font: { family: 'Inter', size: 10 },
+                        stepSize: 1
+                    },
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
