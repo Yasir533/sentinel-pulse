@@ -14,76 +14,110 @@
     </div>
 </div>
 
-<!-- SOC Analyst Scorecards & Telemetry Row -->
+<!-- SOC Analyst<!-- Scorecard & Core KPIs Row -->
 <div class="row g-4 mb-4">
-    <!-- Mean Incident Resolution Cycle Gauge -->
+    <!-- Mean Resolution Time Widget -->
     <div class="col-12 col-xl-4">
         <div class="card border border-secondary-subtle bg-panel h-100 p-3">
-            <h6 class="text-secondary font-outfit small mb-3"><i class="bi bi-stopwatch text-accent-glow me-2"></i>Investigation Cycle Performance</h6>
-            <div class="d-flex align-items-center justify-content-between">
-                <div class="position-relative d-flex justify-content-center align-items-center" style="width: 100px; height: 100px;">
+            <h6 class="text-secondary font-outfit small mb-3"><i class="bi bi-speedometer2 text-accent-glow me-2"></i>Investigation Cycle Performance</h6>
+            <div class="soc-scorecard-layout">
+                <div class="soc-scorecard-gauge-wrapper">
+                    <!-- Circular Progress Ring SVG -->
                     <svg width="100" height="100" class="position-absolute">
                         <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="6"></circle>
-                        <circle cx="50" cy="50" r="42" fill="none" stroke="#20c997" stroke-width="6" stroke-dasharray="264" stroke-dashoffset="{{ 264 - (264 * (mrt_hours if mrt_hours <= 24 else 24) / 24) }}" stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-in-out;"></circle>
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="#10b981" stroke-width="6" stroke-dasharray="264" stroke-dashoffset="{{ 264 - (264 * (mrt_hours if mrt_hours <= 24 else 24) / 24) }}" stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-in-out;"></circle>
                     </svg>
                     <div class="text-center" style="z-index: 1;">
                         <span class="fs-4 fw-bold text-light font-outfit">{{ mrt_hours }}h</span>
                         <small class="text-muted d-block" style="font-size: 0.6rem;">My Mean</small>
                     </div>
                 </div>
-                <div class="flex-grow-1 ps-4">
-                    <h6 class="font-outfit mb-1 text-light">Team Average: <span class="text-info fw-bold">{{ team_mrt }}h</span></h6>
-                    <p class="text-muted small mb-0" style="line-height: 1.3;">Measures the average time from initial alert escalation/threat ingestion to final incident resolution. Keep target cycle below 8 hours.</p>
+                <div class="soc-scorecard-info">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Team average:</span>
+                        <span class="fw-bold text-accent-glow font-outfit">{{ team_mrt }}h</span>
+                    </div>
+                    <p class="text-muted mb-0 mt-1" style="font-size: 0.7rem; line-height: 1.3;">
+                        <strong>Target:</strong> Keep cycle below 8 hours to reduce overall vulnerability footprint.
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Active Operational Counters -->
-    <div class="d-none">Total Alerts New Alerts Critical Alerts Assigned Alerts</div>
     <div class="col-12 col-xl-8">
+        <div class="d-none">Total Alerts New Alerts Critical Alerts Assigned Alerts</div>
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3 h-100">
+            <!-- Counter 1 -->
             <div class="col">
-                <div class="card card-stat h-100 border border-secondary-subtle">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="text-muted small">My Cases</span>
-                            <span class="badge bg-primary-subtle text-primary border-0 small">INC</span>
+                <div class="soc-card-kpi">
+                    <div class="soc-card-kpi-header">
+                        <span class="soc-card-kpi-title">Assigned Incidents</span>
+                        <span class="badge bg-primary-subtle text-primary border-0 small">INC</span>
+                    </div>
+                    <div class="soc-card-kpi-body">
+                        <div class="soc-card-kpi-icon">
+                            <i class="bi bi-file-earmark-medical"></i>
                         </div>
-                        <h3 class="mb-0 text-light font-outfit fw-bold">{{ assigned_incidents }}</h3>
+                        <h3 class="soc-card-kpi-val">{{ assigned_incidents }}</h3>
+                    </div>
+                    <div class="soc-card-kpi-footer">
+                        Dossiers assigned to you
                     </div>
                 </div>
             </div>
+            <!-- Counter 2 -->
             <div class="col">
-                <div class="card card-stat h-100 border border-secondary-subtle">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="text-muted small">Open Investigations</span>
-                            <span class="badge bg-warning-subtle text-warning border-0 small">Active</span>
+                <div class="soc-card-kpi">
+                    <div class="soc-card-kpi-header">
+                        <span class="soc-card-kpi-title">Open Investigations</span>
+                        <span class="badge bg-warning-subtle text-warning border-0 small">Active</span>
+                    </div>
+                    <div class="soc-card-kpi-body">
+                        <div class="soc-card-kpi-icon" style="color: #ffc107; filter: drop-shadow(0 0 8px rgba(255, 193, 7, 0.45));">
+                            <i class="bi bi-shield-exclamation"></i>
                         </div>
-                        <h3 class="mb-0 text-light font-outfit fw-bold">{{ open_investigations }}</h3>
+                        <h3 class="soc-card-kpi-val">{{ open_investigations }}</h3>
+                    </div>
+                    <div class="soc-card-kpi-footer">
+                        Underactive cases
                     </div>
                 </div>
             </div>
+            <!-- Counter 3 -->
             <div class="col">
-                <div class="card card-stat h-100 border border-secondary-subtle">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="text-muted small">Unassigned Alerts</span>
-                            <span class="badge bg-danger-subtle text-danger border-0 small">New</span>
+                <div class="soc-card-kpi">
+                    <div class="soc-card-kpi-header">
+                        <span class="soc-card-kpi-title">Unassigned Alerts</span>
+                        <span class="badge bg-danger-subtle text-danger border-0 small">New</span>
+                    </div>
+                    <div class="soc-card-kpi-body">
+                        <div class="soc-card-kpi-icon" style="color: #ef4444; filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.45));">
+                            <i class="bi bi-bell"></i>
                         </div>
-                        <h3 class="mb-0 text-light font-outfit fw-bold">{{ new_alerts }}</h3>
+                        <h3 class="soc-card-kpi-val">{{ new_alerts }}</h3>
+                    </div>
+                    <div class="soc-card-kpi-footer">
+                        Awaiting triage queue
                     </div>
                 </div>
             </div>
+            <!-- Counter 4 -->
             <div class="col">
-                <div class="card card-stat h-100 border border-secondary-subtle">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="text-muted small">Daily Exposure</span>
-                            <span class="badge bg-secondary-subtle text-light border-0 small">Today</span>
+                <div class="soc-card-kpi">
+                    <div class="soc-card-kpi-header">
+                        <span class="soc-card-kpi-title">Daily Exposure</span>
+                        <span class="badge bg-secondary-subtle text-light border-0 small">Today</span>
+                    </div>
+                    <div class="soc-card-kpi-body">
+                        <div class="soc-card-kpi-icon" style="color: #0ea5e9; filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.45));">
+                            <i class="bi bi-activity"></i>
                         </div>
-                        <h3 class="mb-0 text-light font-outfit fw-bold">{{ today_alerts }}</h3>
+                        <h3 class="soc-card-kpi-val">{{ today_alerts }}</h3>
+                    </div>
+                    <div class="soc-card-kpi-footer">
+                        Threat events flagged
                     </div>
                 </div>
             </div>

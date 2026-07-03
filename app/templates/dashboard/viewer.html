@@ -10,55 +10,75 @@
 
 <!-- Metrics Counters Row -->
 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3 mb-4">
+    <!-- Card 1 -->
     <div class="col">
-        <div class="card card-stat h-100 border border-secondary-subtle">
-            <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-icon-wrapper bg-secondary-subtle text-light rounded-3">
-                    <i class="bi bi-shield-exclamation fs-3"></i>
+        <div class="soc-card-kpi">
+            <div class="soc-card-kpi-header">
+                <span class="soc-card-kpi-title">Total Threats</span>
+                <span class="badge bg-primary-subtle text-primary border-0 small">Exposure</span>
+            </div>
+            <div class="soc-card-kpi-body">
+                <div class="soc-card-kpi-icon">
+                    <i class="bi bi-shield-exclamation"></i>
                 </div>
-                <div>
-                    <h6 class="card-subtitle text-muted mb-1 small">Total Threats</h6>
-                    <h3 class="card-title mb-0 font-outfit text-light">{{ total_threats }}</h3>
-                </div>
+                <h3 class="soc-card-kpi-val">{{ total_threats }}</h3>
+            </div>
+            <div class="soc-card-kpi-footer">
+                Threat vectors Ingested
             </div>
         </div>
     </div>
+    <!-- Card 2 -->
     <div class="col">
-        <div class="card card-stat h-100 border border-secondary-subtle">
-            <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-icon-wrapper bg-secondary-subtle text-light rounded-3">
-                    <i class="bi bi-exclamation-triangle fs-3"></i>
+        <div class="soc-card-kpi">
+            <div class="soc-card-kpi-header">
+                <span class="soc-card-kpi-title">Total Incidents</span>
+                <span class="badge bg-warning-subtle text-warning border-0 small">Active</span>
+            </div>
+            <div class="soc-card-kpi-body">
+                <div class="soc-card-kpi-icon" style="color: #ffc107; filter: drop-shadow(0 0 8px rgba(255, 193, 7, 0.45));">
+                    <i class="bi bi-exclamation-triangle"></i>
                 </div>
-                <div>
-                    <h6 class="card-subtitle text-muted mb-1 small">Total Incidents</h6>
-                    <h3 class="card-title mb-0 font-outfit text-light">{{ total_incidents }}</h3>
-                </div>
+                <h3 class="soc-card-kpi-val">{{ total_incidents }}</h3>
+            </div>
+            <div class="soc-card-kpi-footer">
+                SOC incident escalations
             </div>
         </div>
     </div>
+    <!-- Card 3 -->
     <div class="col">
-        <div class="card card-stat h-100 border border-secondary-subtle">
-            <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-icon-wrapper bg-secondary-subtle text-light rounded-3">
-                    <i class="bi bi-alarm fs-3"></i>
+        <div class="soc-card-kpi">
+            <div class="soc-card-kpi-header">
+                <span class="soc-card-kpi-title">Total Alerts</span>
+                <span class="badge bg-danger-subtle text-danger border-0 small font-monospace">ALT</span>
+            </div>
+            <div class="soc-card-kpi-body">
+                <div class="soc-card-kpi-icon" style="color: #ef4444; filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.45));">
+                    <i class="bi bi-alarm"></i>
                 </div>
-                <div>
-                    <h6 class="card-subtitle text-muted mb-1 small">Total Alerts</h6>
-                    <h3 class="card-title mb-0 font-outfit text-light">{{ total_alerts }}</h3>
-                </div>
+                <h3 class="soc-card-kpi-val">{{ total_alerts }}</h3>
+            </div>
+            <div class="soc-card-kpi-footer">
+                System alerts triggered
             </div>
         </div>
     </div>
+    <!-- Card 4 -->
     <div class="col">
-        <div class="card card-stat h-100 border border-secondary-subtle">
-            <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-icon-wrapper bg-secondary-subtle text-light rounded-3">
-                    <i class="bi bi-shield-slash fs-3"></i>
+        <div class="soc-card-kpi">
+            <div class="soc-card-kpi-header">
+                <span class="soc-card-kpi-title">Critical Threats</span>
+                <span class="badge bg-danger-subtle text-danger border-0 small">Severity</span>
+            </div>
+            <div class="soc-card-kpi-body">
+                <div class="soc-card-kpi-icon" style="color: #ef4444; filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.45));">
+                    <i class="bi bi-shield-slash"></i>
                 </div>
-                <div>
-                    <h6 class="card-subtitle text-muted mb-1 small">Critical Threats</h6>
-                    <h3 class="card-title mb-0 font-outfit text-light">{{ critical_threats }}</h3>
-                </div>
+                <h3 class="soc-card-kpi-val">{{ critical_threats }}</h3>
+            </div>
+            <div class="soc-card-kpi-footer">
+                High risk indicators
             </div>
         </div>
     </div>
