@@ -1,0 +1,62 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}AI Security Assistant | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="page-title font-outfit text-light mb-1">AI SOC Copilot & Assistant</h1>
+    <p class="text-secondary small mb-0">Ask questions about scam message structures, request remediation guidance, or inspect flagged threat indicators.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-xl-8">
+        <div class="card border border-secondary-subtle bg-panel p-4">
+            <h5 class="font-outfit text-light mb-3"><i class="bi bi-chat-dots-fill text-accent-glow me-2"></i>Copilot Interactive Console</h5>
+            
+            <div class="chat-box p-3 rounded-3 bg-dark border border-secondary border-opacity-25 mb-4" style="min-height: 250px;">
+                <!-- System intro message -->
+                <div class="d-flex gap-2 mb-3">
+                    <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                        <i class="bi bi-cpu-fill"></i>
+                    </div>
+                    <div class="p-3 rounded-3 bg-panel border border-secondary border-opacity-10" style="max-width: 80%;">
+                        <p class="mb-0 text-light small">Welcome to Sentinel Pulse AI Assistant. I can help analyze suspicious SMS texts, bank updates, QR payloads, work-from-home offers, and provide remediation advisories. Paste a suspicious snippet below to begin.</p>
+                    </div>
+                </div>
+
+                {% if user_query %}
+                <!-- User message -->
+                <div class="d-flex gap-2 mb-3 justify-content-end">
+                    <div class="p-3 rounded-3 bg-primary bg-opacity-10 border border-primary border-opacity-25 text-end" style="max-width: 80%;">
+                        <p class="mb-0 text-light small">{{ user_query }}</p>
+                    </div>
+                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; border: 1px solid rgba(37, 99, 235, 0.3);">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if bot_response %}
+                <!-- Copilot response -->
+                <div class="d-flex gap-2 mb-3">
+                    <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                        <i class="bi bi-cpu-fill"></i>
+                    </div>
+                    <div class="p-3 rounded-3 bg-panel border border-secondary border-opacity-10" style="max-width: 80%;">
+                        <p class="mb-0 text-light small">{{ bot_response }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="input-group">
+                    <input type="text" class="form-control form-control-dark text-light" name="query" placeholder="e.g. Why is HDFC KYC SMS link suspicious?" required>
+                    <button class="btn btn-primary px-4" type="submit"><i class="bi bi-send-fill"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

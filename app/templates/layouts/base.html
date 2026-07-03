@@ -200,6 +200,74 @@
                                 <span>Alerts</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center justify-content-between {% if request.blueprint == 'mobile' %}active{% endif %}" data-bs-toggle="collapse" href="#mobileSecurityMenu" role="button" aria-expanded="{% if request.blueprint == 'mobile' %}true{% else %}false{% endif %}" aria-controls="mobileSecurityMenu">
+                                <span class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-phone"></i>
+                                    <span>Mobile Security</span>
+                                </span>
+                                <i class="bi bi-chevron-down small"></i>
+                            </a>
+                            <div class="collapse {% if request.blueprint == 'mobile' %}show{% endif %} ps-3" id="mobileSecurityMenu">
+                                <ul class="nav flex-column gap-1 mt-1 small">
+                                    <li class="nav-item">
+                                        <a href="{{ url_for('mobile.dashboard') }}" class="nav-link py-1 {% if request.path == '/mobile/dashboard' %}active text-light{% endif %}">
+                                            <i class="bi bi-speedometer2"></i> Dashboard
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url_for('mobile.submit_threat') }}" class="nav-link py-1 {% if request.path == '/mobile/submit' %}active text-light{% endif %}">
+                                            <i class="bi bi-plus-circle"></i> Submission
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url_for('mobile.scan_link') }}" class="nav-link py-1 {% if request.path == '/mobile/scan/link' %}active text-light{% endif %}">
+                                            <i class="bi bi-link-45deg"></i> Link Scanner
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url_for('mobile.scan_sms') }}" class="nav-link py-1 {% if request.path == '/mobile/scan/sms' %}active text-light{% endif %}">
+                                            <i class="bi bi-chat-left-text"></i> SMS Scanner
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url_for('mobile.scan_whatsapp') }}" class="nav-link py-1 {% if request.path == '/mobile/scan/whatsapp' %}active text-light{% endif %}">
+                                            <i class="bi bi-whatsapp"></i> WhatsApp Scanner
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url_for('mobile.scan_email') }}" class="nav-link py-1 {% if request.path == '/mobile/scan/email' %}active text-light{% endif %}">
+                                            <i class="bi bi-envelope"></i> Email Scanner
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url_for('mobile.scan_qr') }}" class="nav-link py-1 {% if request.path == '/mobile/scan/qr' %}active text-light{% endif %}">
+                                            <i class="bi bi-qr-code-scan"></i> QR Scanner
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url_for('mobile.scan_apk') }}" class="nav-link py-1 {% if request.path == '/mobile/scan/apk' %}active text-light{% endif %}">
+                                            <i class="bi bi-file-earmark-binary"></i> APK Scanner
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url_for('mobile.security_score') }}" class="nav-link py-1 {% if request.path == '/mobile/score' %}active text-light{% endif %}">
+                                            <i class="bi bi-shield-check"></i> Security Score
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url_for('mobile.history') }}" class="nav-link py-1 {% if request.path == '/mobile/history' %}active text-light{% endif %}">
+                                            <i class="bi bi-clock-history"></i> History
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url_for('mobile.assistant') }}" class="nav-link py-1 {% if request.path == '/mobile/assistant' %}active text-light{% endif %}">
+                                            <i class="bi bi-cpu"></i> AI Assistant
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
                         {% endif %}
                         <li class="nav-item">
                             <a href="{{ url_for('reports.list_reports') }}" class="nav-link {% if request.blueprint == 'reports' %}active{% endif %}">

@@ -577,7 +577,8 @@ def list_audit_logs() -> str:
 @dashboard_bp.route('/search')
 @login_required
 def global_search() -> str:
-    """Performs full global search across threats, alerts, incidents, reports, notifications, and users."""
+    """Performs full global search across threats, alerts, incidents, reports, notifications, users, threat intelligence, and mobile submissions."""
+    from app.models.mobile_security import MobileSubmission, ThreatIntel
     q = request.args.get('q', '').strip()
     results = {
         'threats': [],
@@ -585,7 +586,9 @@ def global_search() -> str:
         'incidents': [],
         'reports': [],
         'notifications': [],
-        'users': []
+        'users': [],
+        'threat_intel': [],
+        'mobile_submissions': []
     }
     
     if len(q) >= 2:
@@ -631,6 +634,20 @@ def global_search() -> str:
         results['users'] = User.query.filter(
             (User.username.like(search_filter)) |
             (User.email.like(search_filter))
+        ).limit(10).all()
+
+        # Threat Intelligence Signature Registry
+        results['threat_intel'] = ThreatIntel.query.filter(
+            (ThreatIntel.intel_value.like(search_filter)) |
+            (ThreatIntel.intel_type.like(search_filter)) |
+            (ThreatIntel.classification.like(search_filter))
+        ).limit(10).all()
+
+        # Mobile Ingestions
+        results['mobile_submissions'] = MobileSubmission.query.filter(
+            (MobileSubmission.content.like(search_filter)) |
+            (MobileSubmission.submission_type.like(search_filter)) |
+            (MobileSubmission.threat_category.like(search_filter))
         ).limit(10).all()
         
     return render_template('dashboard/search_results.html', query=q, results=results)

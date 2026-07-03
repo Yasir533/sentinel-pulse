@@ -217,6 +217,59 @@ class ReportService:
                 "Review open alerts older than 72 hours.",
                 "Update standard indicator reputation values across all active threat profiles."
             ]
+        elif report_type == 'Mobile Threat Report':
+            from app.models.mobile_security import MobileSubmission
+            total_mob = MobileSubmission.query.count()
+            blocked_mob = MobileSubmission.query.filter(MobileSubmission.verdict.in_(['BLOCK', 'ESCALATE'])).count()
+            title = "Mobile Threat Report"
+            summary = (
+                f"Smartphone threat analysis registry report. To date, the platform has processed {total_mob} "
+                f"mobile threat submissions, resulting in {blocked_mob} blocked or escalated indicators. "
+                f"AI classifications target phishing campaigns and malicious APK package installs."
+            )
+            recommendations = [
+                "Deploy updated blocklists matching verified SMS sender IDs.",
+                "Review correlated URL campaigns targeting mobile endpoints.",
+                "Ensure that end users are advised to reject any UPI PIN requests."
+            ]
+        elif report_type == 'SMS Scam Report':
+            from app.models.mobile_security import MobileSubmission
+            total_sms = MobileSubmission.query.filter_by(submission_type='sms').count()
+            title = "SMS Scam Report"
+            summary = (
+                f"Heuristic review of SMS submissions. A total of {total_sms} text message scams "
+                f"were verified. Phishing URLs embedded in KYC impersonation campaigns represent the "
+                f"highest source of user risk."
+            )
+            recommendations = [
+                "Track repeated SMS sender handles in the Threat Intelligence database.",
+                "Correlate mobile numbers utilized in fear-tactic job offers."
+            ]
+        elif report_type == 'QR Code Threat Report':
+            from app.models.mobile_security import MobileSubmission
+            total_qr = MobileSubmission.query.filter_by(submission_type='qr').count()
+            title = "QR Code Threat Report"
+            summary = (
+                f"QR destination scanning telemetry. The system registered {total_qr} QR scans. "
+                f"Decoded redirect destinations are scanned using the AI scam analyzer and VirusTotal."
+            )
+            recommendations = [
+                "Flag QR codes leading to non-HTTPS domains as Critical warnings.",
+                "Educate users against scanning physical QR codes in public places."
+            ]
+        elif report_type == 'APK Analysis Report':
+            from app.models.mobile_security import MobileSubmission
+            total_apk = MobileSubmission.query.filter_by(submission_type='apk').count()
+            title = "APK Analysis Report"
+            summary = (
+                f"APK packages malware registry. A total of {total_apk} file signatures "
+                f"and package names were scanned. Cross-checking hash values with VirusTotal "
+                f"prevents sideloading malicious payloads."
+            )
+            recommendations = [
+                "Block installation of packages flagged with positive VirusTotal detections.",
+                "Add known malicious APK hashes to the threat correlation engine."
+            ]
         else:
             title = "Daily SOC Report"
             summary = (

@@ -72,6 +72,7 @@ def create_app(config_name=None):
     from app.blueprints.reports import reports_bp
     from app.blueprints.api import api_bp
     from app.blueprints.notifications import notifications_bp
+    from app.blueprints.mobile import mobile_bp
     
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(dashboard_bp, url_prefix='/')
@@ -81,6 +82,7 @@ def create_app(config_name=None):
     app.register_blueprint(reports_bp, url_prefix='/reports')
     app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(notifications_bp, url_prefix='/notifications')
+    app.register_blueprint(mobile_bp, url_prefix='/mobile')
     
     # Ensure database tables (like notifications) are created
     with app.app_context():
@@ -88,6 +90,7 @@ def create_app(config_name=None):
         from app.models.report import Report
         from app.models.audit_log import AuditLog
         from app.models.report_schedule import ReportSchedule
+        from app.models.mobile_security import MobileSubmission, ThreatIntel
         db.create_all()
 
     # 5. Register Error Handlers

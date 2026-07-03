@@ -1,0 +1,99 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Submit Smartphone Threat | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="page-title font-outfit text-light mb-1">Smartphone Threat Ingestion</h1>
+    <p class="text-secondary small mb-0">Manually submit messages, attachments, URLs, or hashes to the AI security decision engine for threat analysis.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-xl-8">
+        <div class="card border border-secondary-subtle bg-panel p-4">
+            <h5 class="font-outfit text-light mb-4"><i class="bi bi-cloud-arrow-up text-accent-glow me-2"></i>New Ingestion Vector</h5>
+            
+            <form method="POST" action="{{ url_for('mobile.submit_threat') }}" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="row g-3">
+                    <!-- Submission Type -->
+                    <div class="col-12 col-md-6">
+                        <label for="submission_type" class="form-label text-secondary small fw-semibold">Threat Channel / Type</label>
+                        <select class="form-select form-control-dark bg-dark text-light border-secondary" id="submission_type" name="submission_type" required>
+                            <option value="sms">SMS Text</option>
+                            <option value="whatsapp">WhatsApp Message</option>
+                            <option value="telegram">Telegram Chat</option>
+                            <option value="instagram">Instagram DM</option>
+                            <option value="facebook">Facebook Messenger</option>
+                            <option value="email">Email Body / Headers</option>
+                            <option value="url">Malicious URL / Link</option>
+                            <option value="phone">Scam Phone Number</option>
+                            <option value="apk">Malware APK details</option>
+                            <option value="qr">QR Destination URL</option>
+                        </select>
+                    </div>
+
+                    <!-- Sender / Source details -->
+                    <div class="col-12 col-md-6">
+                        <label for="sender" class="form-label text-secondary small fw-semibold">Sender Detail (Phone/Email/Handle)</label>
+                        <input type="text" class="form-control form-control-dark text-light" id="sender" name="sender" placeholder="e.g. +91 98765 43210 or sender@mail.com">
+                    </div>
+
+                    <!-- File parameters for APK checks -->
+                    <div class="col-12 col-md-6" id="apk_hash_group" style="display: none;">
+                        <label for="sha256" class="form-label text-secondary small fw-semibold">File Hash SHA-256 / MD5</label>
+                        <input type="text" class="form-control form-control-dark text-light" id="sha256" name="sha256" placeholder="e.g. 8519962a9c13cfc1d1a6...">
+                    </div>
+                    
+                    <div class="col-12 col-md-6" id="apk_name_group" style="display: none;">
+                        <label for="filename" class="form-label text-secondary small fw-semibold">APK Package Name / Filename</label>
+                        <input type="text" class="form-control form-control-dark text-light" id="filename" name="filename" placeholder="e.g. free_netflix_premium.apk">
+                    </div>
+
+                    <!-- Text Content -->
+                    <div class="col-12">
+                        <label for="content" class="form-label text-secondary small fw-semibold">Message Body / URL / Link Content</label>
+                        <textarea class="form-control form-control-dark text-light" id="content" name="content" rows="4" placeholder="Paste the message content, link URL, or details here..." required></textarea>
+                    </div>
+
+                    <!-- File upload for screenshot -->
+                    <div class="col-12 col-md-6">
+                        <label for="screenshot" class="form-label text-secondary small fw-semibold">Threat Screenshot (Optional)</label>
+                        <input type="file" class="form-control form-control-dark text-light" id="screenshot" name="screenshot" accept="image/*">
+                    </div>
+
+                    <!-- Context description -->
+                    <div class="col-12">
+                        <label for="description" class="form-label text-secondary small fw-semibold">Additional Details / Analyst Notes</label>
+                        <textarea class="form-control form-control-dark text-light" id="description" name="description" rows="2" placeholder="Describe any suspicious behavior, payment requests, or context..."></textarea>
+                    </div>
+
+                    <div class="col-12 mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4"><i class="bi bi-shield-check me-2"></i>Analyze & Submit</button>
+                        <a href="{{ url_for('mobile.dashboard') }}" class="btn btn-outline-light px-4">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const select = document.getElementById("submission_type");
+        const hashGroup = document.getElementById("apk_hash_group");
+        const nameGroup = document.getElementById("apk_name_group");
+        
+        select.addEventListener("change", function() {
+            if (this.value === "apk") {
+                hashGroup.style.display = "block";
+                nameGroup.style.display = "block";
+            } else {
+                hashGroup.style.display = "none";
+                nameGroup.style.display = "none";
+            }
+        });
+    });
+</script>
+{% endblock %}

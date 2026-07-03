@@ -1,0 +1,240 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Mobile Threat Dashboard | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="page-title font-outfit text-light mb-1">Mobile Protection Console</h1>
+    <p class="text-secondary small mb-0">AI-driven endpoint threat protection, link verification, SMS fraud analysis, and system risk scores.</p>
+</div>
+
+<!-- Scorecard & Core KPIs Row -->
+<div class="row g-4 mb-4">
+    <!-- Security Scorecard -->
+    <div class="col-12 col-xl-4">
+        <div class="card border border-secondary-subtle bg-panel h-100 p-3">
+            <h6 class="text-secondary font-outfit small mb-3"><i class="bi bi-shield-check text-accent-glow me-2"></i>Endpoint Health Score</h6>
+            <div class="soc-scorecard-layout">
+                <div class="soc-scorecard-gauge-wrapper">
+                    <!-- Circular Progress Ring SVG -->
+                    <svg width="120" height="120" class="position-absolute">
+                        <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="8"></circle>
+                        <circle cx="60" cy="60" r="50" fill="none" stroke="{% if security_score >= 80 %}#10b981{% elif security_score >= 60 %}#eab308{% else %}#ef4444{% endif %}" stroke-width="8" stroke-dasharray="314" stroke-dashoffset="{{ 314 - (314 * security_score / 100) }}" stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-in-out;"></circle>
+                    </svg>
+                    <div class="text-center" style="z-index: 1;">
+                        <span class="fs-2 fw-bold text-light font-outfit">{{ security_score }}</span>
+                        <small class="text-muted d-block" style="font-size: 0.65rem;">/ 100</small>
+                    </div>
+                </div>
+                <div class="soc-scorecard-info">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Score:</span>
+                        <span class="fw-bold font-outfit text-accent-glow">{{ security_score }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Status:</span>
+                        <span class="fw-bold {% if security_score >= 80 %}text-success{% elif security_score >= 60 %}text-warning{% else %}text-danger{% endif %}">
+                            {% if security_score >= 85 %}Excellent{% elif security_score >= 70 %}Good{% elif security_score >= 50 %}Fair{% else %}Critical{% endif %}
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Risk Level:</span>
+                        <span class="badge {% if security_score >= 80 %}bg-success-subtle text-success border border-success border-opacity-25{% elif security_score >= 60 %}bg-warning-subtle text-warning border border-warning border-opacity-25{% else %}bg-danger-subtle text-danger border border-danger border-opacity-25{% endif %} small" style="font-size: 0.65rem;">
+                            {% if security_score >= 80 %}Low{% elif security_score >= 60 %}Medium{% else %}High{% endif %}
+                        </span>
+                    </div>
+                    <p class="text-muted mb-0 mt-1" style="font-size: 0.7rem; line-height: 1.25;">
+                        <strong>Rec:</strong> 
+                        {% if security_score >= 90 %}
+                            No action required. Mobile endpoint is clean.
+                        {% elif security_score >= 70 %}
+                            Review warnings in threat submission history.
+                        {% else %}
+                            Danger! Highly exposed to mobile fraud. Avoid links.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Counters & KPI Row -->
+    <div class="col-12 col-xl-8">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3 h-100">
+            <!-- Counter 1: Threats Blocked -->
+            <div class="col">
+                <div class="soc-card-kpi">
+                    <div class="soc-card-kpi-header">
+                        <span class="soc-card-kpi-title">Threats Blocked</span>
+                        <span class="badge bg-danger-subtle text-danger border-0 small">Active</span>
+                    </div>
+                    <div class="soc-card-kpi-body">
+                        <div class="soc-card-kpi-icon" style="color: #ef4444; filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.45));">
+                            <i class="bi bi-shield-slash-fill"></i>
+                        </div>
+                        <h3 class="soc-card-kpi-val">{{ total_blocked }}</h3>
+                    </div>
+                    <div class="soc-card-kpi-footer">
+                        Blocked campaigns
+                    </div>
+                </div>
+            </div>
+            <!-- Counter 2: High Risk Messages -->
+            <div class="col">
+                <div class="soc-card-kpi">
+                    <div class="soc-card-kpi-header">
+                        <span class="soc-card-kpi-title">Fraud SMS/Chat</span>
+                        <span class="badge bg-warning-subtle text-warning border-0 small">Scam</span>
+                    </div>
+                    <div class="soc-card-kpi-body">
+                        <div class="soc-card-kpi-icon" style="color: #ffc107; filter: drop-shadow(0 0 8px rgba(255, 193, 7, 0.45));">
+                            <i class="bi bi-chat-left-dots-fill"></i>
+                        </div>
+                        <h3 class="soc-card-kpi-val">{{ high_risk_msgs }}</h3>
+                    </div>
+                    <div class="soc-card-kpi-footer">
+                        High risk messages flagged
+                    </div>
+                </div>
+            </div>
+            <!-- Counter 3: Malicious Links -->
+            <div class="col">
+                <div class="soc-card-kpi">
+                    <div class="soc-card-kpi-header">
+                        <span class="soc-card-kpi-title">Unsafe Links</span>
+                        <span class="badge bg-danger-subtle text-danger border-0 small">URLs</span>
+                    </div>
+                    <div class="soc-card-kpi-body">
+                        <div class="soc-card-kpi-icon" style="color: #ef4444; filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.45));">
+                            <i class="bi bi-link-45deg"></i>
+                        </div>
+                        <h3 class="soc-card-kpi-val">{{ malicious_links }}</h3>
+                    </div>
+                    <div class="soc-card-kpi-footer">
+                        Malicious redirects blocked
+                    </div>
+                </div>
+            </div>
+            <!-- Counter 4: Unsafe APKs -->
+            <div class="col">
+                <div class="soc-card-kpi">
+                    <div class="soc-card-kpi-header">
+                        <span class="soc-card-kpi-title">Unsafe APKs</span>
+                        <span class="badge bg-secondary-subtle text-light border-0 small">Files</span>
+                    </div>
+                    <div class="soc-card-kpi-body">
+                        <div class="soc-card-kpi-icon" style="color: #0ea5e9; filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.45));">
+                            <i class="bi bi-file-earmark-binary"></i>
+                        </div>
+                        <h3 class="soc-card-kpi-val">{{ unsafe_apks }}</h3>
+                    </div>
+                    <div class="soc-card-kpi-footer">
+                        Malware installs blocked
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Visualizations Row -->
+<div class="row g-4 mb-4">
+    <div class="col-12 col-md-6">
+        <div class="card border border-secondary-subtle h-100 bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-activity text-accent-glow me-2"></i>Security Score Trend</h5>
+            </div>
+            <div class="card-body" style="position: relative; min-height: 250px;">
+                <canvas id="scoreTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-md-6">
+        <div class="card border border-secondary-subtle h-100 bg-panel">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-list-stars text-accent-glow me-2"></i>Recent Activity Timeline</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_activity %}
+                <ul class="list-group list-group-flush list-group-dark">
+                    {% for act in recent_activity %}
+                    <li class="list-group-item bg-transparent border-bottom border-secondary border-opacity-25 py-3 px-4 d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge {% if act.verdict == 'ESCALATE' %}bg-danger{% elif act.verdict == 'BLOCK' %}bg-danger bg-opacity-75{% elif act.verdict == 'WARN' %}bg-warning text-dark{% else %}bg-success{% endif %} me-2">{{ act.verdict }}</span>
+                            <strong class="text-light">{{ act.submission_type|upper }} Scan</strong> - 
+                            <span class="text-secondary small">{{ act.threat_category }}</span>
+                            <div class="text-muted small mt-1 text-truncate" style="max-width: 320px;">{{ act.content }}</div>
+                        </div>
+                        <span class="text-muted small font-monospace">{{ act.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-shield-slash fs-1 text-muted mb-3 d-block"></i>
+                    <p class="text-muted">No mobile scans found. Try submitting one below.</p>
+                    <a href="{{ url_for('mobile.submit_threat') }}" class="btn btn-outline-light btn-sm mt-2">Submit Scan</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('scoreTrendChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ trend_labels|tojson }},
+                datasets: [{
+                    label: 'Security Score',
+                    data: {{ trend_values|tojson }},
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.35,
+                    pointBackgroundColor: '#00f0ff',
+                    pointBorderColor: '#ffffff',
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 100,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#9ca3af'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#9ca3af'
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

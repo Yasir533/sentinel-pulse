@@ -1,0 +1,102 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}My Security Score | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="page-title font-outfit text-light mb-1">My Endpoint Security Score</h1>
+    <p class="text-secondary small mb-0">Unified telemetry scoring calculated from threat submission histories and blocked campaigns.</p>
+</div>
+
+<div class="row g-4">
+    <!-- Left Column: Large Gauge and stats -->
+    <div class="col-12 col-xl-4 d-flex flex-column gap-4">
+        <div class="card border border-secondary-subtle bg-panel p-4 text-center">
+            <h5 class="font-outfit text-light mb-4">Overall Endpoint Rating</h5>
+            
+            <div class="d-inline-flex align-items-center justify-content-center position-relative mb-4" style="width: 160px; height: 160px; margin: 0 auto;">
+                <!-- Circular Progress Ring SVG -->
+                <svg width="160" height="160" class="position-absolute">
+                    <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="12"></circle>
+                    <circle cx="80" cy="80" r="70" fill="none" stroke="{% if score >= 80 %}#10b981{% elif score >= 60 %}#eab308{% else %}#ef4444{% endif %}" stroke-width="12" stroke-dasharray="440" stroke-dashoffset="{{ 440 - (440 * score / 100) }}" stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-in-out;"></circle>
+                </svg>
+                <div class="text-center" style="z-index: 1;">
+                    <span class="fs-1 fw-bold text-light font-outfit">{{ score }}</span>
+                    <small class="text-muted d-block" style="font-size: 0.75rem;">/ 100</small>
+                </div>
+            </div>
+
+            <h3 class="font-outfit {% if score >= 80 %}text-success{% elif score >= 60 %}text-warning{% else %}text-danger{% endif %} fw-bold mb-2">
+                {% if score >= 85 %}Fully Secured{% elif score >= 70 %}Minor Exposure{% elif score >= 50 %}High Warning{% else %}Critically Exposed{% endif %}
+            </h3>
+            <p class="text-muted small mb-0">Endpoint threat vulnerability profile based on scanned indicators.</p>
+        </div>
+
+        <div class="card border border-secondary-subtle bg-panel p-4">
+            <h6 class="text-secondary font-outfit small mb-3" style="text-transform: uppercase;">Scan History Statistics</h6>
+            <div class="row g-2 text-center">
+                <div class="col-4">
+                    <div class="p-2 rounded bg-dark border border-secondary border-opacity-10">
+                        <span class="d-block text-muted small">Total</span>
+                        <strong class="fs-4 text-light font-outfit">{{ total_scans }}</strong>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-2 rounded bg-dark border border-secondary border-opacity-10">
+                        <span class="d-block text-muted small">Warnings</span>
+                        <strong class="fs-4 text-warning font-outfit">{{ warn_count }}</strong>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-2 rounded bg-dark border border-secondary border-opacity-10">
+                        <span class="d-block text-muted small">Blocked</span>
+                        <strong class="fs-4 text-danger font-outfit">{{ block_count + escalate_count }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Historical Threat Log -->
+    <div class="col-12 col-xl-8">
+        <div class="card border border-secondary-subtle bg-panel h-100">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+                <h5 class="mb-0 font-outfit text-light"><i class="bi bi-clock-history text-accent-glow me-2"></i>Vulnerability Timeline & History</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if submissions %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped table-hover mb-0">
+                        <thead>
+                            <tr class="text-secondary">
+                                <th class="ps-4">Channel</th>
+                                <th>Scan Content</th>
+                                <th>Category</th>
+                                <th>AI Verdict</th>
+                                <th class="pe-4">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in submissions %}
+                            <tr>
+                                <td class="ps-4"><span class="badge bg-secondary-subtle text-light small border border-secondary border-opacity-25">{{ s.submission_type|upper }}</span></td>
+                                <td class="text-truncate" style="max-width: 250px;">{{ s.content }}</td>
+                                <td>{{ s.threat_category }}</td>
+                                <td><span class="badge {% if s.verdict == 'ESCALATE' %}bg-danger{% elif s.verdict == 'BLOCK' %}bg-danger bg-opacity-75{% elif s.verdict == 'WARN' %}bg-warning text-dark{% else %}bg-success{% endif %}">{{ s.verdict }}</span></td>
+                                <td class="pe-4 font-monospace small text-muted">{{ s.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-shield-slash fs-1 text-muted mb-3 d-block"></i>
+                    <p class="text-muted">No historical scans or vulnerabilities logged.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

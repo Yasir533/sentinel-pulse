@@ -1,0 +1,56 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Scan History | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="page-title font-outfit text-light mb-1">Mobile Scan Registry</h1>
+    <p class="text-secondary small mb-0">Historical listing of all smartphone submissions, link verification records, and AI classification responses.</p>
+</div>
+
+<div class="card border border-secondary-subtle bg-panel">
+    <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3">
+        <h5 class="mb-0 font-outfit text-light"><i class="bi bi-list-columns-reverse text-accent-glow me-2"></i>Ingestion Database Records</h5>
+    </div>
+    <div class="card-body p-0">
+        {% if submissions %}
+        <div class="table-responsive">
+            <table class="table table-dark table-striped table-hover mb-0">
+                <thead>
+                    <tr class="text-secondary">
+                        <th class="ps-4">ID</th>
+                        <th>Type</th>
+                        <th>Scan Target / Content</th>
+                        <th>Threat Category</th>
+                        <th>Risk Score</th>
+                        <th>Verdict</th>
+                        <th>AI Recommendation</th>
+                        <th class="pe-4">Ingested At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in submissions %}
+                    <tr>
+                        <td class="ps-4 font-monospace text-muted">#{{ s.id }}</td>
+                        <td><span class="badge bg-secondary-subtle text-light small border border-secondary border-opacity-25">{{ s.submission_type|upper }}</span></td>
+                        <td class="text-truncate" style="max-width: 200px;" title="{{ s.content }}">{{ s.content }}</td>
+                        <td>{{ s.threat_category }}</td>
+                        <td class="font-outfit fw-bold text-accent-glow">{{ s.risk_score }}</td>
+                        <td><span class="badge {% if s.verdict == 'ESCALATE' %}bg-danger{% elif s.verdict == 'BLOCK' %}bg-danger bg-opacity-75{% elif s.verdict == 'WARN' %}bg-warning text-dark{% else %}bg-success{% endif %}">{{ s.verdict }}</span></td>
+                        <td class="small text-muted text-truncate" style="max-width: 250px;" title="{{ s.ai_recommendation }}">{{ s.ai_recommendation }}</td>
+                        <td class="pe-4 font-monospace small text-muted">{{ s.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-shield-slash fs-1 text-muted mb-3 d-block"></i>
+            <p class="text-muted">No mobile submissions found in the database registry.</p>
+            <a href="{{ url_for('mobile.submit_threat') }}" class="btn btn-primary btn-sm mt-2">Submit First Threat</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
