@@ -1,8 +1,15 @@
 import os
+import sys
 from dotenv import load_dotenv
 
 # Load environment variables from .env file if it exists
 load_dotenv()
+
+# Auto-re-execute in virtual environment if running with system python
+if sys.prefix == sys.base_prefix:
+    venv_python = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'venv', 'Scripts', 'python.exe')
+    if os.path.exists(venv_python):
+        os.execv(venv_python, [venv_python] + sys.argv)
 
 from app import create_app
 from app.extensions import db
