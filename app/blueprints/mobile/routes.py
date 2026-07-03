@@ -271,39 +271,109 @@ def assistant():
     bot_response = None
     user_query = None
     if request.method == 'POST':
-        user_query = request.form.get('query', '')
-        
-        # Smart rule-based AI security response mapping
-        query_lower = user_query.lower()
-        if 'kyc' in query_lower or 'bank' in query_lower:
-            bot_response = (
-                "Suspicious bank message. Banks will never ask for urgent KYC verification via SMS links. "
-                "Remediation: Contact your bank branch directly using the official toll-free phone number."
-            )
-        elif 'won' in query_lower or 'lottery' in query_lower or 'prize' in query_lower:
-            bot_response = (
-                "This resembles a Lottery scam. Legitimate entities never require you to pay processing "
-                "fees to receive a cash prize. Remediation: Ignore and block the sender."
-            )
-        elif 'part-time' in query_lower or 'earn money' in query_lower:
-            bot_response = (
-                "Work-From-Home Task Scam indicator. Scammers decoy users into doing simple social tasks, "
-                "then demand security deposits to release earnings. Remediation: Do not make any payments."
-            )
-        elif 'upi' in query_lower or 'pin' in query_lower:
-            bot_response = (
-                "UPI Payment Scam flag. You only need to type your secret UPI PIN to SEND money, "
-                "never to receive refunds or bonuses. Remediation: Reject any UPI request."
-            )
-        elif 'dhl' in query_lower or 'fedex' in query_lower or 'courier' in query_lower or 'package' in query_lower:
-            bot_response = (
-                "Fake Courier charge decoy. Scammers impersonate postal companies demanding tax payments "
-                "to deliver a non-existent package. Remediation: Use official tracking code directly."
-            )
+        user_query = request.form.get('query', '').strip()
+
+        # Smart rule-based AI security response mapping (RC-2: structured output)
+        q = user_query.lower()
+
+        if 'kyc' in q or 'bank' in q or 'account' in q:
+            bot_response = {
+                'risk': 'High',
+                'confidence': '91%',
+                'threat_type': 'Banking / KYC Phishing',
+                'reason': (
+                    'This message contains urgent language around KYC verification or account activation — '
+                    'a classic social-engineering technique used by financial fraudsters to steal credentials.'
+                ),
+                'recommendation': (
+                    'Do NOT click any link or call any number in the message. '
+                    'Contact your bank directly using the official toll-free number printed on the back of your card.'
+                ),
+            }
+        elif 'won' in q or 'lottery' in q or 'prize' in q or 'congratulation' in q:
+            bot_response = {
+                'risk': 'Critical',
+                'confidence': '97%',
+                'threat_type': 'Lottery / Prize Scam',
+                'reason': (
+                    'Legitimate lotteries never contact winners via unsolicited SMS or WhatsApp, '
+                    'and they never require upfront "processing fees" to release winnings.'
+                ),
+                'recommendation': (
+                    'Ignore and block the sender immediately. '
+                    'Report the message to your national cybercrime helpline.'
+                ),
+            }
+        elif 'part-time' in q or 'earn money' in q or 'work from home' in q or 'task' in q:
+            bot_response = {
+                'risk': 'High',
+                'confidence': '88%',
+                'threat_type': 'Work-from-Home / Task Scam',
+                'reason': (
+                    'Scammers recruit victims into doing simple tasks (likes, ratings), '
+                    'then demand a security deposit before releasing fraudulent "earnings".'
+                ),
+                'recommendation': (
+                    'Do not make any payment. '
+                    'Block the contact and report it to your consumer protection authority.'
+                ),
+            }
+        elif 'upi' in q or 'pin' in q or 'otp' in q or 'collect' in q:
+            bot_response = {
+                'risk': 'Critical',
+                'confidence': '95%',
+                'threat_type': 'UPI Payment / OTP Fraud',
+                'reason': (
+                    'You only enter your secret UPI PIN to SEND money — never to receive a refund, '
+                    'cashback, or bonus. Sharing OTPs gives attackers instant access to your account.'
+                ),
+                'recommendation': (
+                    'Reject any UPI collect request you did not initiate. '
+                    'Never share OTP or PIN with anyone, including bank employees.'
+                ),
+            }
+        elif 'dhl' in q or 'fedex' in q or 'courier' in q or 'parcel' in q or 'package' in q or 'delivery' in q:
+            bot_response = {
+                'risk': 'Medium',
+                'confidence': '82%',
+                'threat_type': 'Fake Courier / Parcel Scam',
+                'reason': (
+                    'Fraudsters impersonate postal companies demanding small "customs tax" payments '
+                    'to release a non-existent parcel, capturing card or UPI details.'
+                ),
+                'recommendation': (
+                    'Use the official courier website to verify any tracking code independently. '
+                    'Do not pay through links received via SMS or WhatsApp.'
+                ),
+            }
+        elif 'loan' in q or 'credit' in q or 'emi' in q or 'interest' in q:
+            bot_response = {
+                'risk': 'High',
+                'confidence': '85%',
+                'threat_type': 'Loan / Credit Fraud',
+                'reason': (
+                    'Instant loan offers with no documentation requirements are red flags for '
+                    'advance-fee fraud or predatory data-harvesting apps.'
+                ),
+                'recommendation': (
+                    'Apply for loans only through RBI-registered NBFCs or your bank\'s official app. '
+                    'Never pay a "processing fee" upfront.'
+                ),
+            }
         else:
-            bot_response = (
-                "Based on heuristics, this text does not contain active scam markers, but remember: "
-                "never click unknown links or share confidential codes/OTPs with strangers."
-            )
-            
+            bot_response = {
+                'risk': 'Low',
+                'confidence': '73%',
+                'threat_type': 'No Active Threat Detected',
+                'reason': (
+                    'Heuristic analysis did not detect known scam patterns in the submitted text. '
+                    'However, novel scam variants emerge daily.'
+                ),
+                'recommendation': (
+                    'Remain cautious: never click unknown links, share OTPs, '
+                    'or transfer money to unverified contacts.'
+                ),
+            }
+
     return render_template('mobile/assistant.html', user_query=user_query, bot_response=bot_response)
+

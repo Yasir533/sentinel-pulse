@@ -217,7 +217,7 @@
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ url_for('mobile.submit_threat') }}" class="nav-link py-1 {% if request.path == '/mobile/submit' %}active text-light{% endif %}">
-                                            <i class="bi bi-plus-circle"></i> Submission
+                                            <i class="bi bi-plus-circle"></i> Submit Threat
                                         </a>
                                     </li>
                                     <li class="nav-item">
@@ -352,7 +352,7 @@
             <div class="d-flex gap-3">
                 <a href="#" class="text-muted text-decoration-none small">Privacy Policy</a>
                 <a href="#" class="text-muted text-decoration-none small">Terms of Service</a>
-                <span class="badge bg-secondary-subtle text-light small border border-secondary border-opacity-25">Version 2.0 RC1</span>
+                <span class="badge bg-secondary-subtle text-light small border border-secondary border-opacity-25">Version 2.0 RC-2</span>
             </div>
         </div>
     </footer>
@@ -362,6 +362,53 @@
     
     <!-- Core App Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <!-- RC-2: Chart empty-state helper & Form loading spinner -->
+    <script>
+    // ── Chart empty-data overlay ─────────────────────────────────────────────
+    window.safeRenderChart = function(canvasId, config) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return null;
+        const datasets = (config && config.data && config.data.datasets) || [];
+        const isEmpty = datasets.every(function(ds) {
+            return !ds.data || ds.data.length === 0 ||
+                   ds.data.every(function(v) { return v === 0 || v === null || v === undefined; });
+        });
+        if (isEmpty) {
+            const wrapper = canvas.parentElement;
+            canvas.style.display = 'none';
+            if (!wrapper.querySelector('.no-data-placeholder')) {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'no-data-placeholder d-flex flex-column align-items-center justify-content-center text-muted';
+                placeholder.style.cssText = 'min-height:120px; font-size:0.8rem; gap:6px;';
+                placeholder.innerHTML = '<i class="bi bi-bar-chart-line" style="font-size:1.6rem; opacity:0.4;"></i><span>No data available</span>';
+                wrapper.appendChild(placeholder);
+            }
+            return null;
+        }
+        return new Chart(canvas, config);
+    };
+
+    // ── Form submission loading spinner ──────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('form').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                if (!form.checkValidity()) return;
+                const btn = form.querySelector('[type="submit"]');
+                if (btn && !btn.dataset.noSpinner) {
+                    btn.disabled = true;
+                    const originalHtml = btn.innerHTML;
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Loading...';
+                    // Re-enable after 15s failsafe
+                    setTimeout(function() {
+                        btn.disabled = false;
+                        btn.innerHTML = originalHtml;
+                    }, 15000);
+                }
+            });
+        });
+    });
+    </script>
 
     <!-- Dynamic Greeting Script -->
     {% if current_user.is_authenticated %}

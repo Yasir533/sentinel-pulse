@@ -4,30 +4,30 @@
 
 {% block content %}
 <div class="mb-4">
-    <h1 class="page-title font-outfit text-light mb-1">AI SOC Copilot & Assistant</h1>
-    <p class="text-secondary small mb-0">Ask questions about scam message structures, request remediation guidance, or inspect flagged threat indicators.</p>
+    <h1 class="page-title font-outfit text-light mb-1">AI Scam Analysis Copilot</h1>
+    <p class="text-secondary small mb-0">Paste a suspicious message, link, or description below. The AI heuristics engine will classify it, rate the risk, and provide actionable remediation guidance.</p>
 </div>
 
 <div class="row justify-content-center">
     <div class="col-12 col-xl-8">
         <div class="card border border-secondary-subtle bg-panel p-4">
             <h5 class="font-outfit text-light mb-3"><i class="bi bi-chat-dots-fill text-accent-glow me-2"></i>Copilot Interactive Console</h5>
-            
-            <div class="chat-box p-3 rounded-3 bg-dark border border-secondary border-opacity-25 mb-4" style="min-height: 250px;">
+
+            <div class="chat-box p-3 rounded-3 bg-dark border border-secondary border-opacity-25 mb-4" style="min-height: 260px;">
                 <!-- System intro message -->
                 <div class="d-flex gap-2 mb-3">
                     <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; border: 1px solid rgba(16, 185, 129, 0.3);">
                         <i class="bi bi-cpu-fill"></i>
                     </div>
-                    <div class="p-3 rounded-3 bg-panel border border-secondary border-opacity-10" style="max-width: 80%;">
-                        <p class="mb-0 text-light small">Welcome to Sentinel Pulse AI Assistant. I can help analyze suspicious SMS texts, bank updates, QR payloads, work-from-home offers, and provide remediation advisories. Paste a suspicious snippet below to begin.</p>
+                    <div class="p-3 rounded-3 bg-panel border border-secondary border-opacity-10" style="max-width: 85%;">
+                        <p class="mb-0 text-light small">Welcome to Sentinel Pulse AI Copilot. I can analyze suspicious SMS, bank alerts, courier notices, UPI requests, lottery messages, and work-from-home offers. Paste a snippet below to get a structured threat verdict.</p>
                     </div>
                 </div>
 
                 {% if user_query %}
                 <!-- User message -->
                 <div class="d-flex gap-2 mb-3 justify-content-end">
-                    <div class="p-3 rounded-3 bg-primary bg-opacity-10 border border-primary border-opacity-25 text-end" style="max-width: 80%;">
+                    <div class="p-3 rounded-3 bg-primary bg-opacity-10 border border-primary border-opacity-25 text-end" style="max-width: 85%;">
                         <p class="mb-0 text-light small">{{ user_query }}</p>
                     </div>
                     <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; border: 1px solid rgba(37, 99, 235, 0.3);">
@@ -37,13 +37,46 @@
                 {% endif %}
 
                 {% if bot_response %}
-                <!-- Copilot response -->
-                <div class="d-flex gap-2 mb-3">
+                <!-- Copilot structured response -->
+                <div class="d-flex gap-2 mb-2">
                     <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; border: 1px solid rgba(16, 185, 129, 0.3);">
                         <i class="bi bi-cpu-fill"></i>
                     </div>
-                    <div class="p-3 rounded-3 bg-panel border border-secondary border-opacity-10" style="max-width: 80%;">
-                        <p class="mb-0 text-light small">{{ bot_response }}</p>
+                    <div class="flex-grow-1" style="max-width: 90%;">
+                        <!-- Risk & Confidence Badges -->
+                        <div class="d-flex flex-wrap gap-2 mb-2">
+                            <span class="badge px-3 py-2
+                                {% if bot_response.risk == 'Critical' %}bg-danger
+                                {% elif bot_response.risk == 'High' %}bg-warning text-dark
+                                {% elif bot_response.risk == 'Medium' %}bg-info text-dark
+                                {% else %}bg-success
+                                {% endif %}" style="font-size: 0.78rem; letter-spacing: 0.03em;">
+                                <i class="bi bi-shield-exclamation me-1"></i>Risk: {{ bot_response.risk }}
+                            </span>
+                            <span class="badge bg-secondary px-3 py-2" style="font-size: 0.78rem;">
+                                <i class="bi bi-graph-up me-1"></i>Confidence: {{ bot_response.confidence }}
+                            </span>
+                            <span class="badge bg-dark border border-secondary border-opacity-25 text-light px-3 py-2" style="font-size: 0.78rem;">
+                                <i class="bi bi-tag me-1"></i>{{ bot_response.threat_type }}
+                            </span>
+                        </div>
+                        <!-- Analysis details card -->
+                        <div class="rounded-3 border border-secondary border-opacity-25 overflow-hidden" style="background: rgba(255,255,255,0.03);">
+                            <!-- Reason -->
+                            <div class="p-3 border-bottom border-secondary border-opacity-10">
+                                <p class="mb-1 text-muted" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;">
+                                    <i class="bi bi-search me-1"></i>Diagnostic Reason
+                                </p>
+                                <p class="mb-0 text-light small lh-sm">{{ bot_response.reason }}</p>
+                            </div>
+                            <!-- Recommendation -->
+                            <div class="p-3" style="background: rgba(16,185,129,0.04);">
+                                <p class="mb-1 text-success" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;">
+                                    <i class="bi bi-shield-check me-1"></i>Recommended Action
+                                </p>
+                                <p class="mb-0 text-light small lh-sm">{{ bot_response.recommendation }}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 {% endif %}
@@ -52,9 +85,15 @@
             <form method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="input-group">
-                    <input type="text" class="form-control form-control-dark text-light" name="query" placeholder="e.g. Why is HDFC KYC SMS link suspicious?" required>
-                    <button class="btn btn-primary px-4" type="submit"><i class="bi bi-send-fill"></i></button>
+                    <input type="text" class="form-control form-control-dark text-light" name="query"
+                           id="assistantQuery"
+                           placeholder="e.g. Got an SMS — your HDFC bank KYC will expire today, click link to update…"
+                           required minlength="5">
+                    <button class="btn btn-primary px-4" type="submit" id="assistantSubmitBtn">
+                        <i class="bi bi-send-fill me-1"></i>Analyze
+                    </button>
                 </div>
+                <p class="text-muted mt-2 mb-0" style="font-size: 0.72rem;"><i class="bi bi-info-circle me-1"></i>Your query is analyzed locally — no message text is stored or transmitted externally.</p>
             </form>
         </div>
     </div>
