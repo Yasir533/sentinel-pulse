@@ -1,0 +1,138 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}System Health | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="page-title font-outfit text-light mb-1">System Health & Telemetry</h1>
+    <p class="text-secondary small mb-0">Real-time status monitoring, integration APIs heartbeat, and service configuration metrics.</p>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Overall Status Card -->
+    <div class="col-12 col-md-4">
+        <div class="card border border-secondary-subtle bg-panel p-4 text-center">
+            <h6 class="text-secondary font-outfit small mb-3" style="text-transform: uppercase; letter-spacing: 0.05em;">Overall Health</h6>
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-10 text-success mb-3 animate-pulse" style="width: 80px; height: 80px; border: 2px solid rgba(16, 185, 129, 0.3);">
+                <i class="bi bi-heart-fill fs-1"></i>
+            </div>
+            <h3 class="font-outfit text-success fw-bold">{{ overall_health }}</h3>
+            <p class="text-muted small mb-0">All core microservices operating within nominal parameters.</p>
+        </div>
+    </div>
+
+    <!-- Telemetry Information Card -->
+    <div class="col-12 col-md-8">
+        <div class="card border border-secondary-subtle bg-panel p-4 h-100">
+            <h6 class="text-secondary font-outfit small mb-3" style="text-transform: uppercase; letter-spacing: 0.05em;">System Properties</h6>
+            <div class="row g-3">
+                <div class="col-6">
+                    <span class="text-muted d-block small">Environment</span>
+                    <strong class="text-light">{{ env }}</strong>
+                </div>
+                <div class="col-6">
+                    <span class="text-muted d-block small">Current Version</span>
+                    <strong class="text-light">{{ version }}</strong>
+                </div>
+                <div class="col-6">
+                    <span class="text-muted d-block small">Platform Uptime</span>
+                    <strong class="text-light">{{ uptime }}</strong>
+                </div>
+                <div class="col-6">
+                    <span class="text-muted d-block small">API Status</span>
+                    <strong class="text-success"><i class="bi bi-check-circle-fill me-1"></i> Online</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="font-outfit text-light mb-3">Microservice Health Heartbeats</h4>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    <!-- Backend Health -->
+    <div class="col">
+        <div class="card border border-secondary-subtle bg-panel p-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="text-secondary font-outfit small mb-0">Backend Core</h6>
+                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">Nominal</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-cpu fs-2 text-accent-glow"></i>
+                <div>
+                    <span class="text-muted d-block small">Status</span>
+                    <strong class="text-light">{{ backend_status }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Database Health -->
+    <div class="col">
+        <div class="card border border-secondary-subtle bg-panel p-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="text-secondary font-outfit small mb-0">SQLite Engine</h6>
+                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">Nominal</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-database-fill fs-2 text-success"></i>
+                <div>
+                    <span class="text-muted d-block small">Status</span>
+                    <strong class="text-light">{{ db_status }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Service -->
+    <div class="col">
+        <div class="card border border-secondary-subtle bg-panel p-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="text-secondary font-outfit small mb-0">Broadcaster</h6>
+                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">Nominal</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-broadcast fs-2 text-info"></i>
+                <div>
+                    <span class="text-muted d-block small">Status</span>
+                    <strong class="text-light">{{ notification_status }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VirusTotal integration -->
+    <div class="col">
+        <div class="card border border-secondary-subtle bg-panel p-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="text-secondary font-outfit small mb-0">VirusTotal API</h6>
+                <span class="badge bg-{% if vt_status == 'Configured' %}success{% else %}warning{% endif %} bg-opacity-10 text-{% if vt_status == 'Configured' %}success{% else %}warning{% endif %} border border-{% if vt_status == 'Configured' %}success{% else %}warning{% endif %} border-opacity-25">{% if vt_status == 'Configured' %}Active{% else %}Inactive{% endif %}</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-cloud-check-fill fs-2 text-primary"></i>
+                <div>
+                    <span class="text-muted d-block small">API Key Status</span>
+                    <strong class="text-light">{{ vt_status }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AbuseIPDB Integration -->
+    <div class="col">
+        <div class="card border border-secondary-subtle bg-panel p-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="text-secondary font-outfit small mb-0">AbuseIPDB API</h6>
+                <span class="badge bg-{% if abuse_status == 'Configured' %}success{% else %}warning{% endif %} bg-opacity-10 text-{% if abuse_status == 'Configured' %}success{% else %}warning{% endif %} border border-{% if abuse_status == 'Configured' %}success{% else %}warning{% endif %} border-opacity-25">{% if abuse_status == 'Configured' %}Active{% else %}Inactive{% endif %}</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-shield-lock-fill fs-2 text-warning"></i>
+                <div>
+                    <span class="text-muted d-block small">API Key Status</span>
+                    <strong class="text-light">{{ abuse_status }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

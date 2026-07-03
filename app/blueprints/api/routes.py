@@ -7,7 +7,7 @@ def get_status():
     return jsonify({
         "status": "healthy",
         "service": "Sentinel Pulse API",
-        "version": "1.0.0-phase1"
+        "version": "Version 2.0 RC1"
     }), 200
 
 @api_bp.route('/threats', methods=['GET'])

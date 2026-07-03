@@ -183,7 +183,7 @@
                         </li>
                         <li class="nav-item">
                             <a href="{{ url_for('threats.list_threats') }}" class="nav-link {% if request.blueprint == 'threats' %}active{% endif %}">
-                                <i class="bi bi-virus"></i>
+                                <i class="bi bi-shield-slash"></i>
                                 <span>Threats</span>
                             </a>
                         </li>
@@ -196,7 +196,7 @@
                         {% if current_user.is_authenticated %}
                         <li class="nav-item">
                             <a href="{{ url_for('alerts.list_alerts') }}" class="nav-link {% if request.blueprint == 'alerts' %}active{% endif %}">
-                                <i class="bi bi-alarm"></i>
+                                <i class="bi bi-bell"></i>
                                 <span>Alerts</span>
                             </a>
                         </li>
@@ -223,9 +223,9 @@
                         {% endif %}
                         <li class="nav-item-divider my-2"></li>
                         <li class="nav-item">
-                            <a href="/api/status" class="nav-link" target="_blank">
-                                <i class="bi bi-braces"></i>
-                                <span>API Status</span>
+                            <a href="{{ url_for('dashboard.system_health') }}" class="nav-link {% if request.path == '/health' %}active{% endif %}">
+                                <i class="bi bi-heart-pulse"></i>
+                                <span>System Health</span>
                             </a>
                         </li>
                     </ul>
@@ -284,7 +284,7 @@
             <div class="d-flex gap-3">
                 <a href="#" class="text-muted text-decoration-none small">Privacy Policy</a>
                 <a href="#" class="text-muted text-decoration-none small">Terms of Service</a>
-                <span class="badge bg-secondary-subtle text-light small border border-secondary border-opacity-25">Phase 1 Foundation</span>
+                <span class="badge bg-secondary-subtle text-light small border border-secondary border-opacity-25">Version 2.0 RC1</span>
             </div>
         </div>
     </footer>
