@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from flask import render_template, redirect, url_for, Response, current_app, request, flash, send_file
+from flask import render_template, redirect, url_for, Response, current_app, request, flash, send_file, abort
 from flask_login import login_required, current_user
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
@@ -11,9 +11,11 @@ from app.models.activity_log import ActivityLog
 from app.models.alert import Alert
 from app.models.notification import Notification
 from app.models.report import Report
+from app.models.audit_log import AuditLog
 from app.services.scorecard import ScorecardService
 from app.extensions import db
 from app.utils import role_required
+
 
 @dashboard_bp.route('/')
 def index() -> str | Response:

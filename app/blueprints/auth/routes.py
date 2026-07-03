@@ -60,7 +60,7 @@ def register() -> str | Response:
             db.session.commit()
             flash("Registration successful! Please log in.", "success")
             return redirect(url_for('auth.login'))
-        except Exception as e:
+        except Exception:
             db.session.rollback()
             flash("An error occurred during registration. Please try again.", "danger")
 
@@ -75,7 +75,7 @@ def login() -> str | Response:
     if request.method == 'POST':
         username_or_email = request.form.get('username_or_email', '').strip()
         password = request.form.get('password', '')
-        remember = True if request.form.get('remember_me') == 'true' or request.form.get('remember_me') == 'True' or request.form.get('remember_me') == 'true' or request.form.get('remember_me') else False
+        remember = bool(request.form.get('remember_me'))
 
         if not username_or_email or not password:
             flash("Please fill in all fields.", "danger")
@@ -94,13 +94,14 @@ def login() -> str | Response:
 
         if not user.is_active:
             from app.services.audit import AuditService
-            AuditService.log('User Login Blocked (Deactivated)', user.username, status='Failed', username=user.username, role=user.role)
+            AuditService.log('User Login Blocked (Deactivated)', user.username,
+                             status='Failed', username=user.username, role=user.role)
             flash("Your account has been deactivated.", "warning")
             return render_template('auth/login.html')
 
-        # Authenticate and login user
+        # Authenticate and create session
         login_user(user, remember=remember)
-        
+
         # Update last login timestamp
         user.last_login_at = datetime.utcnow()
         try:
@@ -109,7 +110,8 @@ def login() -> str | Response:
             db.session.rollback()
 
         from app.services.audit import AuditService
-        AuditService.log('User Login', user.username, status='Success', username=user.username, role=user.role)
+        AuditService.log('User Login', user.username, status='Success',
+                         username=user.username, role=user.role)
 
         flash(f"Welcome back, {user.username}!", "success")
         return redirect(url_for('dashboard.index'))
@@ -130,7 +132,5 @@ def logout() -> Response:
 @login_required
 @role_required('Admin')
 def admin_only() -> str:
-    """Helper route to verify role restriction works."""
+    """RBAC verification endpoint — confirms Admin clearance is enforced."""
     return "Admin Access Granted"
-
-

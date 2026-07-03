@@ -62,7 +62,10 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-sm px-4">Save Configuration</button>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary btn-sm px-4">Save Configuration</button>
+                        <a href="{{ url_for('dashboard.admin_dashboard') }}" class="btn btn-outline-secondary btn-sm px-4">Cancel</a>
+                    </div>
                 </form>
             </div>
         </div>
@@ -75,7 +78,7 @@
                 <h5 class="mb-0 font-outfit text-light"><i class="bi bi-shield-lock text-accent-glow me-2"></i>Security Notice</h5>
             </div>
             <div class="card-body">
-                <p class="text-secondary small mb-3">You are logged in with **Admin clearance**. Actions performed on this console adjust core runtime options instantly.</p>
+                <p class="text-secondary small mb-3">You are logged in with <strong>Admin clearance</strong>. Actions performed on this console adjust core runtime options instantly.</p>
                 <div class="alert alert-warning border border-warning border-opacity-25 bg-dark mb-0 d-flex gap-2 align-items-start">
                     <i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>
                     <span class="text-light small">Changing API constants might cause sync interruptions with the celery task runner during active lookups.</span>

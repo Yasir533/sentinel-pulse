@@ -75,11 +75,24 @@ def dashboard():
             db.session.rollback()
 
     recent_activity = submissions[:6]
-    
-    # Simple risk trend mock data
-    trend_labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4']
-    trend_values = [85, 90, 80, security_score]
-    
+
+    # Real 4-week risk trend: count submissions per week for the past 4 weeks
+    from datetime import date, timedelta
+    from sqlalchemy import func as sql_func
+    today = date.today()
+    trend_labels = []
+    trend_values = []
+    for weeks_ago in range(3, -1, -1):
+        week_start = today - timedelta(days=today.weekday() + 7 * weeks_ago)
+        week_end = week_start + timedelta(days=6)
+        week_count = MobileSubmission.query.filter(
+            MobileSubmission.user_id == current_user.id,
+            sql_func.date(MobileSubmission.created_at) >= week_start,
+            sql_func.date(MobileSubmission.created_at) <= week_end
+        ).count()
+        trend_labels.append(week_start.strftime('%b %d'))
+        trend_values.append(week_count)
+
     return render_template(
         'mobile/dashboard.html',
         security_score=security_score,
