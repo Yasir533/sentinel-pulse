@@ -1,0 +1,6 @@
+<svg width="110" height="135" style="border: 1px solid #ccc; background-color: #f8fafc;">
+        <rect width="110" height="135" fill="#f1f5f9"/>
+        <circle cx="55" cy="50" r="22" fill="#cbd5e1"/>
+        <path d="M25,115 C25,85 85,85 85,115" fill="#cbd5e1"/>
+        <text x="55" y="130" font-family="Arial" font-size="7.5" fill="#64748b" text-anchor="middle">PHOTO PLACEHOLDER</text>
+      </svg>

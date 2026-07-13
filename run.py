@@ -21,10 +21,32 @@ print("VT Config =", app.config.get("VIRUSTOTAL_API_KEY"))
 print("Database URI:", app.config["SQLALCHEMY_DATABASE_URI"])
 
 if __name__ == '__main__':
+    import socket
+
+    def get_local_ip():
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.connect(("8.8.8.8", 80))
+            return s.getsockname()[0]
+        except Exception:
+            return "127.0.0.1"
+        finally:
+            s.close()
+
     # Determine host and port
-    host = os.environ.get('FLASK_RUN_HOST', '127.0.0.1')
+    host = os.environ.get('FLASK_RUN_HOST', '0.0.0.0')
     port = int(os.environ.get('FLASK_RUN_PORT', 5000))
     debug = app.config.get('DEBUG', True)
+    lan_ip = get_local_ip()
 
-    print(f" * Starting Sentinel Pulse Platform in {os.environ.get('FLASK_ENV', 'development')} mode...")
+    print("=" * 55)
+    print("  Sentinel Pulse Platform")
+    print("=" * 55)
+    print(f"  Laptop : http://127.0.0.1:{port}")
+    print(f"  Phone  : http://{lan_ip}:{port}  (same Wi-Fi)")
+    print("=" * 55)
+    print(f"  Mode   : {os.environ.get('FLASK_ENV', 'development')}")
+    print("=" * 55)
+
     app.run(host=host, port=port, debug=debug)
+

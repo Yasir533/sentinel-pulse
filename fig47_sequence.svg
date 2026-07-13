@@ -1,0 +1,36 @@
+<svg width="600" height="280" viewBox="0 0 600 280" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155" />
+        </marker>
+      </defs>
+      
+      <!-- Lifelines -->
+      <text x="80" y="30" font-family="Arial" font-size="10" font-weight="bold" fill="#334155" text-anchor="middle">Security User</text>
+      <line x1="80" y1="40" x2="80" y2="240" stroke="#64748b" stroke-dasharray="4,4"/>
+      
+      <text x="240" y="30" font-family="Arial" font-size="10" font-weight="bold" fill="#334155" text-anchor="middle">Flask App Route</text>
+      <line x1="240" y1="40" x2="240" y2="240" stroke="#64748b" stroke-dasharray="4,4"/>
+      
+      <text x="400" y="30" font-family="Arial" font-size="10" font-weight="bold" fill="#334155" text-anchor="middle">AIScamAnalyzer</text>
+      <line x1="400" y1="40" x2="400" y2="240" stroke="#64748b" stroke-dasharray="4,4"/>
+      
+      <text x="540" y="30" font-family="Arial" font-size="10" font-weight="bold" fill="#334155" text-anchor="middle">SQLite Database</text>
+      <line x1="540" y1="40" x2="540" y2="240" stroke="#64748b" stroke-dasharray="4,4"/>
+      
+      <!-- Action Lines -->
+      <line x1="80" y1="70" x2="240" y2="70" stroke="#1d4ed8" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="160" y="63" font-family="Arial" font-size="9" fill="#1e40af" text-anchor="middle">POST /mobile/scan/link</text>
+      
+      <line x1="240" y1="110" x2="400" y2="110" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="320" y="103" font-family="Arial" font-size="9" fill="#065f46" text-anchor="middle">analyze_content('url')</text>
+      
+      <line x1="400" y1="150" x2="540" y2="150" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="470" y="143" font-family="Arial" font-size="9" fill="#5b21b6" text-anchor="middle">Insert MobileSubmission</text>
+      
+      <line x1="540" y1="190" x2="240" y2="190" stroke="#64748b" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+      <text x="390" y="183" font-family="Arial" font-size="8.5" fill="#475569" text-anchor="middle">Return save confirmation</text>
+      
+      <line x1="240" y1="220" x2="80" y2="220" stroke="#64748b" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+      <text x="160" y="213" font-family="Arial" font-size="8.5" fill="#475569" text-anchor="middle">Renders output dashboard results</text>
+    </svg>

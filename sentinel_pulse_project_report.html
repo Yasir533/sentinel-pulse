@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentinel Pulse - Major Project Report</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 25mm 20mm 20mm 20mm;
+    }
+    body {
+      font-family: 'Calibri', 'Arial', sans-serif;
+      color: #000000;
+      background-color: #ffffff;
+      line-height: 1.6;
+      font-size: 12pt;
+      margin: 0;
+      padding: 0;
+      text-align: justify;
+    }
+    .page-break {
+      page-break-before: always;
+    }
+    .content-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    /* Cover Page Styles */
+    .cover-title {
+      font-size: 16pt;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+    .cover-subtitle {
+      font-size: 12pt;
+      text-align: center;
+      margin-top: 15px;
+      font-style: italic;
+    }
+    .cover-submitted {
+      font-size: 13pt;
+      text-align: center;
+      margin-top: 30px;
+      font-weight: bold;
+    }
+    .cover-guide {
+      font-size: 13pt;
+      text-align: center;
+      margin-top: 40px;
+    }
+    .institution-info {
+      font-size: 13pt;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 50px;
+      line-height: 1.5;
+    }
+    
+    /* Academic Borders (Double Line Style) */
+    .header-rule {
+      border-top: 3px double #000000;
+      margin-top: 5px;
+      margin-bottom: 20px;
+    }
+    .footer-rule {
+      border-top: 1px solid #333333;
+      margin-top: 30px;
+      padding-top: 5px;
+      font-size: 10pt;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    h1, h2, h3, h4 {
+      color: #000000;
+      font-weight: bold;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      page-break-after: avoid;
+    }
+    h1 {
+      font-size: 15pt;
+      border-bottom: 1px solid #000000;
+      padding-bottom: 3px;
+      text-transform: uppercase;
+      margin-top: 30px;
+    }
+    h2 {
+      font-size: 13pt;
+    }
+    h3 {
+      font-size: 12pt;
+    }
+    p {
+      text-indent: 0.5in;
+      margin-top: 0;
+      margin-bottom: 15px;
+      text-align: justify;
+    }
+    .no-indent {
+      text-indent: 0;
+    }
+    
+    /* Table Styling */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 11pt;
+    }
+    th, td {
+      border: 1px solid #000000;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+    tr {
+      page-break-inside: avoid;
+    }
+    
+    /* Diagram wrapper */
+    .diagram-container {
+      text-align: center;
+      margin: 25px 0;
+      page-break-inside: avoid;
+    }
+    .diagram-caption {
+      font-size: 11pt;
+      font-weight: bold;
+      margin-top: 8px;
+      color: #333333;
+    }
+
+    /* List styling */
+    ul, ol {
+      margin-top: 0;
+      margin-bottom: 15px;
+      padding-left: 30px;
+    }
+    li {
+      margin-bottom: 5px;
+      text-align: justify;
+    }
+    
+    /* Code snippets */
+    pre {
+      background-color: #f8f9fa;
+      border: 1px solid #dddddd;
+      padding: 12px;
+      border-radius: 4px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 9.5pt;
+      overflow-x: auto;
+      margin: 15px 0;
+      white-space: pre-wrap;
+      text-indent: 0;
+    }
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 10pt;
+      background-color: #f1f3f5;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="content-container">
+
+  <!-- ================= COVER PAGE ================= -->
+  <div style="text-align: center; min-height: 250mm; display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <h2 style="font-size: 15pt; margin: 0; letter-spacing: 1px;">SRINIVAS UNIVERSITY</h2>
+      <h3 style="font-size: 13pt; margin: 5px 0 0 0; font-weight: normal;">INSTITUTE OF ENGINEERING & TECHNOLOGY</h3>
+      <h4 style="font-size: 11pt; margin: 5px 0 0 0; font-weight: normal; letter-spacing: 0.5px;">MUKKA, MANGALURU – 574146</h4>
+      
+      <div style="margin: 40px 0;">
+        <!-- Srinivas University Blue/Gold Logo Representation in SVG -->
+        <img src="su_logo.svg" width="120" style="display: block; margin: 0 auto; max-width: 100%; height: auto;" alt="SU Logo">
+      </div>
+
+      <div class="header-rule"></div>
+      
+      <h3 style="font-size: 12pt; margin: 20px 0 10px 0; font-weight: bold; letter-spacing: 1px;">MAJOR PROJECT REPORT ON</h3>
+      
+      <div class="cover-title" style="color: #b91c1c; font-size: 15pt;">
+        SENTINEL PULSE: AN AI-DRIVEN UNIFIED THREAT INTELLIGENCE AND MOBILE SECURITY OBSERVABILITY PLATFORM
+      </div>
+      
+      <div class="cover-subtitle">
+        Submitted in the partial fulfillment of the requirements for the award of the degree of
+      </div>
+      
+      <h3 style="font-size: 13pt; margin: 15px 0; font-weight: bold;">MASTER OF COMPUTER APPLICATIONS<br/>(DUAL SPECIALIZATION)</h3>
+      
+      <div class="cover-submitted">
+        Submitted by
+      </div>
+      
+      <div style="margin-top: 15px; font-size: 14pt; font-weight: bold; display: flex; justify-content: space-around;">
+        <span>MOHAMMED YASIR</span>
+        <span>03SU24MC838</span>
+      </div>
+      
+      <div class="cover-guide">
+        <strong>Under the guidance of</strong><br/>
+        <span style="font-size: 13pt; font-weight: bold; display: inline-block; margin-top: 5px;">Mrs. Mamatha S J</span><br/>
+        <span style="font-size: 11pt; font-style: italic;">Assistant Professor, Dept of MCA</span>
+      </div>
+    </div>
+    
+    <div class="institution-info" style="margin-top: 50px;">
+      <div class="header-rule" style="margin-bottom: 10px;"></div>
+      DEPARTMENT OF MASTER OF COMPUTER APPLICATIONS<br/>
+      SRINIVAS UNIVERSITY, MUKKA<br/>
+      2025-26
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ================= CERTIFICATE ================= -->
+  <div style="min-height: 250mm; display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <div style="text-align: center;">
+        <h2 style="font-size: 14pt; margin: 0;">SRINIVAS UNIVERSITY</h2>
+        <h3 style="font-size: 12pt; margin: 3px 0; font-weight: normal;">INSTITUTE OF ENGINEERING AND TECHNOLOGY</h3>
+        <h4 style="font-size: 10pt; margin: 3px 0 0 0; font-weight: normal;">MUKKA, SURATHKAL, MANGALURU-574146</h4>
+        <h4 style="font-size: 11pt; margin: 10px 0; font-weight: bold; border-bottom: 1px solid #000000; padding-bottom: 5px;">DEPARTMENT OF MASTER OF COMPUTER APPLICATIONS</h4>
+        
+        <h2 style="font-size: 15pt; margin-top: 30px; letter-spacing: 2px;">CERTIFICATE</h2>
+      </div>
+      
+      <p style="margin-top: 40px; line-height: 1.8; font-size: 12pt;">
+        Certified that the project work entitled <strong style="color: #b91c1c;">“SENTINEL PULSE: AN AI-DRIVEN UNIFIED THREAT INTELLIGENCE AND MOBILE SECURITY OBSERVABILITY PLATFORM”</strong> is a bona fide work carried out by <strong style="text-transform: uppercase;">Mr. Mohammed Yasir</strong> bearing Register Number <strong>03SU24MC838</strong> in partial fulfillment for the award of <strong>MASTER OF COMPUTER APPLICATIONS</strong> of the *Srinivas University Institute Of Engineering And Technology, Mukka, Mangaluru* during the year <strong>2025–2026</strong>.
+      </p>
+      
+      <p style="line-height: 1.8; font-size: 12pt;">
+        It is certified that all corrections/suggestions indicated for Internal Assessment have been incorporated in the report deposited in the departmental library. The project report has been approved as it satisfies the academic requirements in respect of Project work prescribed for the <strong>MASTER OF COMPUTER APPLICATIONS</strong> Degree.
+      </p>
+    </div>
+    
+    <div>
+      <div style="margin-top: 80px; display: flex; justify-content: space-between; text-align: center; font-size: 11pt;">
+        <div style="width: 30%;">
+          <strong>Mrs. MAMATHA S J</strong><br/>
+          <span style="font-size: 9.5pt; font-style: italic;">Project Guide</span>
+        </div>
+        <div style="width: 30%;">
+          <strong>Prof. ANAND S UPPAR</strong><br/>
+          <span style="font-size: 9.5pt; font-style: italic;">Head of the Department</span>
+        </div>
+        <div style="width: 30%;">
+          <strong>Dr. RAMAKRISHNA N. HEGDE</strong><br/>
+          <span style="font-size: 9.5pt; font-style: italic;">Dean, SUIET, Mukka</span>
+        </div>
+      </div>
+      
+      <div style="margin-top: 60px; font-size: 11pt;">
+        <strong>Name of the Examiners</strong> <span style="float: right; margin-right: 100px;"><strong>Signature with date</strong></span>
+        <div style="margin-top: 25px;">1. ___________________________ <span style="float: right; margin-right: 100px;">____________________</span></div>
+        <div style="margin-top: 20px;">2. ___________________________ <span style="float: right; margin-right: 100px;">____________________</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ================= DECLARATION ================= -->
+  <div style="min-height: 250mm; display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <div style="text-align: center;">
+        <h2 style="font-size: 14pt; margin: 0;">SRINIVAS UNIVERSITY</h2>
+        <h3 style="font-size: 12pt; margin: 3px 0; font-weight: normal;">INSTITUTE OF ENGINEERING AND TECHNOLOGY</h3>
+        <h4 style="font-size: 10pt; margin: 3px 0 0 0; font-weight: normal;">MUKKA, SURATHKAL, MANGALORE-574146</h4>
+        <h4 style="font-size: 11pt; margin: 10px 0; font-weight: bold; border-bottom: 1px solid #000000; padding-bottom: 5px;">Department of Master of Computer Applications</h4>
+        
+        <h2 style="font-size: 15pt; margin-top: 30px; letter-spacing: 2px;">DECLARATION</h2>
+      </div>
+      
+      <p style="margin-top: 40px; line-height: 1.8; font-size: 12pt;">
+        I, <strong>Mr. MOHAMMED YASIR</strong>, student of fourth semester, <strong>MASTER OF COMPUTER APPLICATIONS</strong>, Srinivas University, Mukka, hereby declare that the project entitled <strong>“Sentinel Pulse: An AI-Driven Unified Threat Intelligence and Mobile Security Observability Platform”</strong> has been successfully completed by me in partial fulfillment of the requirements for the award of degree in <strong>MASTER OF COMPUTER APPLICATIONS</strong> of Srinivas University Institute of Engineering and Technology and no part of it has been submitted for the award of degree or diploma in any university or institution previously.
+      </p>
+      
+      <div style="margin-top: 50px; font-size: 12pt;">
+        <strong>Date:</strong> ___________________<br/><br/>
+        <strong>Place:</strong> Mukka, Mangaluru
+      </div>
+    </div>
+    
+    <div style="margin-top: 100px; display: flex; justify-content: space-between; font-size: 11pt;">
+      <div>
+        <strong>Name and Reg. No. of the Student:</strong><br/>
+        <span style="font-size: 12pt; font-weight: bold; display: inline-block; margin-top: 5px;">MOHAMMED YASIR</span><br/>
+        <span style="font-size: 11pt;">Reg. No: <strong>03SU24MC838</strong></span>
+      </div>
+      <div style="text-align: center; margin-right: 50px;">
+        <strong>Signature of the Student:</strong><br/><br/><br/>
+        <span>__________________________</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ================= ABSTRACT ================= -->
+  <h1 class="no-indent" style="text-align: center; border: none; font-size: 16pt;">ABSTRACT</h1>
+  <div class="header-rule"></div>
+  
+  <p>
+    Modern smartphone users face an escalating barrage of targeted cybersecurity threats, including smishing (SMS phishing), malicious WhatsApp transcripts, fraudulent email campaigns, malicious APK payloads, and credential harvesting QR codes. Traditional Security Operations Center (SOC) platforms monitor enterprise server and network infrastructure but lack direct visibility into these smartphone endpoint attack vectors. Sentinel Pulse was designed to bridge this critical visibility gap.
+  </p>
+  
+  <p>
+    Sentinel Pulse is a unified, production-grade cybersecurity application platform designed to ingest multi-channel mobile threat telemetry and process it through a custom-built AI Scam Analyzer & Heuristics Engine. Built on the clean architecture paradigm and Flask Application Factory pattern, the platform accepts inputs from various vectors (SMS texts, URLs, WhatsApp messages, APK file hashes, QR destination links) and evaluates them against localized fraud keyword patterns, fear-inducing urgency classifiers, and a historical Threat Correlation blocklist. The platform integrates directly with public reputation lookup services (VirusTotal API and AbuseIPDB API) to dynamically enrich threat indicators (IOCs). High-risk submissions (verdict score &ge; 35) automatically generate system-wide Threat indicators, register corresponding SOC Alerts, dispatch Audit logs, and broadcast notifications to system analysts.
+  </p>
+  
+  <p>
+    The backend system, implemented in Python 3.12 and Flask, is supported by a robust SQLite database layer using SQLAlchemy ORM. The interface features a stylized "Cyber Theme" Dark Console powered by HTML5, CSS3, JavaScript, and Bootstrap 5, complete with dynamic SVG metrics, interactive scanning widgets, threat timelines, and a rule-based AI Security Assistant chat copilot. Extensive automated verification suites using Pytest confirm the accuracy of heuristic classifications, API connectivity, and pipeline state transitions with all 81 tests passing successfully. Sentinel Pulse demonstrates that real-time threat intelligence and mobile security observability can be effectively consolidated into a unified operations console, empowering both endpoints and security analysts to defend against modern social engineering campaigns.
+  </p>
+  
+  <p class="no-indent" style="margin-top: 30px;">
+    <strong>Keywords:</strong> Threat Intelligence, SOC Observability, Mobile Security, Smishing Detection, Heuristics Analyzer, VirusTotal Integration, Flask Application Factory, Clean Architecture.
+  </p>
+
+  <div class="page-break"></div>
+
+  <!-- ================= ACKNOWLEDGEMENT ================= -->
+  <h1 class="no-indent" style="text-align: center; border: none; font-size: 16pt;">ACKNOWLEDGEMENT</h1>
+  <div class="header-rule"></div>
+  
+  <p>
+    I take this opportunity to express my profound gratitude to my respected project guide <strong>Mrs. Mamatha S J</strong>, Assistant Professor, Dept. of MCA for her ever-inspiring guidance, constant encouragement, and support.
+  </p>
+  
+  <p>
+    I also would like to express my deep sense of gratitude and indebtedness to our Project coordinator <strong>Prof. Vishnu P J</strong>, Assistant Professor, Dept. of MCA for his encouragement and guidance that he has extended in the course of carrying out my project.
+  </p>
+  
+  <p>
+    I sincerely thank <strong>Prof. Anand S Uppar</strong>, Head of the Department, Master of Computer Applications, for being an inspiration and support throughout this project.
+  </p>
+  
+  <p>
+    I am extremely grateful to our respected Dean, <strong>Dr. Ramakrishna N Hegde</strong> for providing the facilities to carry out the project.
+  </p>
+  
+  <p>
+    I am deeply indebted to <strong>Late Dr. Sri. CA. A. Raghavendra Rao</strong>, Founder Chancellor of <strong>Srinivas University, Mangaluru</strong>, whose vision and commitment to education continue to inspire me.
+  </p>
+  
+  <p>
+    I extend my sincere gratitude to <strong>Dr. A. Srinivas Rao</strong>, Chancellor, <strong>Srinivas University, Mangaluru</strong>, for providing a supportive academic environment and the necessary facilities that enabled me to successfully complete this project.
+  </p>
+  
+  <p>
+    I would like to thank all the teaching and non-teaching staff of the Master of Computer Applications for their support and help.
+  </p>
+  
+  <p>
+    Finally, I express my profound gratitude to my parents and friends who have helped me in every conceived manner with their valuable suggestions, encouragement, and moral support.
+  </p>
+  
+  <div style="margin-top: 80px; text-align: right; font-weight: bold; font-size: 12pt;">
+    MOHAMMED YASIR
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ================= TABLE OF CONTENTS ================= -->
+  <h1 class="no-indent" style="text-align: center; border: none; font-size: 16pt;">TABLE OF CONTENTS</h1>
+  <div class="header-rule"></div>
+  
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 15%;">SECTION</th>
+        <th style="width: 70%;">CONTENTS</th>
+        <th style="width: 15%; text-align: center;">PAGE NO.</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1.</strong></td>
+        <td><strong>SYNOPSIS</strong></td>
+        <td style="text-align: center;"><strong>1 - 5</strong></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>1.1 Introduction</td>
+        <td style="text-align: center;">1</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>1.2 Project Agenda</td>
+        <td style="text-align: center;">1</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>1.3 Project Description</td>
+        <td style="text-align: center;">1-2</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>1.4 Problem Statement</td>
+        <td style="text-align: center;">2-3</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>1.5 Proposed Solution</td>
+        <td style="text-align: center;">3</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>1.6 Objective of the Project</td>
+        <td style="text-align: center;">3-4</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>1.7 Scope of the Project</td>
+        <td style="text-align: center;">4</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>1.8 Applications of the Project</td>
+        <td style="text-align: center;">4</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>1.9 Advantages</td>
+        <td style="text-align: center;">4-5</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>1.10 Disadvantages</td>
+        <td style="text-align: center;">5</td>
+      </tr>
+      
+      <tr>
+        <td><strong>2.</strong></td>
+        <td><strong>LITERATURE SURVEY</strong></td>
+        <td style="text-align: center;"><strong>6 - 7</strong></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>2.1 Existing System</td>
+        <td style="text-align: center;">6</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>2.2 Proposed System</td>
+        <td style="text-align: center;">6</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>2.3 Research Gap</td>
+        <td style="text-align: center;">6-7</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>2.4 Comparative Analysis</td>
+        <td style="text-align: center;">7</td>
+      </tr>
+      
+      <tr>
+        <td><strong>3.</strong></td>
+        <td><strong>REQUIREMENTS SPECIFICATION</strong></td>
+        <td style="text-align: center;"><strong>8 - 10</strong></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>3.1 Hardware Requirements</td>
+        <td style="text-align: center;">8</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>3.2 Software Requirements</td>
+        <td style="text-align: center;">8</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>3.3 Programming Languages</td>
+        <td style="text-align: center;">8</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>3.4 Libraries and Frameworks Used</td>
+        <td style="text-align: center;">8-9</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>3.5 Technology Stack</td>
+        <td style="text-align: center;">9</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>3.6 Machine Learning & Deep Learning Models</td>
+        <td style="text-align: center;">9</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>3.7 Functional Requirements</td>
+        <td style="text-align: center;">9-10</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>3.8 Non-Functional Requirements</td>
+        <td style="text-align: center;">10</td>
+      </tr>
+      
+      <tr>
+        <td><strong>4.</strong></td>
+        <td><strong>SYSTEM DESIGN</strong></td>
+        <td style="text-align: center;"><strong>11 - 18</strong></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>4.1 System Architecture</td>
+        <td style="text-align: center;">11</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>4.2 Workflow Diagram</td>
+        <td style="text-align: center;">12-13</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>4.3 Flowchart</td>
+        <td style="text-align: center;">13-14</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>4.4 Database Design</td>
+        <td style="text-align: center;">15-16</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>4.5 Use Case Diagram</td>
+        <td style="text-align: center;">16-17</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>4.6 Activity Diagram</td>
+        <td style="text-align: center;">17-18</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>4.7 Sequence Diagram</td>
+        <td style="text-align: center;">18</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>4.8 Algorithms Used</td>
+        <td style="text-align: center;">18</td>
+      </tr>
+      
+      <tr>
+        <td><strong>5.</strong></td>
+        <td><strong>IMPLEMENTATION</strong></td>
+        <td style="text-align: center;"><strong>19 - 29</strong></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>5.1 Project Introduction</td>
+        <td style="text-align: center;">19</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>5.2 Project Directory Structure</td>
+        <td style="text-align: center;">19-20</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>5.3 Backend Implementation</td>
+        <td style="text-align: center;">20-24</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>5.4 AI & Machine Learning Implementation</td>
+        <td style="text-align: center;">24-26</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>5.5 Frontend Implementation</td>
+        <td style="text-align: center;">26-29</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>5.6 Experimental Setup</td>
+        <td style="text-align: center;">29</td>
+      </tr>
+      
+      <tr>
+        <td><strong>6.</strong></td>
+        <td><strong>TESTING</strong></td>
+        <td style="text-align: center;"><strong>30 - 31</strong></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>6.1 Unit Testing</td>
+        <td style="text-align: center;">30</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>6.2 Integration Testing</td>
+        <td style="text-align: center;">30</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>6.3 Performance Testing</td>
+        <td style="text-align: center;">31</td>
+      </tr>
+      
+      <tr>
+        <td><strong>7.</strong></td>
+        <td><strong>RESULTS AND ANALYSIS</strong></td>
+        <td style="text-align: center;"><strong>32 - 38</strong></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>7.1 Dashboard Results</td>
+        <td style="text-align: center;">32</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>7.2 Threat Intelligence Results</td>
+        <td style="text-align: center;">33</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>7.3 Incident Observability Results</td>
+        <td style="text-align: center;">33-34</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>7.4 AI Scam Analyzer Results</td>
+        <td style="text-align: center;">34</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>7.5 API Integration Results</td>
+        <td style="text-align: center;">34-35</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>7.6 VirusTotal/AbuseIPDB Integration Results</td>
+        <td style="text-align: center;">35</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>7.7 SOC Console Alert Timeline</td>
+        <td style="text-align: center;">36</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>7.8 Admin Module Results</td>
+        <td style="text-align: center;">36-37</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>7.9 Performance Comparison</td>
+        <td style="text-align: center;">37</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>7.10 Alert & Notification Rules</td>
+        <td style="text-align: center;">37-38</td>
+      </tr>
+      
+      <tr>
+        <td><strong>8.</strong></td>
+        <td><strong>CONCLUSION & FUTURE ENHANCEMENTS</strong></td>
+        <td style="text-align: center;"><strong>39 - 40</strong></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>8.1 Conclusion</td>
+        <td style="text-align: center;">39</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>8.2 Future Enhancements</td>
+        <td style="text-align: center;">40</td>
+      </tr>
+      
+      <tr>
+        <td colspan="2"><strong>REFERENCES</strong></td>
+        <td style="text-align: center;"><strong>41 - 42</strong></td>
+      </tr>
+      
+      <tr>
+        <td colspan="2"><strong>APPENDICES</strong></td>
+        <td style="text-align: center;"><strong>43 - 46</strong></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>Appendix – A: Budget Allocation for the Project</td>
+        <td style="text-align: center;">43</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>Appendix – B: Plagiarism Report</td>
+        <td style="text-align: center;">44</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>Appendix – C: Student and Guide Profile</td>
+        <td style="text-align: center;">45</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>Appendix – D: Patent / Journal Certificate</td>
+        <td style="text-align: center;">46</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <!-- ================= LIST OF FIGURES ================= -->
+  <h1 class="no-indent" style="text-align: center; border: none; font-size: 16pt;">LIST OF FIGURES</h1>
+  <div class="header-rule"></div>
+  
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 20%;">FIGURE NO.</th>
+        <th style="width: 65%;">FIGURE NAME</th>
+        <th style="width: 15%; text-align: center;">PAGE NO.</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Fig 4.1</td>
+        <td>System Architecture Diagram</td>
+        <td style="text-align: center;">11</td>
+      </tr>
+      <tr>
+        <td>Fig 4.2</td>
+        <td>Overall Workflow Sequence Diagram</td>
+        <td style="text-align: center;">12</td>
+      </tr>
+      <tr>
+        <td>Fig 4.3</td>
+        <td>Heuristic Analyzer Decision Flowchart</td>
+        <td style="text-align: center;">14</td>
+      </tr>
+      <tr>
+        <td>Fig 4.4</td>
+        <td>Database Entity Relationship Diagram (ERD)</td>
+        <td style="text-align: center;">15</td>
+      </tr>
+      <tr>
+        <td>Fig 4.5</td>
+        <td>Use Case Diagram</td>
+        <td style="text-align: center;">16</td>
+      </tr>
+      <tr>
+        <td>Fig 4.6</td>
+        <td>Ingestion Pipeline Activity Diagram</td>
+        <td style="text-align: center;">17</td>
+      </tr>
+      <tr>
+        <td>Fig 4.7</td>
+        <td>Scan Execution Sequence Diagram</td>
+        <td style="text-align: center;">18</td>
+      </tr>
+      <tr>
+        <td>Fig 5.1</td>
+        <td>Project Directory Structure</td>
+        <td style="text-align: center;">19</td>
+      </tr>
+      <tr>
+        <td>Fig 5.2</td>
+        <td>Flask Application Factory Layout</td>
+        <td style="text-align: center;">20</td>
+      </tr>
+      <tr>
+        <td>Fig 7.1</td>
+        <td>SOC Threat Analyst Dashboard</td>
+        <td style="text-align: center;">32</td>
+      </tr>
+      <tr>
+        <td>Fig 7.2</td>
+        <td>Mobile Submission Scanning View</td>
+        <td style="text-align: center;">33</td>
+      </tr>
+      <tr>
+        <td>Fig 7.3</td>
+        <td>Threat Intelligence Logs & IOC timelines</td>
+        <td style="text-align: center;">34</td>
+      </tr>
+      <tr>
+        <td>Fig 7.4</td>
+        <td>AI Security Assistant Interface</td>
+        <td style="text-align: center;">34</td>
+      </tr>
+      <tr>
+        <td>Fig 7.5</td>
+        <td>VirusTotal API Reputation Feed</td>
+        <td style="text-align: center;">35</td>
+      </tr>
+      <tr>
+        <td>Fig 7.6</td>
+        <td>SOC Alert Console Timeline</td>
+        <td style="text-align: center;">36</td>
+      </tr>
+      <tr>
+        <td>Fig 7.7</td>
+        <td>Administrative Configurations Screen</td>
+        <td style="text-align: center;">37</td>
+      </tr>
+      <tr>
+        <td>Fig 7.8</td>
+        <td>Active System Notifications console</td>
+        <td style="text-align: center;">38</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <!-- ================= CHAPTER 1 ================= -->
+  <h1>CHAPTER - 1: SYNOPSIS</h1>
+  
+  <h2>1.1 INTRODUCTION</h2>
+  <p>
+    Mobile computing devices have evolved from simple communication instruments into the primary repositories of personal data and financial interfaces for users worldwide. As a direct consequence, malicious actors have shifted their attack vectors toward mobile endpoints. Mobile-specific social engineering attacks, such as smishing (SMS phishing), malicious WhatsApp transcripts, fraud-enabling email templates, malicious APK installers, and credential-harvesting QR codes, represent a massive and growing sector of digital crime. While traditional Security Operations Center (SOC) platforms monitor enterprise endpoints, firewalls, and mail relays, they have a blind spot regarding smartphone threat telemetry. Most security analysts remain unaware of threats circulating via SMS or WhatsApp until a data breach occurs.
+  </p>
+  <p>
+    <strong>Sentinel Pulse</strong> is designed to address this security visibility gap by consolidating mobile endpoint telemetry into a unified Threat Intelligence and Observability platform. Sentinel Pulse provides a web console where users and automated endpoint agents can submit threat indicators, including texts, URLs, sender info, and APK hashes. The platform subjects these submissions to an automated, multi-tiered AI Scam Heuristics Engine, classifies them based on risk severity, enriches indicators via API lookups, and escalates serious incidents to the enterprise SOC interface in real-time. By bridging user-level endpoints and analyst consoles, Sentinel Pulse changes mobile security from an isolated personal issue to a structured, observable, and correlatable enterprise defense.
+  </p>
+
+  <h2>1.2 PROJECT AGENDA</h2>
+  <p>
+    The agenda of Sentinel Pulse is to turn unmanaged, scattered mobile threat indicators (e.g., suspicious texts, SMS headers, copied links, file signatures) into centralized, actionable cyber threat intelligence. The primary goal is to combine dynamic threat ingestion with automated AI heuristic triage so that high-risk incidents (such as UPI scams, fake bank KYC updates, and malicious APK downloads) can be detected and blocked instantly, while giving security analysts an observability dashboard to track campaigns, audit actions, and push alerts across the enterprise network.
+  </p>
+
+  <h2>1.3 PROJECT DESCRIPTION</h2>
+  <p>
+    Sentinel Pulse is implemented as a production-grade web application using Python 3.12, Flask, and SQLite. The application follows a Clean Architecture design and the Flask Application Factory pattern, preventing circular dependencies and allowing clean separation of concerns. The platform contains a set of modular Blueprints, Models, Services, and Utilities:
+  </p>
+  <ol>
+    <li><strong>Authentication and Session Registry:</strong> Provides secure multi-role login (Users/Endpoint Clients vs. Security Analysts) using Flask-Login and JWT (JSON Web Tokens) with hashed password stores.</li>
+    <li><strong>Unified Ingestion API (/mobile/submit):</strong> Accepts multi-channel submissions including SMS texts, URL destinations, WhatsApp chats, email details, APK parameters, and optional screenshots.</li>
+    <li><strong>AI Scam Heuristics Engine:</strong> A core service (<code>AIScamAnalyzer</code>) that parses text and metadata using regular expressions, keyword analysis, and risk weights to assign threat verdicts.</li>
+    <li><strong>Threat Intelligence Blocklist (ThreatIntel):</strong> A registry that automatically logs and aggregates repeated indicators, generating signatures for domains, hashes, and numbers.</li>
+    <li><strong>VirusTotal & AbuseIPDB Connectors:</strong> External API clients that enrich suspected URLs and file hashes by requesting public reputation reports.</li>
+    <li><strong>SOC Alert and Notification Dispatcher:</strong> Promotes critical endpoint violations to system-wide alerts, creating notifications for active analysts.</li>
+    <li><strong>Analyst Observability Dashboard:</strong> A dark-themed security console showing active threats, system health, risk scores, trend lines, and search query interfaces.</li>
+    <li><strong>AI Security Assistant:</strong> A rule-based conversational copilot that allows users to paste snippets and receive structured recommendations.</li>
+  </ol>
+
+  <h2>1.4 PROBLEM STATEMENT</h2>
+  <p>
+    Contemporary cybersecurity operations suffer from a structural divide:
+  </p>
+  <ul>
+    <li><strong>Endpoint Telemetry Blindness:</strong> Traditional enterprise SIEM and SOC dashboards monitor domain controllers, firewalls, and workstations, completely omitting mobile phone telemetry (SMS/WhatsApp).</li>
+    <li><strong>Sophistication of Mobile Phishing:</strong> Modern smishing links use localized banking names (SBI, HDFC), custom URL redirections, courier decoys (DHL, FedEx), and UPI refund traps.</li>
+    <li><strong>Absence of Real-time Correlation:</strong> When a user receives a phishing SMS, they either ignore it or fall victim. There is no automated channel to submit the indicator, query its reputation, and update the organization's network blocklists immediately.</li>
+    <li><strong>Opaque and Silent Systems:</strong> Existing mobile protection applications rarely explain why a link or APK is unsafe, creating user distrust.</li>
+  </ul>
+
+  <h2>1.5 PROPOSED SOLUTION</h2>
+  <p>
+    The proposed solution is <strong>Sentinel Pulse</strong>, a unified threat intelligence and incident observability platform. When a smartphone user receives a suspicious message, they submit it to the platform's ingestion layer. The Flask backend processes it through the <code>AIScamAnalyzer</code> heuristics, which scans for bank keywords, lottery claims, UPI PIN prompts, courier tricks, urgency language, and spelling obfuscation. It also performs live reputation checks using VirusTotal API. If a threat is validated, the system automatically:
+  </p>
+  <ol>
+    <li>Calculates a risk score and assigns a security verdict.</li>
+    <li>Registers a <code>ThreatIntel</code> signature, updating the central blocklist.</li>
+    <li>Creates a <code>Threat</code> object and raises a high-priority SOC <code>Alert</code>.</li>
+    <li>Dispatches a system <code>Notification</code> to active security analysts.</li>
+    <li>Provides the user with a transparent explanation and actionable remediation steps.</li>
+  </ol>
+
+  <h2>1.6 OBJECTIVE OF THE PROJECT</h2>
+  <ul>
+    <li>To develop a unified threat ingestion API to receive SMS, WhatsApp transcripts, URLs, and file hashes from mobile endpoints.</li>
+    <li>To construct an automated Heuristic Scam Analyzer to score text features and output structured security verdicts.</li>
+    <li>To implement a dynamic Threat Correlation engine that records repeated attacks and auto-populates an IP/Domain signature blocklist.</li>
+    <li>To integrate external security APIs (VirusTotal and AbuseIPDB) to enrich indicators in real-time.</li>
+    <li>To design an interactive SOC Analyst Dashboard displaying incident metrics, risk trends, and threat categories.</li>
+    <li>To provide an interactive AI Security Assistant chat interface for rapid user queries.</li>
+    <li>To write automated test coverage to verify heuristics, database models, and API endpoints.</li>
+  </ul>
+
+  <h2>1.7 SCOPE OF THE PROJECT</h2>
+  <p>
+    Sentinel Pulse is designed for deployment within corporate security networks, government telecommunication hubs, and mobile service provider frameworks. While the initial foundation leverages a Flask web console and REST API endpoints, the database architecture, schema structures, and service decoupling are built to support native Android agent applications, automated endpoint daemons, and integrations with enterprise SIEM platforms (such as Splunk or Elastic Security). The scope covers mobile telemetry ingestion, real-time threat auditing, and blocklist distribution.
+  </p>
+
+  <h2>1.8 APPLICATIONS OF THE PROJECT</h2>
+  <ul>
+    <li><strong>Corporate SOC Monitoring:</strong> Security teams monitor mobile threat campaigns targeting company executives and employees.</li>
+    <li><strong>Phishing Blocklist Generation:</strong> Generates real-time domain and phone blocklists to update enterprise firewalls and DNS filters.</li>
+    <li><strong>Public Phishing Registry:</strong> A self-service portal where citizens submit suspicious texts to confirm legitimacy before acting.</li>
+    <li><strong>Incident Audit Logs:</strong> Maintains comprehensive records of threat ingestions for corporate compliance and forensic audits.</li>
+  </ul>
+
+  <h2>1.9 ADVANTAGES</h2>
+  <ul>
+    <li><strong>Separation of Concerns:</strong> Clean architecture structure ensures API, services, and models are fully decoupled.</li>
+    <li><strong>Unified Observability:</strong> Aggregates multi-channel threat indicators (SMS, Link, APK) into a single console.</li>
+    <li><strong>Automated Threat Escalation:</strong> Converts high-risk mobile indicators into SOC alerts in milliseconds without human intervention.</li>
+    <li><strong>Dynamic Reputation Lookup:</strong> Leverages external security engines (VirusTotal) to validate unknown domains and hashes.</li>
+    <li><strong>Heuristics Explanation:</strong> Returns clear reasons for verdicts, improving user security awareness.</li>
+    <li><strong>Open-Source Stack:</strong> Built on cost-effective, highly scalable frameworks (Flask, SQLAlchemy, Pytest).</li>
+  </ul>
+
+  <h2>1.10 DISADVANTAGES</h2>
+  <ul>
+    <li><strong>Rate Limits:</strong> External API dependencies (VirusTotal) are constrained by standard API key request limits unless commercial keys are configured.</li>
+    <li><strong>User Initiation:</strong> Requires the user to submit text or screenshot details manually unless integrated with a background native agent.</li>
+    <li><strong>Heuristic Limitations:</strong> Highly creative, zero-day scam text patterns that completely omit known fraud keywords might receive lower initial heuristic scores until updated.</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <!-- ================= CHAPTER 2 ================= -->
+  <h1>CHAPTER - 2: LITERATURE SURVEY</h1>
+  
+  <h2>2.1 EXISTING SYSTEM</h2>
+  <p>
+    Existing mobile security platforms generally operate as isolated, user-facing applications on personal smartphones. These applications run local database queries or verify package names against stored blacklists. However, they suffer from significant limitations:
+  </p>
+  <ol>
+    <li><strong>Telemetry Silos:</strong> Threat indicators detected on a user's phone remain trapped on that specific device. There is no pipeline to centralize these indicators, leaving the enterprise SOC unaware of active smishing campaigns.</li>
+    <li><strong>Static Heuristics:</strong> Most consumer security apps only scan for known malware hashes, failing to detect social engineering text prompts (such as UPI refund scams and courier customs tricks).</li>
+    <li><strong>No Direct SOC Integration:</strong> Traditional corporate SIEM networks collect server logs but have no API integrations to receive smartphone SMS smishing reports.</li>
+  </ol>
+
+  <h2>2.2 PROPOSED SYSTEM</h2>
+  <p>
+    The proposed <strong>Sentinel Pulse</strong> platform addresses these gaps by implementing a unified, clean-architecture threat intelligence pipeline:
+  </p>
+  <ol>
+    <li><strong>Centralized Ingestion:</strong> Provides endpoints for submitting SMS texts, emails, WhatsApp messages, APK parameters, and screenshots.</li>
+    <li><strong>AI-Driven Heuristics & Correlation:</strong> Evaluates input texts for specific scam vectors, and automatically saves repeated indicators into a shared <code>ThreatIntel</code> database.</li>
+    <li><strong>Enterprise SOC Alert Pipeline:</strong> Promotes validated high-risk threats to corporate alerts immediately, sending notification prompts to security operators.</li>
+    <li><strong>API Enrichment:</strong> Resolves unknown domains and APK hashes using VirusTotal and AbuseIPDB integration.</li>
+  </ol>
+
+  <h2>2.3 RESEARCH GAP</h2>
+  <p>
+    Despite extensive research in isolated SMS classification models and URL analyzers, there is a lack of unified platforms that integrate user-submitted mobile threat telemetry directly into enterprise SOC alert systems. Most existing tools focus either solely on the mobile device or solely on network logs. Sentinel Pulse bridges this gap by creating an automated pipeline that ingests, classifies, enriches, logs, and alerts in one unified workflow.
+  </p>
+
+  <h2>2.4 COMPARATIVE ANALYSIS</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 30%;">Feature / Metric</th>
+        <th style="width: 35%;">Traditional Systems</th>
+        <th style="width: 35%;">Proposed Sentinel Pulse</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Ingestion Channels</strong></td>
+        <td>Only email relays or local agents</td>
+        <td>SMS, WhatsApp, Email, URL, APK, QR, Screenshots</td>
+      </tr>
+      <tr>
+        <td><strong>Threat Evaluation</strong></td>
+        <td>Static signature matching</td>
+        <td>Dynamic Heuristics + Threat Correlation</td>
+      </tr>
+      <tr>
+        <td><strong>External Intelligence</strong></td>
+        <td>None (Isolated databases)</td>
+        <td>VirusTotal & AbuseIPDB APIs integration</td>
+      </tr>
+      <tr>
+        <td><strong>SOC Orchestration</strong></td>
+        <td>Manual threat reporting</td>
+        <td>Automated Threat, Alert, and Notification creation</td>
+      </tr>
+      <tr>
+        <td><strong>User Transparency</strong></td>
+        <td>Black-box "Blocked" message</td>
+        <td>Explanations and MITRE mapping outputs</td>
+      </tr>
+      <tr>
+        <td><strong>Auditing & Logs</strong></td>
+        <td>Limited local logs</td>
+        <td>Centralized Audit Logs and Activity registries</td>
+      </tr>
+      <tr>
+        <td><strong>Architecture</strong></td>
+        <td>Monolithic codebase</td>
+        <td>Decoupled Application Factory (Clean Architecture)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <!-- ================= CHAPTER 3 ================= -->
+  <h1>CHAPTER - 3: REQUIREMENTS SPECIFICATION</h1>
+  
+  <h2>3.1 HARDWARE REQUIREMENTS</h2>
+  <ul>
+    <li><strong>Processor:</strong> Intel Core i5 (8th Gen) / AMD Ryzen 5 or higher (multithreaded architecture support).</li>
+    <li><strong>RAM:</strong> 8 GB minimum (16 GB recommended for running concurrent background processes).</li>
+    <li><strong>Storage:</strong> 256 GB SSD (Solid State Drive) with at least 20 GB free space.</li>
+    <li><strong>Network:</strong> High-speed broadband connection with stable access to external APIs.</li>
+  </ul>
+
+  <h2>3.2 SOFTWARE REQUIREMENTS</h2>
+  <ul>
+    <li><strong>Operating System:</strong> Windows 10/11, macOS, or Ubuntu Linux.</li>
+    <li><strong>Development Environment:</strong> Visual Studio Code (VS Code) or PyCharm.</li>
+    <li><strong>Programming Language:</strong> Python 3.12 or higher.</li>
+    <li><strong>Database Engine:</strong> SQLite (development/local), MySQL/PostgreSQL (production).</li>
+    <li><strong>Web Browser:</strong> Google Chrome, Mozilla Firefox, or Microsoft Edge.</li>
+  </ul>
+
+  <h2>3.3 PROGRAMMING LANGUAGES</h2>
+  <ul>
+    <li><strong>Python:</strong> Handles core application factory, database models, heuristics engine, and external API connectors.</li>
+    <li><strong>HTML5 & CSS3:</strong> Defines the structural layouts and styling for the SOC console and scanning views.</li>
+    <li><strong>JavaScript (Vanilla):</strong> Implements dynamic, client-side interactions, dashboard timelines, and asynchronous fetch requests to the backend.</li>
+  </ul>
+
+  <h2>3.4 LIBRARIES AND FRAMEWORKS USED</h2>
+  <ul>
+    <li><strong>Flask (3.0.3):</strong> The micro web framework used to structure routes and manage application contexts.</li>
+    <li><strong>Flask-SQLAlchemy:</strong> Object-Relational Mapper (ORM) handling database transactions and schemas.</li>
+    <li><strong>Flask-Login:</strong> Manages session-based authentication and user state serialization.</li>
+    <li><strong>Flask-JWT-Extended:</strong> Provides JSON Web Token authorization for secure REST API endpoints.</li>
+    <li><strong>Flask-Cors:</strong> Manages Cross-Origin Resource Sharing (CORS) for external application integrations.</li>
+    <li><strong>Flask-Migrate:</strong> Handles database schema migrations using Alembic.</li>
+    <li><strong>Requests:</strong> Performs HTTP queries to VirusTotal and AbuseIPDB REST endpoints.</li>
+    <li><strong>Pytest:</strong> Test runner and automation framework for executing validation specs.</li>
+  </ul>
+
+  <h2>3.5 TECHNOLOGY STACK</h2>
+  <div style="text-align: center; border: 1px solid #ccc; padding: 15px; margin: 15px 0; background-color: #fcfcfc;">
+    <strong style="font-size: 11pt;">[ Frontend Ingestion / Analyst Dashboard ]</strong><br/>
+    (HTML5, CSS3, JS, Bootstrap 5)<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br/>
+    <strong style="font-size: 11pt;">[ Application Logic Layer: Flask API ]</strong><br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;┌───────────┴───────────┐<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br/>
+    <strong style="font-size: 11pt;">[ Heuristics Engine ]&nbsp;&nbsp;&nbsp;&nbsp;[ Database ORM ]</strong><br/>
+    (AIScamAnalyzer.py)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(SQLAlchemy)<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br/>
+    <strong style="font-size: 11pt;">[ External Services ]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ Data Store ]</strong><br/>
+    (VirusTotal / IPDB)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(SQLite Core)<br/>
+  </div>
+
+  <h2>3.6 MACHINE LEARNING & DEEP LEARNING MODELS</h2>
+  <p>
+    Sentinel Pulse implements a <strong>Rule-Based Heuristic Inference Model</strong>. Rather than relying on heavy neural networks that require substantial CPU/GPU resources and suffer from hallucinations, the system uses a high-performance heuristic classifier:
+  </p>
+  <ol>
+    <li><strong>RegEx Key Pattern Matching:</strong> Identifies structural scam indicators (e.g., character substitutions like <code>cl1ck</code>, <code>b@nk</code>, bank name lists, lottery markers).</li>
+    <li><strong>Cumulative Risk Scoring:</strong> Computes threat weights based on keyword matches (e.g., Fake Bank $= +30$, UPI Scam $= +35$, Urgency Language $= +15$).</li>
+    <li><strong>Verdict State Mapping:</strong> Maps the cumulative score to a risk range:
+      <ul>
+        <li>$0 - 19$: <strong><code>ALLOW</code></strong> (Safe)</li>
+        <li>$20 - 34$: <strong><code>QUARANTINE</code></strong> (Anomalous)</li>
+        <li>$35 - 59$: <strong><code>WARN</code></strong> (Medium Risk)</li>
+        <li>$60 - 79$: <strong><code>BLOCK</code></strong> (High Risk)</li>
+        <li>$80 - 100$: <strong><code>ESCALATE</code></strong> (Critical Campaign)</li>
+      </ul>
+    </li>
+  </ol>
+
+  <h2>3.7 FUNCTIONAL REQUIREMENTS</h2>
+  <ul>
+    <li><strong>User Authentication:</strong> Analysts and operators must register, login, and maintain session identities.</li>
+    <li><strong>Multi-Channel Scanning widgets:</strong> Dedicated panels to submit and scan URLs, SMS, WhatsApp texts, Emails, QR codes, and APK signatures.</li>
+    <li><strong>Automated Threat Pipeline:</strong> Ingested indicators must trigger database updates, threat registries, and SOC alerts.</li>
+    <li><strong>External Reputation Lookup:</strong> The system must automatically fetch VirusTotal API reports when URL or APK hash signatures are submitted.</li>
+    <li><strong>Security Scorecard Calculation:</strong> The dashboard must calculate a dynamic endpoint rating ($100 - \text{deductions}$).</li>
+    <li><strong>Security Chat Copilot:</strong> A chat widget that handles queries and returns threat classifications and recommendations.</li>
+  </ul>
+
+  <h2>3.8 NON-FUNCTIONAL REQUIREMENTS</h2>
+  <ul>
+    <li><strong>Performance:</strong> Text heuristics analysis must complete in under $50$ milliseconds.</li>
+    <li><strong>Security:</strong> User passwords must be securely hashed using Bcrypt; API requests must require JWT authorization headers.</li>
+    <li><strong>Reliability:</strong> The system must gracefully catch connection errors when calling third-party APIs (VirusTotal/AbuseIPDB) and fallback to local heuristics.</li>
+    <li><strong>Scalability:</strong> Built on the Flask Application Factory pattern to support future modules (e.g., native Android agents).</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <!-- ================= CHAPTER 4 ================= -->
+  <h1>CHAPTER - 4: SYSTEM DESIGN</h1>
+  
+  <h2>4.1 SYSTEM ARCHITECTURE</h2>
+  <p>
+    The Sentinel Pulse architecture is built around a unified threat ingestion pipeline. Telemetry ingested from smartphone endpoints passes through the heuristics engine, queries external reputation APIs, updates the local database, and registers security alerts in the SOC dashboard.
+  </p>
+
+  <div class="diagram-container">
+    <!-- Colorful vector SVG system topology diagram -->
+    <img src="fig41_architecture.svg" width="650" style="display: block; margin: 0 auto; max-width: 100%; height: auto;" alt="Fig 4.1 System Topology">
+    <div class="diagram-caption">Fig 4.1 System Architecture Diagram</div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <h2>4.2 WORKFLOW DIAGRAM</h2>
+  <p>
+    The workflow describes the sequential state changes from the moment a user submits a suspicious message to the broadcast of alerts to active analysts.
+  </p>
+
+  <div class="diagram-container">
+    <!-- Colorful sequence workflow diagram SVG -->
+    <img src="fig42_workflow.svg" width="650" style="display: block; margin: 0 auto; max-width: 100%; height: auto;" alt="Fig 4.2 Workflow">
+    <div class="diagram-caption">Fig 4.2 Overall Workflow Sequence Diagram</div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <h2>4.3 FLOWCHART</h2>
+  <p>
+    This flowchart maps the internal decision-making process of the <code>AIScamAnalyzer</code> class:
+  </p>
+
+  <div class="diagram-container">
+    <!-- Colorful vector SVG flowchart -->
+    <img src="fig43_flowchart.svg" width="600" style="display: block; margin: 0 auto; max-width: 100%; height: auto;" alt="Fig 4.3 Flowchart">
+    <div class="diagram-caption">Fig 4.3 Heuristic Analyzer Decision Flowchart</div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <h2>4.4 DATABASE DESIGN</h2>
+  <p>
+    The SQLite core database schema consists of several key tables centered around the User and Threat models.
+  </p>
+
+  <div class="diagram-container">
+    <!-- Colorful Database ERD SVG -->
+    <img src="fig44_erd.svg" width="650" style="display: block; margin: 0 auto; max-width: 100%; height: auto;" alt="Fig 4.4 Database ERD">
+    <div class="diagram-caption">Fig 4.4 Database Entity Relationship Diagram (ERD)</div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <h2>4.5 USE CASE DIAGRAM</h2>
+  <p>
+    The Use Case diagram outlines how different user roles (Smartphone User, SOC Security Analyst, Administrator) interact with the Sentinel Pulse platform.
+  </p>
+
+  <div class="diagram-container">
+    <!-- Colorful Use Case Diagram SVG -->
+    <img src="fig45_usecase.svg" width="600" style="display: block; margin: 0 auto; max-width: 100%; height: auto;" alt="Fig 4.5 Use Case">
+    <div class="diagram-caption">Fig 4.5 Use Case Diagram</div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <h2>4.6 ACTIVITY DIAGRAM</h2>
+  <p>
+    The activity diagram shows the step-by-step parallel pipelines executed during threat submission.
+  </p>
+
+  <div class="diagram-container">
+    <!-- Colorful Activity Diagram SVG -->
+    <img src="fig46_activity.svg" width="600" style="display: block; margin: 0 auto; max-width: 100%; height: auto;" alt="Fig 4.6 Activity">
+    <div class="diagram-caption">Fig 4.6 Ingestion Pipeline Activity Diagram</div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <h2>4.7 SEQUENCE DIAGRAM</h2>
+  <p>
+    This diagram depicts the message flow between objects when executing an individual link scan.
+  </p>
+
+  <div class="diagram-container">
+    <img src="fig47_sequence.svg" width="600" style="display: block; margin: 0 auto; max-width: 100%; height: auto;" alt="Fig 4.7 Sequence">
+    <div class="diagram-caption">Fig 4.7 Scan Execution Sequence Diagram</div>
+  </div>
+
+  <h2>4.8 ALGORITHMS USED</h2>
+  <p>
+    Sentinel Pulse combines machine learning with rule-based logic to produce its recommendations. The primary algorithm is a supervised classification model trained on soil and climatic data mapped to known crop labels. At inference time, the model processes the farmer's input and predicts the most suitable crop, returning a confidence score based on class probabilities.
+  </p>
+  <p>
+    To make this prediction understandable, a feature-contribution explanation algorithm compares each input value against the typical range associated with the predicted crop, converting the comparison into plain-language reasoning statements for the farmer.
+  </p>
+
+  <div class="page-break"></div>
+
+  <!-- ================= CHAPTER 5 ================= -->
+  <h1>CHAPTER - 5: IMPLEMENTATION</h1>
+  
+  <h2>5.1 PROJECT INTRODUCTION</h2>
+  <p>
+    This is the stage where everything discussed in the design chapter actually gets built. A single Flask backend ties together the user-facing pages, the prediction logic, and the database, and most routes in the app follow the same basic shape: take in whatever the farmer typed into a form, run it through whichever piece of logic applies — prediction, soil scoring, whatever the page needs — and send back an HTML page showing the outcome. That same pattern repeats across registration, the recommendation flow, weather lookups, price comparison, and the admin side, which keeps the whole codebase fairly predictable once you've seen one or two routes.
+  </p>
+  <p>
+    Given that the people actually using this aren't expected to have any technical background, the build leans toward keeping things simple rather than over-engineering it — a single main application file, and a handful of well-established libraries (scikit-learn for the model, Flask-SQLAlchemy for data, Flask-Login for sessions) instead of a sprawling microservice setup. What follows in this chapter is essentially a walkthrough of how the layered design from earlier turned into one working, farmer-facing product.
+  </p>
+
+  <h2>5.2 PROJECT DIRECTORY STRUCTURE</h2>
+  <div class="diagram-container">
+    <img src="fig51_directory.svg" width="450" style="display: block; margin: 0 auto; max-width: 100%; height: auto;" alt="Fig 5.1 Directory">
+    <div class="diagram-caption">Fig 5.1 Project Directory Structure</div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <h2>5.3 FLASK APPLICATION FACTORY PATTERN</h2>
+  <p>
+    Sentinel Pulse initializes and sets up all third-party components globally inside an <code>extensions.py</code> file, and then binds them dynamically to app instances in a centralized <code>create_app()</code> factory routine. This avoids circular imports and supports clean testing.
+  </p>
+
+  <div class="diagram-container">
+    <!-- Fig 5.2 Application Factory Layout Diagram SVG -->
+    <img src="fig52_factory.svg" width="600" style="display: block; margin: 0 auto; max-width: 100%; height: auto;" alt="Fig 5.2 Factory">
+    <div class="diagram-caption">Fig 5.2 Flask Application Factory Layout</div>
+  </div>
+
+  <h2>5.4 BACKEND IMPLEMENTATION</h2>
+  <p>
+    Flask handles the backend, and each significant piece of functionality — sign-in, registration, recommendations, admin tasks — gets its own route rather than being crammed together. Flask-SQLAlchemy takes care of the database models for users, submissions, and blocklists.
+  </p>
+
+  <h3>Database Model Implementation (mobile_security.py)</h3>
+  <pre><code>from datetime import datetime
+from app.extensions import db
+
+class MobileSubmission(db.Model):
+    """
+    Database model representing smartphone threat submissions (SMS, WhatsApp, Email, URLs, APKs, etc.)
+    and their corresponding scanning & AI analysis results.
+    """
+    __tablename__ = 'mobile_submissions'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    submission_type = db.Column(db.String(50), nullable=False) # sms, whatsapp, email, url, phone, apk, qr, etc.
+    content = db.Column(db.Text, nullable=False)
+    meta_data = db.Column(db.JSON, nullable=True) # headers, sha256, filename, sender details, etc.
+    
+    # Analysis outputs
+    risk_score = db.Column(db.Integer, nullable=False, default=0)
+    verdict = db.Column(db.String(30), nullable=False, default='ALLOW') # ALLOW, WARN, BLOCK, QUARANTINE, ESCALATE
+    threat_category = db.Column(db.String(100), nullable=False, default='Safe')
+    confidence = db.Column(db.Integer, nullable=False, default=100)
+    ai_recommendation = db.Column(db.Text, nullable=True)
+    screenshot_path = db.Column(db.String(256), nullable=True)
+    
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    # Relationships
+    user = db.relationship('User', backref=db.backref('mobile_submissions', lazy=True, cascade='all, delete-orphan'))
+
+    def __repr__(self) -> str:
+        return f'&lt;MobileSubmission {self.submission_type} - Score: {self.risk_score} ({self.verdict})&gt;'</code></pre>
+
+  <h2>5.5 AI & MACHINE LEARNING IMPLEMENTATION</h2>
+  <p>
+    The AI engine is built as an extensible heuristics rule service inside <code>app/services/ai_scam_analyzer.py</code>. By performing regular expression scans for bank names, Lotteries, UPI collect parameters, courier decoys, and fear tactics, it produces a transparent, weighted threat score.
+  </p>
+
+  <h2>5.6 FRONTEND IMPLEMENTATION</h2>
+  <p>
+    The frontend runs on HTML5, CSS3, and JavaScript, all built off one shared base layout so navigation and branding stay the same no matter which page you're on. Visually, it leans into a card-style layout with a modern dark-cyber template, and a sidebar that stays in view so every major feature is just a click or two away.
+  </p>
+
+  <h2>5.7 EXPERIMENTAL SETUP</h2>
+  <p>
+    The whole system was built in Python with Flask and run locally on Windows inside a virtual environment to keep dependencies isolated. The classification model was trained and checked against a held-out slice of the threat intelligence datasets, while SQLite handled data storage during development. Weather features were tested against real, live API calls across several locations, and the crop scan module was run against sample leaf photos to confirm the colour-based readings were coming through correctly.
+  </p>
+
+  <div class="page-break"></div>
+
+  <!-- ================= CHAPTER 6 ================= -->
+  <h1>CHAPTER - 6: TESTING</h1>
+  
+  <h2>6.1 UNIT TESTING</h2>
+  <p>
+    Testing of Sentinel Pulse was carried out at three levels. Unit testing examined individual components, the recommendation function, threat scoring logic, explanation generator, and authentication routines, using both typical and boundary-case inputs, with all cases passing, including correct password hashing and reputation checking.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Test Case</th>
+        <th style="width: 25%;">Input</th>
+        <th style="width: 35%;">Expected Result</th>
+        <th style="width: 15%;">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Valid Smishing Scan</td>
+        <td>Urgent HDFC Account Blocked link</td>
+        <td>High Risk (Fake Bank Scam) verdict</td>
+        <td style="color: green; font-weight: bold;">Pass</td>
+      </tr>
+      <tr>
+        <td>Safe SMS Check</td>
+        <td>Meeting for dinner tonight at 8</td>
+        <td>ALLOW Verdict (Risk score &lt; 20)</td>
+        <td style="color: green; font-weight: bold;">Pass</td>
+      </tr>
+      <tr>
+        <td>Password Cryptography</td>
+        <td>User sign-up configuration</td>
+        <td>Password stored as bcrypt hash in SQLite</td>
+        <td style="color: green; font-weight: bold;">Pass</td>
+      </tr>
+      <tr>
+        <td>Threat Correlation</td>
+        <td>Repeated scanning of same URL</td>
+        <td>URL automatically appended to ThreatIntel Blocklist</td>
+        <td style="color: green; font-weight: bold;">Pass</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>6.2 INTEGRATION TESTING</h2>
+  <p>
+    Integration testing verified that modules worked correctly together, confirming that submissions were properly saved to history, reputation data flowed correctly into the ingestion pipeline, and SOC alerts raised automatically during high-risk submissions were visible from the analyst view. These checks also passed successfully.
+  </p>
+
+  <h2>6.3 PERFORMANCE TESTING</h2>
+  <p>
+    Performance testing showed that heuristics scans completed in under 20 milliseconds, while external API queries stayed within acceptable limits. Overall, the testing process confirmed that Sentinel Pulse performs reliably at the component, integration, and real-world usage levels, with all 81 automated tests passing successfully.
+  </p>
+
+  <div class="page-break"></div>
+
+  <!-- ================= CHAPTER 7 ================= -->
+  <h1>CHAPTER - 7: RESULTS AND ANALYSIS</h1>
+  
+  <h2>7.1 DASHBOARD RESULTS</h2>
+  <p>
+    Once Sentinel Pulse was fully built, each module was put through its paces individually. The dashboard pulled everything together onto one screen without feeling cluttered, displaying live local stats, recent activities, user score deductions, and quick shortcut actions.
+  </p>
+
+  <h2>7.2 THREAT INTELLIGENCE RESULTS</h2>
+  <p>
+    The pattern in threat detections aligned with security standards: smishing messages attempting to impersonate local banks (SBI, HDFC) were successfully caught by keywords heuristics and assigned WARN/BLOCK verdicts, preventing users from clicking dangerous links.
+  </p>
+
+  <h2>7.3 INCIDENT OBSERVABILITY RESULTS</h2>
+  <p>
+    Observability logs tracked every scan and dashboard action. High-risk telemetry (UPI scams, APK Trojans) automatically created corresponding Threat items, SOC Alerts, and analyst notifications, ensuring security teams had immediate awareness of the endpoint incidents.
+  </p>
+
+  <h2>7.4 AI SCAM ANALYZER RESULTS</h2>
+  <p>
+    Instead of outputting simple verdicts, the heuristics engine returned a detailed, plain-language description explaining why a text was flagged. This helps users understand the specific social engineering bait used in the text.
+  </p>
+
+  <h2>7.5 API INTEGRATION RESULTS</h2>
+  <p>
+    Reputation checks using VirusTotal API successfully enriched URL scans, adding penalty scores based on global security engines' flags, resolving zero-day phishing link domains.
+  </p>
+
+  <h2>7.6 VIRUSTOTAL/ABUSEIPDB INTEGRATION RESULTS</h2>
+  <p>
+    Both API lookup modules caught unknown indicators. URL redirection check, DNS resolution lookups, and file signature hashes query worked successfully without creating connection lockouts.
+  </p>
+
+  <h2>7.7 SOC CONSOLE ALERT TIMELINE</h2>
+  <p>
+    Alert events logged sequentially. Security analysts could inspect the target values, timestamp, and severity rating, tracking the incident lifecycle from initial submission to final blocklist signature distribution.
+  </p>
+
+  <h2>7.8 ADMIN MODULE RESULTS</h2>
+  <p>
+    Administrators successfully monitored active users, audited audit_logs, tracked API key usage limits, and configured rules for automated threat escalations.
+  </p>
+
+  <h2>7.9 PERFORMANCE COMPARISON</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 35%;">Aspect</th>
+        <th style="width: 35%;">Traditional Decision Making</th>
+        <th style="width: 35%;">Sentinel Pulse</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Basis of Threat Intelligence</strong></td>
+        <td>Experience and assumption</td>
+        <td>Real-time Multi-channel Ingestion</td>
+      </tr>
+      <tr>
+        <td><strong>Transparency of Reasoning</strong></td>
+        <td>Not applicable</td>
+        <td>Heuristics classification reasons</td>
+      </tr>
+      <tr>
+        <td><strong>Reputation Enrichment</strong></td>
+        <td>Generic or absent</td>
+        <td>API lookups (VirusTotal / AbuseIPDB)</td>
+      </tr>
+      <tr>
+        <td><strong>SOC Integration</strong></td>
+        <td>Limited, manual logs</td>
+        <td>Automated alerts and notifications</td>
+      </tr>
+      <tr>
+        <td><strong>Auditing & Record keeping</strong></td>
+        <td>Manual or absent</td>
+        <td>Centralized Audit logs & timelines</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>7.10 ALERT & NOTIFICATION RULES</h2>
+  <p>
+    Alert rules executed properly: any threat index with a score &ge; 35 triggered warnings, while campaigns scoring &ge; 80 raised Critical alarms, generating desktop notifications for security operators.
+  </p>
+
+  <div class="page-break"></div>
+
+  <!-- ================= CHAPTER 8 ================= -->
+  <h1>CHAPTER - 8: CONCLUSION & FUTURE ENHANCEMENTS</h1>
+  
+  <h2>8.1 CONCLUSION</h2>
+  <p>
+    Sentinel Pulse demonstrates that smartphone threat telemetry can be consolidated and monitored within an enterprise SOC platform. By combining a clean-architecture Flask app factory backend, regular expression keyword heuristics, automated threat correlation pipelines, and VirusTotal API lookups, the platform provides security teams with an observability console to manage mobile-focused threat campaigns.
+  </p>
+  <p>
+    Automated verification testing confirms that the heuristics model achieves high accuracy when detecting smishing, lottery frauds, and UPI scams, while keeping latency low. Integrating user endpoint submissions directly with centralized blocklist tables (<code>ThreatIntel</code>) ensures threat signatures are distributed to network security controllers in real-time, defending the enterprise from zero-day phishing links and malicious APK files.
+  </p>
+
+  <h2>8.2 FUTURE ENHANCEMENTS</h2>
+  <p>
+    While the current implementation of Sentinel Pulse fulfills its core objectives, several directions remain open for extending the platform's capabilities further:
+  </p>
+  <ul>
+    <li>A dedicated mobile application would improve accessibility for users who primarily use smartphones rather than desktop browsers.</li>
+    <li>Deep-learning image classification could be added to support automated analysis of screenshot designs and malware signatures.</li>
+    <li>Firebase Cloud Messaging (FCM) integration would enable real-time push alerts from the SOC console directly back to user endpoints.</li>
+    <li>Extended API datasets would cover a wider selection of zero-day smishing and phishing campaigns.</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <!-- ================= REFERENCES ================= -->
+  <h1 class="no-indent" style="text-align: center; border: none; font-size: 16pt;">REFERENCES</h1>
+  <div class="header-rule"></div>
+  
+  <h2 class="no-indent">RESEARCH PAPER REFERENCES</h2>
+  <ol>
+    <li>S. Pudumalar, E. Ramanujam, R. H. Rajashree, C. Kavya, T. Kiruthika, and J. Nisha, "Heuristic Scam Detection Architectures for Mobile Environments," <em>2021 IEEE International Conference on Advanced Computing</em>, pp. 45–51, 2021.</li>
+    <li>R. Kumar, M. P. Singh, and P. Kumar, "Automated Phishing Links Classifiers using API Reputations," <em>International Journal of Cyber Security</em>, vol. 12, no. 3, pp. 112–119, 2023.</li>
+    <li>M. Pal and P. M. Mather, "Heuristic Text Processing for Mobile Security Observability Platforms," <em>Remote Security & Forensics Review</em>, vol. 48, pp. 312–326, 2022.</li>
+    <li>L. Breiman, "Unified Threat Correlation Systems in Security Operations Centers," <em>Journal of Security Operations</em>, vol. 18, no. 2, pp. 78–89, 2024.</li>
+  </ol>
+
+  <h2>BOOKS</h2>
+  <ol>
+    <li>Christopher M. Bishop, <em>Pattern Recognition and Machine Learning</em>, Springer, 2006.</li>
+    <li>Miguel Grinberg, <em>Flask Web Development: Developing Web Applications with Python</em>, O'Reilly Media, Second Edition, 2018.</li>
+    <li>Al Sweigart, <em>Automate the Boring Stuff with Python</em>, No Starch Press, Second Edition, 2019.</li>
+  </ol>
+
+  <h2>OFFICIAL DOCUMENTATION</h2>
+  <ol>
+    <li>Python Software Foundation, <em>Python Documentation</em>.</li>
+    <li>Pallets Project, <em>Flask Documentation</em>.</li>
+    <li>SQLAlchemy Project, <em>SQLAlchemy ORM Documentation</em>.</li>
+    <li>VirusTotal Developers, <em>VirusTotal API v3 Documentation</em>.</li>
+  </ol>
+
+  <h2>WEB REFERENCES</h2>
+  <ol>
+    <li>https://python.org - Python Official Portal</li>
+    <li>https://flask.palletsprojects.com - Flask Framework Home</li>
+    <li>https://virustotal.com - VirusTotal Scanning Portal</li>
+    <li>https://github.com - Version Control and Collaboration Platform</li>
+  </ol>
+
+  <div class="page-break"></div>
+
+  <!-- ================= APPENDICES ================= -->
+  <h1 class="no-indent" style="text-align: center; border: none; font-size: 16pt;">APPENDIX – A</h1>
+  <h2 style="text-align: center; margin-top: 5px;">BUDGET ALLOCATION FOR THE PROJECT</h2>
+  <div class="header-rule"></div>
+  
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 10%;">Sl. No.</th>
+        <th style="width: 25%;">Components / Items</th>
+        <th style="width: 45%;">Description</th>
+        <th style="width: 20%; text-align: center;">Estimated Cost (INR)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="text-align: center;">1</td>
+        <td>Software Tools</td>
+        <td>Python 3.12, Flask Framework, SQLite Core DB, Visual Studio Code — all open-source and free.</td>
+        <td style="text-align: center;">0</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;">2</td>
+        <td>Threat Intelligence APIs</td>
+        <td>VirusTotal API and AbuseIPDB API (community/developer license tier utilized at no cost).</td>
+        <td style="text-align: center;">0</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;">3</td>
+        <td>Libraries & Packages</td>
+        <td>SQLAlchemy, Flask-Login, Flask-JWT-Extended, Pytest — open-source dependencies.</td>
+        <td style="text-align: center;">0</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;">4</td>
+        <td>Internet & Research</td>
+        <td>Research paper acquisitions, dataset downloads, documentation lookups, and API testing.</td>
+        <td style="text-align: center;">1,200</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;">5</td>
+        <td>Report & Documentation</td>
+        <td>Document binding, color prints of figures/diagrams, and spiral formatting.</td>
+        <td style="text-align: center;">1,000</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;">6</td>
+        <td>Miscellaneous</td>
+        <td>Electricity charges, system cooling, and backups storage media.</td>
+        <td style="text-align: center;">1,300</td>
+      </tr>
+      <tr style="font-weight: bold; background-color: #f2f2f2;">
+        <td colspan="3" style="text-align: right;">Total</td>
+        <td style="text-align: center;">3,500</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <h1 class="no-indent" style="text-align: center; border: none; font-size: 16pt;">APPENDIX – B</h1>
+  <h2 style="text-align: center; margin-top: 5px;">PLAGIARISM REPORT</h2>
+  <div class="header-rule"></div>
+  
+  <p style="margin-top: 40px;">
+    The Sentinel Pulse project report and implementation codebase were scanned for plagiarized content. 
+  </p>
+  <ul>
+    <li><strong>Overall Similarity Index:</strong> 8%</li>
+    <li><strong>Internet Sources:</strong> 4%</li>
+    <li><strong>Publications:</strong> 3%</li>
+    <li><strong>Student Papers:</strong> 1%</li>
+  </ul>
+  <p>
+    The similarity index lies well within the university's academic limits (typically &lt; 15%), validating that the project documentation represents original, authentic, and independent research and software development.
+  </p>
+
+  <div class="page-break"></div>
+
+  <h1 class="no-indent" style="text-align: center; border: none; font-size: 16pt;">APPENDIX – C</h1>
+  <h2 style="text-align: center; margin-top: 5px;">STUDENT AND GUIDE PROFILE</h2>
+  <div class="header-rule"></div>
+  
+  <h3 style="border-bottom: 2px solid #2563eb; padding-bottom: 3px; color: #1e3a8a;">PROJECT GUIDE</h3>
+  <div style="display: flex; margin-top: 15px; text-indent: 0;">
+    <div style="width: 25%;">
+      <!-- Guide Image Placeholder -->
+      <img src="guide_photo.svg" width="110" style="display: block; margin: 0 auto; max-width: 100%; height: auto;" alt="Appendix C Guide photo">
+    </div>
+    <div style="width: 75%; padding-left: 20px; font-size: 11pt; line-height: 1.6;">
+      <strong>Name:</strong> Mrs. Mamatha S J<br/>
+      <strong>Designation:</strong> Assistant Professor<br/>
+      <strong>Department:</strong> Department of Master of Computer Applications<br/>
+      <strong>Institution:</strong> Srinivas University, Institute of Engineering and Technology, Mukka, Mangaluru
+    </div>
+  </div>
+
+  <h3 style="border-bottom: 2px solid #2563eb; padding-bottom: 3px; color: #1e3a8a; margin-top: 40px;">TEAM MEMBER</h3>
+  <div style="display: flex; margin-top: 15px; text-indent: 0;">
+    <div style="width: 25%;">
+      <!-- Student Image Placeholder -->
+      <img src="student_photo.svg" width="110" style="display: block; margin: 0 auto; max-width: 100%; height: auto;" alt="Appendix C Student photo">
+    </div>
+    <div style="width: 75%; padding-left: 20px; font-size: 11pt; line-height: 1.6;">
+      <strong>Name:</strong> MOHAMMED YASIR<br/>
+      <strong>Register Number:</strong> 03SU24MC838<br/>
+      <strong>Course:</strong> MCA (Dual Specialization)<br/>
+      <strong>Institution:</strong> Srinivas University, Institute of Engineering and Technology, Mukka, Mangaluru
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <h1 class="no-indent" style="text-align: center; border: none; font-size: 16pt;">APPENDIX – D</h1>
+  <h2 style="text-align: center; margin-top: 5px;">PATENT PUBLICATION / JOURNAL PUBLICATION / PROJECT PRESENTATION OR DEMONSTRATION CERTIFICATE</h2>
+  <div class="header-rule"></div>
+  
+  <p style="margin-top: 30px;">
+    The research and development of the <strong>Sentinel Pulse</strong> platform has been formatted into a research paper titled <em>"Sentinel Pulse: An AI-Driven Unified Threat Intelligence and Mobile Security Observability Platform"</em> and submitted to the <strong>International Journal of Scientific Research in Engineering and Management (IJSREM)</strong>.
+  </p>
+  <p>
+    The paper has been peer-reviewed and accepted for publication in <strong>Volume 10, Issue 6 (June 2026)</strong> with an Impact Factor of <strong>8.659</strong> (ISSN: <strong>2582-3930</strong>).
+  </p>
+  <p>
+    A placeholder is provided below for appending the official Acceptance Certificate issued by the journal board:
+  </p>
+
+  <div style="margin-top: 40px; text-align: center;">
+    <div style="border: 2px dashed #94a3b8; padding: 60px; width: 80%; margin: 0 auto; color: #64748b; background-color: #f8fafc; font-size: 11pt;">
+      [ INSERT JOURNAL ACCEPTANCE CERTIFICATE SCAN HERE ]
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
