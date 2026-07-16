@@ -61,6 +61,58 @@
             </div>
         </div>
 
+        <!-- AI Incident Copilot Guidance -->
+        {% if ai_assistance %}
+        <div class="card bg-panel border border-secondary-subtle mb-4">
+            <div class="card-header bg-transparent border-bottom border-secondary-subtle py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 font-outfit text-light">
+                    <i class="bi bi-robot text-accent-glow me-2"></i> AI Incident Copilot Guidance
+                </h5>
+                <span class="badge bg-primary-subtle text-primary border border-primary border-opacity-25 px-2 py-1 rounded small text-uppercase">Copilot Active</span>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <h6 class="text-uppercase tracking-wider text-muted small mb-1">Executive Summary</h6>
+                    <p class="text-light fs-6 mb-0">{{ ai_assistance.summary }}</p>
+                </div>
+                
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-md-6">
+                        <h6 class="text-uppercase tracking-wider text-muted small mb-1">Assessed Root Cause</h6>
+                        <div class="p-3 bg-dark bg-opacity-20 rounded border border-secondary border-opacity-10 text-secondary small">
+                            {{ ai_assistance.root_cause }}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <h6 class="text-uppercase tracking-wider text-muted small mb-1">Business Impact</h6>
+                        <div class="p-3 bg-dark bg-opacity-20 rounded border border-secondary border-opacity-10 text-secondary small">
+                            {{ ai_assistance.business_impact }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-12 col-md-6">
+                        <h6 class="text-uppercase tracking-wider text-muted small mb-1"><i class="bi bi-wrench me-1 text-success"></i>Remediation Steps</h6>
+                        <ul class="mb-0 text-secondary ps-3 small">
+                            {% for step in ai_assistance.resolution_steps %}
+                                <li class="mb-1">{{ step }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <h6 class="text-uppercase tracking-wider text-muted small mb-1"><i class="bi bi-shield-check me-1 text-info"></i>Prevention Suggestions</h6>
+                        <ul class="mb-0 text-secondary ps-3 small">
+                            {% for suggestion in ai_assistance.prevention_suggestions %}
+                                <li class="mb-1">{{ suggestion }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Linked Threat Intel Dossier Summary (Reused design to prevent duplicate data) -->
         <h4 class="font-outfit text-light mt-5 mb-3"><i class="bi bi-shield-exclamation text-accent-glow me-2"></i>Linked Heuristics & Threat Intelligence</h4>
 

@@ -48,8 +48,11 @@ class AIIncidentAssistant:
             root_cause = "A collect request or deceptive UPI link was triggered, falsely claiming a cash prize or refund to bait the user into typing their secret PIN."
         elif attack_vector == "Ransomware":
             root_cause = "A malicious file execution payload attempted to run file encryption routines, requesting cryptocurrency payments to release keys."
-        else:
+        elif attack_vector == "Credential Access":
             root_cause = "Credential harvesting decoy or suspicious netbanking redirection links triggered system warnings."
+        else:
+            # Social Engineering
+            root_cause = "The victim was manipulated via impersonation, trust relationship exploitation, or pretexting to bypass security controls."
 
         # 3. Resolution Steps
         if attack_vector == "Malware":
@@ -70,11 +73,30 @@ class AIIncidentAssistant:
                 "Report transaction details to the national cybercrime coordination portal.",
                 "Reset the UPI PIN and update bank application access passwords."
             ]
-        else:
+        elif attack_vector == "Ransomware":
             resolution_steps = [
-                "Acknowledge the alert, check the source feed, and block matching indicators of compromise.",
-                "Conduct a forensic audit of the target client logs to verify if credential sharing occurred.",
-                "Quarantine affected hosts or user sessions on the identity server."
+                "Isolate the infected hosts from the network immediately to prevent lateral spread.",
+                "Locate and verify clean offline backup restore points for data recovery.",
+                "Preserve logs, memory snapshots, and encrypted samples for forensic analysis."
+            ]
+        elif attack_vector == "Credential Access":
+            resolution_steps = [
+                "Force a global password reset for all affected identity accounts.",
+                "Terminate all active sessions on the identity provider and log out user devices.",
+                "Enable/enforce multi-factor authentication (MFA) and audit access logs for rogue API keys."
+            ]
+        elif attack_vector == "SMS Scam":
+            resolution_steps = [
+                "Report the malicious sender ID and sender numbers to cellular service providers.",
+                "Inform users of the ongoing spam/phishing campaign to raise situational awareness.",
+                "Block any destination domains contained within the scam message on DNS gateways."
+            ]
+        else:
+            # Social Engineering
+            resolution_steps = [
+                "Conduct a prompt post-incident verification of the user's reported access levels.",
+                "Revoke unauthorized access and monitor corresponding identity logs for anomalies.",
+                "Deliver targeted security awareness training to the affected users or department."
             ]
 
         # 4. Business Impact
@@ -86,12 +108,49 @@ class AIIncidentAssistant:
             business_impact = "Low-Medium Risk. Minor security exposure, contained localized warnings, with low likelihood of broader escalation."
 
         # 5. Prevention Suggestions
-        prevention_suggestions = [
-            "Conduct regular employee security awareness training on mobile social engineering schemes.",
-            "Enforce strict mobile device management (MDM) rules preventing sideloading of third-party APKs.",
-            "Deploy secure email/SMS gateways with automated link-checking heuristics.",
-            "Enforce multi-factor authentication (MFA) on all corporate portals to prevent credential abuse."
-        ]
+        if attack_vector == "Malware":
+            prevention_suggestions = [
+                "Enforce strict mobile device management (MDM) rules preventing sideloading of third-party APKs.",
+                "Install reliable mobile endpoint protection (EPP/EDR) tools on all corporate devices.",
+                "Conduct regular audits of installed applications and device security compliance states."
+            ]
+        elif attack_vector == "Phishing":
+            prevention_suggestions = [
+                "Deploy secure email/SMS gateways with automated link-checking heuristics.",
+                "Educate employees on how to spot domain spoofing and look-alike URLs.",
+                "Implement multi-factor authentication (MFA) to minimize credential harvesting impact."
+            ]
+        elif attack_vector == "SMS Scam":
+            prevention_suggestions = [
+                "Set up operator-level SMS spam filtering and sender validation registry rules.",
+                "Deliver specific phishing awareness campaigns focusing on text message channels (Smishing).",
+                "Establish clear guidelines that corporate accounts will never contact users via SMS for sensitive updates."
+            ]
+        elif attack_vector == "UPI / Financial Fraud":
+            prevention_suggestions = [
+                "Enforce mandatory multi-operator verification for corporate funds transfers and transactions.",
+                "Provide ongoing customer/staff training on UPI PIN safety and money request concepts.",
+                "Configure transaction alerts and speed limits on all operational bank channels."
+            ]
+        elif attack_vector == "Ransomware":
+            prevention_suggestions = [
+                "Maintain offline, immutable backups of critical directories and server states regularly.",
+                "Restrict user execution privileges and use application whitelisting policies.",
+                "Patch software vulnerabilities and keep local system OS definitions up to date."
+            ]
+        elif attack_vector == "Credential Access":
+            prevention_suggestions = [
+                "Enforce strong password complexity rules and passwordless authentication strategies.",
+                "Monitor logins for impossible travel anomalies and credential stuffing patterns.",
+                "Restrict administrative access to systems via localized privileged access workstations."
+            ]
+        else:
+            # Social Engineering
+            prevention_suggestions = [
+                "Establish strict out-of-band verification protocols for requests involving financial or access changes.",
+                "Conduct regular simulated social engineering tests to build strong verification habits.",
+                "Encourage an open reporting culture for any suspicious internal or external communications."
+            ]
 
         return {
             "summary": summary,
@@ -100,3 +159,4 @@ class AIIncidentAssistant:
             "business_impact": business_impact,
             "prevention_suggestions": prevention_suggestions
         }
+

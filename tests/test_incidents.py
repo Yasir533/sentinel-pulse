@@ -334,3 +334,81 @@ def test_incident_close_workflow_constraints(client, app, seed_users, seed_threa
     with app.app_context():
         inc = db.session.get(Incident, incident_id)
         assert inc.status == 'Closed'
+
+def test_ai_incident_assistant_vectors(app):
+    """Test AIIncidentAssistant heuristics classify and recommend correctly across vectors."""
+    from app.services.ai_incident_assistant import AIIncidentAssistant
+
+    # 1. Malware / APK
+    inc1 = Incident(title="Suspicious APK Downloaded", description="Malware signature matched on endpoint", severity="Critical", incident_number="INC-1")
+    res1 = AIIncidentAssistant.generate_assistance(inc1)
+    assert "Malware" in res1["summary"]
+    assert "Isolate the affected mobile device" in res1["resolution_steps"][0]
+    assert "MDM" in res1["prevention_suggestions"][0] or "sideloading" in res1["prevention_suggestions"][0]
+
+    # 2. Ransomware
+    inc2 = Incident(title="Critical server ransomware alert", description="Files encrypted with extension .locked", severity="Critical", incident_number="INC-2")
+    res2 = AIIncidentAssistant.generate_assistance(inc2)
+    assert "Ransomware" in res2["summary"]
+    assert "Isolate the infected hosts" in res2["resolution_steps"][0]
+    assert "backup" in res2["prevention_suggestions"][0].lower() or "immutable" in res2["prevention_suggestions"][0].lower()
+
+    # 3. UPI Fraud
+    inc3 = Incident(title="UPI transaction PIN bypass", description="Deceptive money collection request", severity="High", incident_number="INC-3")
+    res3 = AIIncidentAssistant.generate_assistance(inc3)
+    assert "UPI / Financial Fraud" in res3["summary"]
+    assert "freeze affected accounts" in res3["resolution_steps"][0].lower()
+
+    # 4. SMS Scam
+    inc4 = Incident(title="SMS lottery scam broadcast", description="Smishing text lure received", severity="Medium", incident_number="INC-4")
+    res4 = AIIncidentAssistant.generate_assistance(inc4)
+    assert "SMS Scam" in res4["summary"]
+    assert "cellular service providers" in res4["resolution_steps"][0].lower()
+
+    # 5. Phishing Link
+    inc5 = Incident(title="Phishing link domain accessed", description="User clicked url from WhatsApp", severity="High", incident_number="INC-5")
+    res5 = AIIncidentAssistant.generate_assistance(inc5)
+    assert "Phishing" in res5["summary"]
+    assert "Block the malicious domain" in res5["resolution_steps"][0]
+
+    # 6. Credential Access
+    inc6 = Incident(title="Decoy login page auth failure", description="Suspected password spraying attack", severity="High", incident_number="INC-6")
+    res6 = AIIncidentAssistant.generate_assistance(inc6)
+    assert "Credential Access" in res6["summary"]
+    assert "Force a global password reset" in res6["resolution_steps"][0]
+
+    # 7. Default (Social Engineering)
+    inc7 = Incident(title="Deceptive support call", description="Impression verification request", severity="Low", incident_number="INC-7")
+    res7 = AIIncidentAssistant.generate_assistance(inc7)
+    assert "Social Engineering" in res7["summary"]
+    assert "verification of the user" in res7["resolution_steps"][0]
+
+def test_ai_incident_assistant_dossier_integration(client, app, seed_users, seed_threat):
+    """Test details route generates AI Incident Copilot Guidance and renders details dossier."""
+    client.post('/auth/login', data={
+        'username_or_email': 'admin_op',
+        'password': 'AdminPassword123'
+    })
+
+    with app.app_context():
+        incident = Incident(
+            incident_number='INC-2026-0099',
+            threat_id=seed_threat,
+            title='Malware Ransomware Attack Triggered',
+            description='Threat actor executed locker file extension payload',
+            severity='Critical',
+            status='Open',
+            created_by=seed_users['admin']
+        )
+        db.session.add(incident)
+        db.session.commit()
+        incident_id = incident.id
+
+    response = client.get(f'/incidents/{incident_id}')
+    assert response.status_code == 200
+    assert b"AI Incident Copilot Guidance" in response.data
+    assert b"Executive Summary" in response.data
+    assert b"Assessed Root Cause" in response.data
+    assert b"Remediation Steps" in response.data
+    assert b"Ransomware" in response.data or b"Malware" in response.data
+

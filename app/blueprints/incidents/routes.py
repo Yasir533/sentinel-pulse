@@ -217,6 +217,10 @@ def view_incident(incident_id: int):
     summary = generate_summary(threat)
     recommendations = generate_recommendation(threat)
 
+    # Generate AI Assistant Remediation & Incident Guidance
+    from app.services.ai_incident_assistant import AIIncidentAssistant
+    ai_assistance = AIIncidentAssistant.generate_assistance(incident)
+
     return render_template(
         'incidents/detail.html',
         incident=incident,
@@ -225,7 +229,8 @@ def view_incident(incident_id: int):
         summary=summary,
         recommendations=recommendations,
         vt=threat.vt_enrichment,
-        abuse=threat.abuseipdb_enrichment
+        abuse=threat.abuseipdb_enrichment,
+        ai_assistance=ai_assistance
     )
 
 @incidents_bp.route('/<int:incident_id>/edit', methods=['GET', 'POST'])
