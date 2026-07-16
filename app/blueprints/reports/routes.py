@@ -47,7 +47,12 @@ def generate_report() -> Response:
         'IOC Report',
         'Monthly SOC Report',
         'Weekly SOC Report',
-        'Daily SOC Report'
+        'Daily SOC Report',
+        'Threat Report',
+        'Incident Report',
+        'Mobile Security Report',
+        'AI Analysis Report',
+        'Executive Summary'
     ]
     
     if not report_type or report_type not in valid_types:
@@ -212,3 +217,27 @@ def delete_schedule(schedule_id: int) -> Response:
 
 def send_file_io_bytes(data_bytes: bytes) -> io.BytesIO:
     return io.BytesIO(data_bytes)
+
+@reports_bp.route('/<int:report_id>/delete', methods=['POST'])
+@login_required
+@role_required('Admin')
+def delete_report(report_id: int) -> Response:
+    """Admin-only endpoint to delete a generated report."""
+    report = db.session.get(Report, report_id)
+    if not report:
+        flash("Report not found.", "warning")
+        return redirect(url_for('reports.list_reports'))
+        
+    try:
+        db.session.delete(report)
+        db.session.commit()
+        
+        from app.services.audit import AuditService
+        AuditService.log('Report Deletion', f"Report {report.report_number}", status='Success')
+        
+        flash("Report deleted successfully.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Failed to delete report: {str(e)}", "danger")
+        
+    return redirect(url_for('reports.list_reports'))

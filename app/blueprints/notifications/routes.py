@@ -108,3 +108,45 @@ def poll_notifications():
         'dropdown_html': dropdown_html,
         'widget_html': widget_html
     })
+
+@notifications_bp.route('/new', methods=['GET', 'POST'])
+@login_required
+def create_notification() -> str | Response:
+    """Trigger/dispatch a new notification manually (restricted to Admin/Analyst)."""
+    # Enforce role restriction
+    if current_user.role not in ['Admin', 'Analyst']:
+        abort(403)
+        
+    if request.method == 'POST':
+        user_id_val = request.form.get('user_id')
+        title = request.form.get('title', '').strip()
+        message = request.form.get('message', '').strip()
+        priority = request.form.get('priority', 'Medium').strip()
+        category = request.form.get('category', 'System Announcement').strip()
+        
+        if not user_id_val or not title or not message:
+            flash("User, title and message are required.", "danger")
+            return redirect(url_for('notifications.list_notifications'))
+            
+        try:
+            user_id = int(user_id_val)
+            notif = NotificationService.create_notification(
+                user_id=user_id,
+                title=title,
+                message=message,
+                priority=priority,
+                category=category
+            )
+            
+            from app.services.audit import AuditService
+            AuditService.log('Notification Dispatch', f"Notification {notif.id}", after=f"Recipient User={user_id}, Title={title}", status='Success')
+            
+            flash("Notification dispatched successfully.", "success")
+            return redirect(url_for('notifications.list_notifications'))
+        except Exception as e:
+            flash(f"Failed to dispatch notification: {str(e)}", "danger")
+            
+    # For GET, fetch users to target
+    from app.models.user import User
+    users = User.query.order_by(User.username.asc()).all()
+    return render_template('notifications/new.html', users=users)

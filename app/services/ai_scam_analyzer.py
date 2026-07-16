@@ -183,6 +183,21 @@ class AIScamAnalyzer:
 
         # Determine Verdict
         risk_score = min(risk_score, 100)
+        
+        # AI Learning: check previous scans of the same indicator and increase severity/confidence
+        if content:
+            content_clean = content.strip().lower()
+            prev_scan_count = MobileSubmission.query.filter(
+                (MobileSubmission.content == content) | (MobileSubmission.content.like(f"%{content_clean}%"))
+            ).count()
+            if prev_scan_count > 0:
+                learning_score_boost = min(prev_scan_count * 10, 30)
+                learning_confidence_boost = min(prev_scan_count * 5, 15)
+                risk_score += learning_score_boost
+                confidence = min(confidence + learning_confidence_boost, 100)
+                reasons.append(f"AI Learning: Found {prev_scan_count} matching historical scans for this indicator. Elevated severity by {learning_score_boost}% and confidence by {learning_confidence_boost}%.")
+
+        risk_score = min(risk_score, 100)
         if risk_score >= 80:
             verdict = 'ESCALATE'
         elif risk_score >= 60:
@@ -194,14 +209,41 @@ class AIScamAnalyzer:
         else:
             verdict = 'ALLOW'
 
-        if risk_score >= 30 and threat_category == 'Safe':
-            threat_category = 'Social Engineering'
+        # Automatic Classification Mapping
+        content_description_lower = (content + " " + " ".join(reasons)).lower()
+        if 'ransomware' in content_description_lower or 'encrypt' in content_description_lower or 'bitcoin' in content_description_lower:
+            threat_category = 'Ransomware'
+        elif 'trojan' in content_description_lower or 'sideload' in content_description_lower:
+            threat_category = 'Trojan'
+        elif 'spyware' in content_description_lower or 'keylogger' in content_description_lower or 'stealer' in content_description_lower:
+            threat_category = 'Spyware'
+        elif threat_category not in ['Fake Bank Scam', 'UPI Scam', 'Lottery Scam', 'Job Scam', 'Fake Courier Scam']:
+            if submission_type == 'apk' or 'malware' in content_description_lower or 'malicious file' in content_description_lower:
+                threat_category = 'Malware'
+            elif 'phish' in content_description_lower or 'bank' in content_description_lower or 'kyc' in content_description_lower or 'netbanking' in content_description_lower or 'login' in content_description_lower:
+                threat_category = 'Phishing'
+            elif 'scam' in content_description_lower or 'won' in content_description_lower or 'lottery' in content_description_lower or 'prize' in content_description_lower or 'part-time' in content_description_lower or 'upi' in content_description_lower:
+                threat_category = 'Scam'
+            elif risk_score >= 30 and threat_category == 'Safe':
+                threat_category = 'Scam'
 
         if not recommendations:
             if verdict in ['WARN', 'BLOCK', 'ESCALATE']:
                 recommendations.append("Exercise extreme caution. Do not click links, transfer money, or download files.")
             else:
                 recommendations.append("No active indicators of fraud or malicious campaigns identified.")
+
+        risk_level = 'Low'
+        if risk_score >= 80:
+            risk_level = 'Critical'
+        elif risk_score >= 60:
+            risk_level = 'High'
+        elif risk_score >= 35:
+            risk_level = 'Medium'
+
+        reasoning = f"Heuristic analysis detected {len(reasons)} warnings: " + "; ".join(reasons) if reasons else "No anomalous heuristics triggered."
+        executive_summary = f"This scan analyzed the input content under category {threat_category}. Risk verdict is {verdict} with a score of {risk_score}/100. It is recommended to follow the security suggestions."
+        technical_analysis = f"Indicators Checked: Urgency heuristics, fake bank brand correlation, known IOC signature lookup. Risk score calculated dynamically: {risk_score}/100. MITRE ATT&CK: Tactic={mitre_tactic or 'N/A'}, Technique={mitre_technique or 'N/A'}."
 
         return {
             'risk_score': risk_score,
@@ -211,7 +253,15 @@ class AIScamAnalyzer:
             'reasons': reasons,
             'recommendation': " ".join(recommendations),
             'mitre_tactic': mitre_tactic,
-            'mitre_technique': mitre_technique
+            'mitre_technique': mitre_technique,
+            # Phase 4 Enriched AI output
+            'risk_level': risk_level,
+            'confidence_score': f"{confidence if risk_score > 15 else 98}%",
+            'attack_type': threat_category,
+            'reasoning': reasoning,
+            'recommendations': recommendations,
+            'executive_summary': executive_summary,
+            'technical_analysis': technical_analysis
         }
 
     @classmethod
@@ -222,6 +272,17 @@ class AIScamAnalyzer:
         """
         meta = meta or {}
         analysis = cls.analyze_content(submission_type, content, meta)
+
+        # Store detailed reports inside JSON meta_data
+        meta['ai_report'] = {
+            'risk_level': analysis['risk_level'],
+            'confidence_score': analysis['confidence_score'],
+            'attack_type': analysis['attack_type'],
+            'reasoning': analysis['reasoning'],
+            'recommendations': analysis['recommendations'],
+            'executive_summary': analysis['executive_summary'],
+            'technical_analysis': analysis['technical_analysis']
+        }
 
         submission = MobileSubmission(
             user_id=user_id,
@@ -261,8 +322,18 @@ class AIScamAnalyzer:
                 ioc_type = 'Email'
                 ioc_value = meta.get('sender', content)
 
+            db_threat_type = analysis['threat_category']
+            if db_threat_type == 'Fake Bank Scam':
+                db_threat_type = 'Phishing'
+            elif db_threat_type in ['UPI Scam', 'Lottery Scam', 'Job Scam', 'Fake Courier Scam']:
+                db_threat_type = 'Scam'
+            elif db_threat_type == 'Malware APK':
+                db_threat_type = 'Malware'
+            elif db_threat_type not in Threat.THREAT_TYPES:
+                db_threat_type = 'Other'
+
             threat = Threat(
-                threat_type=analysis['threat_category'],
+                threat_type=db_threat_type,
                 ioc_type=ioc_type,
                 ioc_value=ioc_value[:256],
                 severity='Critical' if analysis['risk_score'] >= 80 else 'High' if analysis['risk_score'] >= 60 else 'Medium',
@@ -312,6 +383,31 @@ class AIScamAnalyzer:
                         message=f"A critical mobile scam ({analysis['threat_category']}) has been automatically escalated to the SOC console.",
                         priority='High',
                         category='Security Update'
+                    )
+                except Exception:
+                    pass
+
+                # Auto Incident generation for Critical Mobile Security Threat
+                try:
+                    from app.services.incident import create_incident
+                    incident_title = f"Auto-Escalated Critical Mobile Scam: {analysis['threat_category']}"
+                    incident_desc = (
+                        f"The AI Scam Analyzer detected a Critical Mobile security threat.\n"
+                        f"Verdict: {analysis['verdict']}\n"
+                        f"Classification: {analysis['threat_category']}\n"
+                        f"Risk Score: {analysis['risk_score']}/100\n"
+                        f"Confidence: {analysis['confidence_score']}\n"
+                        f"Reasoning: {analysis['reasoning']}\n"
+                        f"Content: {content}"
+                    )
+                    create_incident(
+                        threat_id=threat.id,
+                        title=incident_title,
+                        description=incident_desc,
+                        severity='Critical',
+                        status='Open',
+                        assigned_to=None,
+                        creator_id=user_id
                     )
                 except Exception:
                     pass

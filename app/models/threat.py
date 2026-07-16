@@ -11,7 +11,7 @@ class Threat(db.Model):
     THREAT_TYPES = [
         'Malware', 'Phishing', 'Intrusion', 'Ransomware', 
         'Suspicious Login', 'Malicious URL', 'Malicious IP', 
-        'Malicious Domain', 'Other'
+        'Malicious Domain', 'Scam', 'Trojan', 'Spyware', 'Other'
     ]
     SEVERITIES = ['Critical', 'High', 'Medium', 'Low']
     STATUSES = ['New', 'Investigating', 'Resolved', 'False Positive']

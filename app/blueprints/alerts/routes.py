@@ -240,3 +240,89 @@ def archive_alert(alert_id: int) -> Response:
         flash("Alert must be in Resolved status to be archived.", "danger")
         
     return redirect(url_for('alerts.view_alert', alert_id=alert.id))
+
+@alerts_bp.route('/new', methods=['GET', 'POST'])
+@login_required
+@role_required('Admin', 'Analyst')
+def new_alert() -> str | Response:
+    """Manually trigger/create a new alert associated with a Threat."""
+    from app.models.threat import Threat
+    from app.services.alert import AlertService
+    
+    if request.method == 'POST':
+        threat_id_val = request.form.get('threat_id')
+        severity = request.form.get('severity', 'Medium').strip()
+        message = request.form.get('message', '').strip()
+        
+        if not threat_id_val or not message:
+            flash("Threat and alert message are required.", "danger")
+            return redirect(url_for('alerts.list_alerts'))
+            
+        try:
+            threat_id = int(threat_id_val)
+            threat = Threat.query.get_or_404(threat_id)
+            
+            alert_number = AlertService.generate_next_alert_number()
+            alert = Alert(
+                alert_number=alert_number,
+                threat_id=threat.id,
+                severity=severity,
+                status='New',
+                message=message,
+                ai_risk=severity.upper()
+            )
+            
+            db.session.add(alert)
+            db.session.commit()
+            
+            from app.services.audit import AuditService
+            AuditService.log('Alert Generation', f"Alert {alert.alert_number}", after=f"Severity={alert.severity}, Message={alert.message}", status='Success')
+            
+            # Dispatch notification
+            try:
+                from app.services.notification import NotificationService
+                NotificationService.create_notification_for_alert(alert)
+            except Exception:
+                pass
+                
+            from app.services.activity import log_activity
+            log_activity(
+                message=f"Operator {current_user.username} manually created Alert {alert.alert_number}",
+                icon='bi-bell-fill',
+                badge_class='bg-warning-subtle text-warning'
+            )
+            flash("Alert created successfully.", "success")
+            return redirect(url_for('alerts.list_alerts'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Failed to create alert: {str(e)}", "danger")
+            
+    # For GET, fetch threats to link to
+    threats = Threat.query.order_by(Threat.created_at.desc()).all()
+    return render_template('alerts/new.html', threats=threats)
+
+@alerts_bp.route('/<int:alert_id>/delete', methods=['POST'])
+@login_required
+@role_required('Admin')
+def delete_alert(alert_id: int) -> Response:
+    """Admin-only endpoint to delete a system alert."""
+    alert = Alert.query.get_or_404(alert_id)
+    try:
+        db.session.delete(alert)
+        db.session.commit()
+        
+        from app.services.audit import AuditService
+        AuditService.log('Alert Deletion', f"Alert {alert.alert_number}", status='Success')
+        
+        from app.services.activity import log_activity
+        log_activity(
+            message=f"Administrator {current_user.username} deleted Alert {alert.alert_number}",
+            icon='bi-trash-fill',
+            badge_class='bg-danger-subtle text-danger'
+        )
+        flash("Alert deleted successfully.", "success")
+    except Exception:
+        db.session.rollback()
+        flash("An error occurred while deleting the alert.", "danger")
+        
+    return redirect(url_for('alerts.list_alerts'))

@@ -1,0 +1,90 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Create Platform Operator | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}" class="text-accent-glow text-decoration-none">SOC Console</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('dashboard.manage_users') }}" class="text-accent-glow text-decoration-none">User Management</a></li>
+            <li class="breadcrumb-item active text-light" aria-current="page">Create Operator</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card bg-dark border-secondary border-opacity-50 shadow-lg" style="border-radius: 12px; backdrop-filter: blur(10px);">
+                <div class="card-header border-bottom border-secondary border-opacity-25 bg-dark p-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-person-plus text-primary fs-4"></i>
+                    <h5 class="card-title text-light mb-0 font-outfit">Create Operator Account</h5>
+                </div>
+                <div class="card-body p-4">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, msg in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show small" role="alert">
+                                    {{ msg }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form action="{{ url_for('dashboard.create_user') }}" method="POST" class="needs-validation" novalidate>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <!-- Username -->
+                        <div class="mb-3">
+                            <label for="username" class="form-label text-secondary small fw-semibold">Username</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-dark border-secondary border-opacity-50 text-secondary"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control bg-dark text-light border-secondary border-opacity-50" id="username" name="username" required placeholder="e.g. jdoe">
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label text-secondary small fw-semibold">Email Address</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-dark border-secondary border-opacity-50 text-secondary"><i class="bi bi-envelope"></i></span>
+                                <input type="email" class="form-control bg-dark text-light border-secondary border-opacity-50" id="email" name="email" required placeholder="e.g. john.doe@company.com">
+                            </div>
+                        </div>
+
+                        <!-- Role -->
+                        <div class="mb-3">
+                            <label for="role" class="form-label text-secondary small fw-semibold">Platform Role</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-dark border-secondary border-opacity-50 text-secondary"><i class="bi bi-shield-lock"></i></span>
+                                <select class="form-select bg-dark text-light border-secondary border-opacity-50" id="role" name="role" required>
+                                    <option value="Viewer">Viewer (Read-Only Monitor)</option>
+                                    <option value="Analyst">Analyst (Triage & Incidents)</option>
+                                    <option value="Admin">Admin (Full Control)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-4">
+                            <label for="password" class="form-label text-secondary small fw-semibold">Initial Password</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-dark border-secondary border-opacity-50 text-secondary"><i class="bi bi-key"></i></span>
+                                <input type="password" class="form-control bg-dark text-light border-secondary border-opacity-50" id="password" name="password" required placeholder="••••••••">
+                            </div>
+                            <div class="form-text text-muted small mt-1">Must be at least 8 characters long.</div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex align-items-center justify-content-between pt-2">
+                            <a href="{{ url_for('dashboard.manage_users') }}" class="btn btn-sm btn-outline-secondary px-3">Cancel</a>
+                            <button type="submit" class="btn btn-sm btn-primary px-4">Create Account</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

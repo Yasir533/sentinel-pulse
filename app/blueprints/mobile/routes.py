@@ -390,3 +390,72 @@ def assistant():
 
     return render_template('mobile/assistant.html', user_query=user_query, bot_response=bot_response)
 
+
+@mobile_bp.route('/apps', methods=['GET', 'POST'])
+@login_required
+def installed_apps():
+    """Simulated Installed Apps and Permission Analysis."""
+    apps_list = [
+        {"name": "WhatsApp", "package": "com.whatsapp", "risk": "Low", "permissions": ["Contacts", "Storage", "Camera"]},
+        {"name": "Google Maps", "package": "com.google.android.apps.maps", "risk": "Low", "permissions": ["Location", "Storage"]},
+        {"name": "Free PDF Reader Pro", "package": "com.pdf.reader.free.pro", "risk": "Medium", "permissions": ["Storage", "Network Access", "Read Phone State"]},
+        {"name": "ShadowKey Keyboard", "package": "com.shadow.key.keyboard", "risk": "Critical", "permissions": ["Accessibility Service", "SMS", "Read Contacts", "Storage"]},
+        {"name": "Quick Cash Loan Tracker", "package": "com.quick.loan.tracker", "risk": "High", "permissions": ["SMS", "Location", "Contacts", "Read Logs"]}
+    ]
+    
+    result = None
+    if request.method == 'POST':
+        result = {
+            "scanned_count": len(apps_list),
+            "threats_found": 2,
+            "critical_app": "ShadowKey Keyboard (Accessibility Service abuse)",
+            "high_risk_app": "Quick Cash Loan Tracker (SMS + Contacts permission abuse)",
+            "verdict": "BLOCK"
+        }
+        
+        AIScamAnalyzer.process_submission(
+            user_id=current_user.id,
+            submission_type='apk',
+            content="ShadowKey Keyboard & Quick Cash Loan Tracker detected abusing Accessibility and SMS permissions.",
+            meta={'sha256': '95b3d688b1cc924a49c4cf4ea9a96e625a6cfd56d11a2f2bb3a9d7cfb56a4221', 'filename': 'shadowkey_keyboard.apk', 'description': 'Abuses high-risk accessibility permissions to harvest keystrokes.'}
+        )
+        flash("App permission scan completed. Threats identified and escalated.", "danger")
+        
+    return render_template('mobile/apps.html', apps=apps_list, result=result)
+
+
+@mobile_bp.route('/health', methods=['GET', 'POST'])
+@login_required
+def device_health():
+    """Simulated Mobile Device Health Diagnostic Check."""
+    checks = {
+        "root_access": "Secured",
+        "developer_options": "Enabled (Warning)",
+        "usb_debugging": "Enabled (Warning)",
+        "google_play_protect": "Active",
+        "encryption": "Encrypted",
+        "os_version": "Android 14 (Security Patch: June 2026)"
+    }
+    
+    result = None
+    if request.method == 'POST':
+        result = {
+            "status": "Insecure (Warning)",
+            "score": 68,
+            "reasons": [
+                "Developer Options and USB Debugging are active, increasing physical attack vector surface.",
+                "Simulated Root validation check bypassed by testing hooks."
+            ],
+            "verdict": "WARN"
+        }
+        
+        AIScamAnalyzer.process_submission(
+            user_id=current_user.id,
+            submission_type='url',
+            content="Device Health Check: Developer Options & USB Debugging active. Root validation alert.",
+            meta={'description': 'Device diagnostic returned warning score of 68/100 due to insecure developer settings.'}
+        )
+        flash("Device health diagnostic complete. System settings warning logged.", "warning")
+        
+    return render_template('mobile/health.html', checks=checks, result=result)
+

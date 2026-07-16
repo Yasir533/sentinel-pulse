@@ -35,6 +35,9 @@ class User(db.Model, UserMixin):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     last_login_at = db.Column(db.DateTime, nullable=True)
+    last_seen_at = db.Column(db.DateTime, nullable=True)
+    failed_login_attempts = db.Column(db.Integer, nullable=False, default=0)
+    lockout_until = db.Column(db.DateTime, nullable=True)
 
     def __init__(self, **kwargs):
         role_val = kwargs.pop('role', 'Viewer')

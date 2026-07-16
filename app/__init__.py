@@ -92,6 +92,24 @@ def create_app(config_name=None):
         from app.models.report_schedule import ReportSchedule
         from app.models.mobile_security import MobileSubmission, ThreatIntel
         db.create_all()
+        
+        # Ensure SQLite tables have the new columns dynamically
+        if "sqlite" in app.config.get("SQLALCHEMY_DATABASE_URI", ""):
+            try:
+                db.session.execute(db.text("ALTER TABLE users ADD COLUMN last_seen_at DATETIME"))
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+            try:
+                db.session.execute(db.text("ALTER TABLE users ADD COLUMN failed_login_attempts INTEGER DEFAULT 0 NOT NULL"))
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+            try:
+                db.session.execute(db.text("ALTER TABLE users ADD COLUMN lockout_until DATETIME"))
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
 
     # 5. Register Error Handlers
     register_error_handlers(app)
@@ -127,6 +145,63 @@ def create_app(config_name=None):
     @app.context_processor
     def inject_csrf_token():
         return dict(csrf_token=generate_csrf_token)
+
+    @app.context_processor
+    def inject_device_mode():
+        from flask import session
+        from flask_login import current_user
+        
+        mode = 'desktop'
+        if current_user and current_user.is_authenticated:
+            if current_user.role == 'Admin':
+                mode = session.get('device_mode', 'desktop')
+            elif current_user.role in ['Analyst', 'Viewer']:
+                mode = 'desktop'
+            else:
+                mode = 'mobile'
+        else:
+            mode = session.get('device_mode', 'desktop')
+        return dict(device_mode=mode)
+
+    @app.before_request
+    def update_last_seen():
+        from flask_login import current_user
+        from datetime import datetime
+        if current_user and current_user.is_authenticated:
+            try:
+                current_user.last_seen_at = datetime.utcnow()
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+
+    @app.before_request
+    def enforce_device_mode_restrictions():
+        from flask import request, redirect, url_for, session, current_app
+        from flask_login import current_user
+        
+        if current_app.config.get('TESTING'):
+            return
+        if not request.endpoint:
+            return
+        if request.endpoint in ['static', 'auth.login', 'auth.register', 'auth.logout', 'notifications.poll_notifications', 'dashboard.toggle_device_mode', 'dashboard.realtime_dashboard_api']:
+            return
+        if request.blueprint in ['api', 'auth']:
+            return
+        if not current_user or not current_user.is_authenticated:
+            return
+            
+        mode = 'desktop'
+        if current_user.role == 'Admin':
+            mode = session.get('device_mode', 'desktop')
+        elif current_user.role in ['Analyst', 'Viewer']:
+            mode = 'desktop'
+        else:
+            mode = 'mobile'
+            
+        if mode == 'desktop' and request.blueprint == 'mobile':
+            return redirect(url_for('dashboard.index'))
+        elif mode == 'mobile' and request.blueprint in ['dashboard', 'threats', 'incidents', 'alerts', 'reports']:
+            return redirect(url_for('mobile.dashboard'))
 
     @app.before_request
     def check_csrf():

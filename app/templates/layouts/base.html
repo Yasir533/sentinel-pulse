@@ -143,6 +143,22 @@
                         
                         <!-- User Session Dropdown or Authentication CTAs -->
                         {% if current_user.is_authenticated %}
+                        
+                        <!-- Device Mode Switcher for Admins -->
+                        {% if current_user.role == 'Admin' %}
+                        <form action="{{ url_for('dashboard.toggle_device_mode') }}" method="POST" class="d-flex align-items-center m-0 me-2" id="deviceModeForm">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="btn-group btn-group-sm border border-secondary border-opacity-50 rounded" role="group">
+                                <button type="submit" name="mode" value="desktop" class="btn btn-sm py-1 px-2 {% if device_mode == 'desktop' %}btn-primary text-light{% else %}btn-outline-secondary text-secondary{% endif %}" title="Switch to Desktop Mode">
+                                    <i class="bi bi-laptop"></i> <span class="d-none d-md-inline small">Desktop Mode</span>
+                                </button>
+                                <button type="submit" name="mode" value="mobile" class="btn btn-sm py-1 px-2 {% if device_mode == 'mobile' %}btn-primary text-light{% else %}btn-outline-secondary text-secondary{% endif %}" title="Switch to Mobile Mode">
+                                    <i class="bi bi-phone"></i> <span class="d-none d-md-inline small">Mobile Mode</span>
+                                </button>
+                            </div>
+                        </form>
+                        {% endif %}
+
                         <div class="dropdown">
                             <button class="btn btn-user dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <div class="user-avatar-circle d-flex align-items-center justify-content-center text-dark fw-bold" style="width: 28px; height: 28px; border-radius: 50%; background-color: var(--accent-glow); font-size: 0.85rem; color: #090d16 !important;">
@@ -175,6 +191,8 @@
             <nav class="sidebar border-end border-secondary-subtle d-none d-lg-block flex-shrink-0">
                 <div class="d-flex flex-column justify-content-between h-100 p-3">
                     <ul class="nav nav-pills flex-column mb-auto gap-1">
+                        {% if device_mode == 'desktop' %}
+                        <!-- Desktop SOC features -->
                         <li class="nav-item">
                             <a href="{{ url_for('dashboard.index') }}" class="nav-link {% if request.blueprint == 'dashboard' and request.path in ['/dashboard', '/admin/dashboard', '/analyst/dashboard', '/viewer/dashboard'] %}active{% endif %}">
                                 <i class="bi bi-speedometer2"></i>
@@ -184,13 +202,13 @@
                         <li class="nav-item">
                             <a href="{{ url_for('threats.list_threats') }}" class="nav-link {% if request.blueprint == 'threats' %}active{% endif %}">
                                 <i class="bi bi-shield-slash"></i>
-                                <span>Threats</span>
+                                <span>Threat Intelligence</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ url_for('incidents.list_incidents') }}" class="nav-link {% if request.blueprint == 'incidents' %}active{% endif %}">
                                 <i class="bi bi-exclamation-triangle"></i>
-                                <span>Incidents</span>
+                                <span>Incident Response</span>
                             </a>
                         </li>
                         {% if current_user.is_authenticated %}
@@ -199,74 +217,6 @@
                                 <i class="bi bi-bell"></i>
                                 <span>Alerts</span>
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center justify-content-between {% if request.blueprint == 'mobile' %}active{% endif %}" data-bs-toggle="collapse" href="#mobileSecurityMenu" role="button" aria-expanded="{% if request.blueprint == 'mobile' %}true{% else %}false{% endif %}" aria-controls="mobileSecurityMenu">
-                                <span class="d-flex align-items-center gap-2">
-                                    <i class="bi bi-phone"></i>
-                                    <span>Mobile Security</span>
-                                </span>
-                                <i class="bi bi-chevron-down small"></i>
-                            </a>
-                            <div class="collapse {% if request.blueprint == 'mobile' %}show{% endif %} ps-3" id="mobileSecurityMenu">
-                                <ul class="nav flex-column gap-1 mt-1 small">
-                                    <li class="nav-item">
-                                        <a href="{{ url_for('mobile.dashboard') }}" class="nav-link py-1 {% if request.path == '/mobile/dashboard' %}active text-light{% endif %}">
-                                            <i class="bi bi-speedometer2"></i> Dashboard
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ url_for('mobile.submit_threat') }}" class="nav-link py-1 {% if request.path == '/mobile/submit' %}active text-light{% endif %}">
-                                            <i class="bi bi-plus-circle"></i> Submit Threat
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ url_for('mobile.scan_link') }}" class="nav-link py-1 {% if request.path == '/mobile/scan/link' %}active text-light{% endif %}">
-                                            <i class="bi bi-link-45deg"></i> Link Scanner
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ url_for('mobile.scan_sms') }}" class="nav-link py-1 {% if request.path == '/mobile/scan/sms' %}active text-light{% endif %}">
-                                            <i class="bi bi-chat-left-text"></i> SMS Scanner
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ url_for('mobile.scan_whatsapp') }}" class="nav-link py-1 {% if request.path == '/mobile/scan/whatsapp' %}active text-light{% endif %}">
-                                            <i class="bi bi-whatsapp"></i> WhatsApp Scanner
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ url_for('mobile.scan_email') }}" class="nav-link py-1 {% if request.path == '/mobile/scan/email' %}active text-light{% endif %}">
-                                            <i class="bi bi-envelope"></i> Email Scanner
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ url_for('mobile.scan_qr') }}" class="nav-link py-1 {% if request.path == '/mobile/scan/qr' %}active text-light{% endif %}">
-                                            <i class="bi bi-qr-code-scan"></i> QR Scanner
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ url_for('mobile.scan_apk') }}" class="nav-link py-1 {% if request.path == '/mobile/scan/apk' %}active text-light{% endif %}">
-                                            <i class="bi bi-file-earmark-binary"></i> APK Scanner
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ url_for('mobile.security_score') }}" class="nav-link py-1 {% if request.path == '/mobile/score' %}active text-light{% endif %}">
-                                            <i class="bi bi-shield-check"></i> Security Score
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ url_for('mobile.history') }}" class="nav-link py-1 {% if request.path == '/mobile/history' %}active text-light{% endif %}">
-                                            <i class="bi bi-clock-history"></i> History
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ url_for('mobile.assistant') }}" class="nav-link py-1 {% if request.path == '/mobile/assistant' %}active text-light{% endif %}">
-                                            <i class="bi bi-cpu"></i> AI Assistant
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
                         </li>
                         {% endif %}
                         <li class="nav-item">
@@ -279,13 +229,19 @@
                         <li class="nav-item">
                             <a href="{{ url_for('dashboard.manage_users') }}" class="nav-link {% if request.path == '/admin/users' %}active{% endif %}">
                                 <i class="bi bi-people"></i>
-                                <span>Users</span>
+                                <span>User Management</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ url_for('dashboard.system_settings') }}" class="nav-link {% if request.path == '/admin/settings' %}active{% endif %}">
                                 <i class="bi bi-gear"></i>
-                                <span>System Settings</span>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('dashboard.list_audit_logs') }}" class="nav-link {% if request.path == '/admin/audit-logs' %}active{% endif %}">
+                                <i class="bi bi-shield-check"></i>
+                                <span>Audit Logs</span>
                             </a>
                         </li>
                         {% endif %}
@@ -296,6 +252,82 @@
                                 <span>System Health</span>
                             </a>
                         </li>
+                        
+                        {% else %}
+                        <!-- Mobile Security features -->
+                        <li class="nav-item">
+                            <a href="{{ url_for('mobile.dashboard') }}" class="nav-link {% if request.path == '/mobile/dashboard' %}active{% endif %}">
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Mobile Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('mobile.scan_sms') }}" class="nav-link {% if request.path == '/mobile/scan/sms' %}active{% endif %}">
+                                <i class="bi bi-chat-left-text"></i>
+                                <span>SMS Security</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('mobile.scan_apk') }}" class="nav-link {% if request.path == '/mobile/scan/apk' %}active{% endif %}">
+                                <i class="bi bi-file-earmark-binary"></i>
+                                <span>APK Scanner</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('mobile.scan_link') }}" class="nav-link {% if request.path == '/mobile/scan/link' %}active{% endif %}">
+                                <i class="bi bi-link-45deg"></i>
+                                <span>URL Scanner</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('mobile.scan_qr') }}" class="nav-link {% if request.path == '/mobile/scan/qr' %}active{% endif %}">
+                                <i class="bi bi-qr-code-scan"></i>
+                                <span>QR Scanner</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('mobile.scan_whatsapp') }}" class="nav-link {% if request.path == '/mobile/scan/whatsapp' %}active{% endif %}">
+                                <i class="bi bi-whatsapp"></i>
+                                <span>WhatsApp Scanner</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('mobile.scan_email') }}" class="nav-link {% if request.path == '/mobile/scan/email' %}active{% endif %}">
+                                <i class="bi bi-envelope"></i>
+                                <span>Email Scanner</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('mobile.device_health') }}" class="nav-link {% if request.path == '/mobile/health' %}active{% endif %}">
+                                <i class="bi bi-phone-fill"></i>
+                                <span>Device Health</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('mobile.installed_apps') }}" class="nav-link {% if request.path == '/mobile/apps' %}active{% endif %}">
+                                <i class="bi bi-grid-fill"></i>
+                                <span>Installed Apps</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('mobile.security_score') }}" class="nav-link {% if request.path == '/mobile/score' %}active{% endif %}">
+                                <i class="bi bi-shield-check"></i>
+                                <span>Risk Score</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('mobile.assistant') }}" class="nav-link {% if request.path == '/mobile/assistant' %}active{% endif %}">
+                                <i class="bi bi-cpu"></i>
+                                <span>AI Mobile Assistant</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('mobile.history') }}" class="nav-link {% if request.path == '/mobile/history' %}active{% endif %}">
+                                <i class="bi bi-clock-history"></i>
+                                <span>History</span>
+                            </a>
+                        </li>
+                        {% endif %}
                     </ul>
                     
                     <!-- System Agent Status Placeholder -->
@@ -464,8 +496,53 @@
                     })
                     .catch(err => console.log('Polling error:', err));
             }
-            // Poll every 30 seconds
-            setInterval(pollNotifications, 30000);
+
+            // Real-time Dashboard Polling
+            function pollRealtimeDashboard() {
+                const totalThreatsEl = document.getElementById('rt-total-threats');
+                const openIncidentsEl = document.getElementById('rt-open-incidents');
+                const resolvedIncidentsEl = document.getElementById('rt-resolved-incidents');
+                const criticalAlertsEl = document.getElementById('rt-critical-alerts');
+                const newAlertsEl = document.getElementById('rt-new-alerts');
+                const onlineUsersEl = document.getElementById('rt-online-users');
+                const activeAnalystsEl = document.getElementById('rt-active-analysts');
+                const activeMobileDevicesEl = document.getElementById('rt-active-mobile-devices');
+                const cpuValEl = document.getElementById('rt-cpu-val');
+                const ramValEl = document.getElementById('rt-ram-val');
+
+                if (totalThreatsEl || openIncidentsEl || resolvedIncidentsEl || criticalAlertsEl || onlineUsersEl) {
+                    fetch('{{ url_for("dashboard.realtime_dashboard_api") }}')
+                        .then(res => res.json())
+                        .then(data => {
+                            if (totalThreatsEl) totalThreatsEl.textContent = data.total_threats;
+                            if (openIncidentsEl) openIncidentsEl.textContent = data.open_incidents;
+                            if (resolvedIncidentsEl) resolvedIncidentsEl.textContent = data.resolved_incidents;
+                            if (criticalAlertsEl) {
+                                criticalAlertsEl.textContent = data.critical_alerts;
+                                if (data.critical_alerts > 0) {
+                                    criticalAlertsEl.closest('.card')?.classList.add('border-danger');
+                                } else {
+                                    criticalAlertsEl.closest('.card')?.classList.remove('border-danger');
+                                }
+                            }
+                            if (newAlertsEl) newAlertsEl.textContent = data.new_alerts;
+                            if (onlineUsersEl) onlineUsersEl.textContent = data.online_users;
+                            if (activeAnalystsEl) activeAnalystsEl.textContent = data.active_analysts;
+                            if (activeMobileDevicesEl) activeMobileDevicesEl.textContent = data.active_mobile_devices;
+                            if (cpuValEl) cpuValEl.textContent = data.cpu;
+                            if (ramValEl) ramValEl.textContent = data.ram;
+                        })
+                        .catch(err => console.log('Realtime poll error:', err));
+                }
+            }
+
+            // Poll every 3 seconds for instant updates
+            setInterval(pollNotifications, 3000);
+            setInterval(pollRealtimeDashboard, 3000);
+            
+            // Initial poll
+            pollNotifications();
+            pollRealtimeDashboard();
             
             // Mark a notification as read when clicked in the dropdown list
             document.addEventListener('click', function(e) {
