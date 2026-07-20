@@ -272,10 +272,10 @@
             labels: ['Critical', 'High', 'Medium', 'Low'],
             datasets: [{
                 data: [
-                    {{ severity_counts['Critical'] }},
-                    {{ severity_counts['High'] }},
-                    {{ severity_counts['Medium'] }},
-                    {{ severity_counts['Low'] }}
+                    Number('{{ severity_counts["Critical"] }}' || 0),
+                    Number('{{ severity_counts["High"] }}' || 0),
+                    Number('{{ severity_counts["Medium"] }}' || 0),
+                    Number('{{ severity_counts["Low"] }}' || 0)
                 ],
                 backgroundColor: ['#dc3545', '#ffc107', '#0dcaf0', '#6c757d'],
                 borderColor: '#101626',
@@ -300,9 +300,9 @@
     new Chart(threatTypesCtx, {
         type: 'doughnut',
         data: {
-            labels: {{ threat_types_data.keys() | list | tojson }},
+            labels: JSON.parse('{{ threat_types_data.keys() | list | tojson | safe }}'),
             datasets: [{
-                data: {{ threat_types_data.values() | list | tojson }},
+                data: JSON.parse('{{ threat_types_data.values() | list | tojson | safe }}'),
                 backgroundColor: ['#0d6efd', '#20c997', '#6f42c1', '#fd7e14', '#0dcaf0', '#e83e8c'],
                 borderColor: '#101626',
                 borderWidth: 2
@@ -326,10 +326,10 @@
     new Chart(threatTrendCtx, {
         type: 'line',
         data: {
-            labels: {{ trend_labels | tojson }},
+            labels: JSON.parse('{{ trend_labels | tojson | safe }}'),
             datasets: [{
                 label: 'Threats Ingested',
-                data: {{ threat_trend_values | tojson }},
+                data: JSON.parse('{{ threat_trend_values | tojson | safe }}'),
                 borderColor: '#00f0ff',
                 backgroundColor: 'rgba(0, 240, 255, 0.04)',
                 borderWidth: 2,

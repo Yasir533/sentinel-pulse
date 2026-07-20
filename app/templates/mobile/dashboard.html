@@ -191,10 +191,10 @@
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: {{ trend_labels|tojson }},
+                labels: JSON.parse('{{ trend_labels | tojson | safe }}'),
                 datasets: [{
                     label: 'Security Score',
-                    data: {{ trend_values|tojson }},
+                    data: JSON.parse('{{ trend_values | tojson | safe }}'),
                     borderColor: '#10b981',
                     backgroundColor: 'rgba(16, 185, 129, 0.05)',
                     borderWidth: 3,

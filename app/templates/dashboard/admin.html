@@ -558,10 +558,10 @@
             labels: ['Critical', 'High', 'Medium', 'Low'],
             datasets: [{
                 data: [
-                    {{ severity_counts['Critical'] }},
-                    {{ severity_counts['High'] }},
-                    {{ severity_counts['Medium'] }},
-                    {{ severity_counts['Low'] }}
+                    Number('{{ severity_counts["Critical"] }}' || 0),
+                    Number('{{ severity_counts["High"] }}' || 0),
+                    Number('{{ severity_counts["Medium"] }}' || 0),
+                    Number('{{ severity_counts["Low"] }}' || 0)
                 ],
                 backgroundColor: ['#dc3545', '#ffc107', '#0dcaf0', '#6c757d'],
                 borderColor: '#101626',
@@ -586,9 +586,9 @@
     new Chart(threatTypesCtx, {
         type: 'doughnut',
         data: {
-            labels: {{ threat_types_data.keys() | list | tojson }},
+            labels: JSON.parse('{{ threat_types_data.keys() | list | tojson | safe }}'),
             datasets: [{
-                data: {{ threat_types_data.values() | list | tojson }},
+                data: JSON.parse('{{ threat_types_data.values() | list | tojson | safe }}'),
                 backgroundColor: ['#0d6efd', '#20c997', '#6f42c1', '#fd7e14', '#0dcaf0', '#e83e8c'],
                 borderColor: '#101626',
                 borderWidth: 2
@@ -612,11 +612,11 @@
     new Chart(ingestionTrendCtx, {
         type: 'line',
         data: {
-            labels: {{ trend_labels | tojson }},
+            labels: JSON.parse('{{ trend_labels | tojson | safe }}'),
             datasets: [
                 {
                     label: 'Threats',
-                    data: {{ threat_trend_values | tojson }},
+                    data: JSON.parse('{{ threat_trend_values | tojson | safe }}'),
                     borderColor: '#00f0ff',
                     backgroundColor: 'rgba(0, 240, 255, 0.04)',
                     borderWidth: 2,
@@ -627,7 +627,7 @@
                 },
                 {
                     label: 'Incidents',
-                    data: {{ incident_trend_values | tojson }},
+                    data: JSON.parse('{{ incident_trend_values | tojson | safe }}'),
                     borderColor: '#3b82f6',
                     backgroundColor: 'rgba(59, 130, 246, 0.04)',
                     borderWidth: 2,
@@ -654,11 +654,11 @@
     new Chart(alertNotifTrendCtx, {
         type: 'line',
         data: {
-            labels: {{ trend_labels | tojson }},
+            labels: JSON.parse('{{ trend_labels | tojson | safe }}'),
             datasets: [
                 {
                     label: 'Alerts',
-                    data: {{ alert_trend_values | tojson }},
+                    data: JSON.parse('{{ alert_trend_values | tojson | safe }}'),
                     borderColor: '#ffc107',
                     backgroundColor: 'rgba(255, 193, 7, 0.04)',
                     borderWidth: 2,
@@ -669,7 +669,7 @@
                 },
                 {
                     label: 'Notifications',
-                    data: {{ notification_trend_values | tojson }},
+                    data: JSON.parse('{{ notification_trend_values | tojson | safe }}'),
                     borderColor: '#6f42c1',
                     backgroundColor: 'rgba(111, 66, 193, 0.04)',
                     borderWidth: 2,
@@ -696,9 +696,9 @@
     new Chart(riskCtx, {
         type: 'bar',
         data: {
-            labels: {{ risk_brackets.keys() | list | tojson }},
+            labels: JSON.parse('{{ risk_brackets.keys() | list | tojson | safe }}'),
             datasets: [{
-                data: {{ risk_brackets.values() | list | tojson }},
+                data: JSON.parse('{{ risk_brackets.values() | list | tojson | safe }}'),
                 backgroundColor: '#20c997',
                 borderRadius: 4
             }]
@@ -719,9 +719,9 @@
     new Chart(sourceCtx, {
         type: 'pie',
         data: {
-            labels: {{ sources_data.keys() | list | tojson }},
+            labels: JSON.parse('{{ sources_data.keys() | list | tojson | safe }}'),
             datasets: [{
-                data: {{ sources_data.values() | list | tojson }},
+                data: JSON.parse('{{ sources_data.values() | list | tojson | safe }}'),
                 backgroundColor: ['#fd7e14', '#0d6efd', '#20c997', '#6f42c1', '#e83e8c'],
                 borderColor: '#101626',
                 borderWidth: 1

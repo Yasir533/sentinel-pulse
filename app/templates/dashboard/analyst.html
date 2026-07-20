@@ -362,10 +362,10 @@
             labels: ['Critical', 'High', 'Medium', 'Low'],
             datasets: [{
                 data: [
-                    {{ severity_counts['Critical'] }},
-                    {{ severity_counts['High'] }},
-                    {{ severity_counts['Medium'] }},
-                    {{ severity_counts['Low'] }}
+                    Number('{{ severity_counts["Critical"] }}' || 0),
+                    Number('{{ severity_counts["High"] }}' || 0),
+                    Number('{{ severity_counts["Medium"] }}' || 0),
+                    Number('{{ severity_counts["Low"] }}' || 0)
                 ],
                 backgroundColor: ['#dc3545', '#ffc107', '#0dcaf0', '#6c757d'],
                 borderColor: '#101626',
@@ -390,9 +390,9 @@
     new Chart(iocTypesCtx, {
         type: 'pie',
         data: {
-            labels: {{ ioc_types_data.keys() | list | tojson }},
+            labels: JSON.parse('{{ ioc_types_data.keys() | list | tojson | safe }}'),
             datasets: [{
-                data: {{ ioc_types_data.values() | list | tojson }},
+                data: JSON.parse('{{ ioc_types_data.values() | list | tojson | safe }}'),
                 backgroundColor: ['#0d6efd', '#20c997', '#6f42c1', '#fd7e14', '#e83e8c'],
                 borderColor: '#101626',
                 borderWidth: 1
@@ -415,10 +415,10 @@
     new Chart(activityTrendCtx, {
         type: 'line',
         data: {
-            labels: {{ weekly_activity_labels | tojson }},
+            labels: JSON.parse('{{ weekly_activity_labels | tojson | safe }}'),
             datasets: [{
                 label: 'Activity logs count',
-                data: {{ weekly_activity_values | tojson }},
+                data: JSON.parse('{{ weekly_activity_values | tojson | safe }}'),
                 borderColor: '#20c997',
                 backgroundColor: 'rgba(32, 201, 151, 0.04)',
                 borderWidth: 2,
