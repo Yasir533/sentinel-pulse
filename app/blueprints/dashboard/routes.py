@@ -753,7 +753,7 @@ def realtime_dashboard_api() -> Response:
         'open_alerts': open_alerts,
         'resolved_alerts': resolved_alerts,
         'total_users': total_users,
-        'online_users': max(online, 1) if 'online' in locals() else max(online_users, 1),
+        'online_users': max(online_users, 1),
         'active_analysts': active_analysts,
         'active_mobile_devices': active_mobile_devices,
         'severity_counts': severity_counts,
