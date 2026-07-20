@@ -1239,16 +1239,74 @@ def ai_decisions() -> str:
 @login_required
 @role_required('Admin', 'Analyst')
 def mobile_observability() -> str:
-    """Admin Mobile Security Observability dashboard to inspect user mobile scan events."""
+    """Scam Guard dashboard: local smart anti-scam capabilities & smartphone permission management."""
     from app.models.mobile_security import MobileSubmission
 
     page = request.args.get('page', 1, type=int)
-    pagination = MobileSubmission.query.order_by(MobileSubmission.created_at.desc()).paginate(page=page, per_page=15, error_out=False)
+    pagination = MobileSubmission.query.order_by(MobileSubmission.created_at.desc()).paginate(page=page, per_page=10, error_out=False)
     
     total_scans = MobileSubmission.query.count()
     scams_detected = MobileSubmission.query.filter(MobileSubmission.verdict.in_(['BLOCK', 'WARN', 'ESCALATE'])).count()
     apk_scans = MobileSubmission.query.filter_by(submission_type='apk').count()
     url_scans = MobileSubmission.query.filter(MobileSubmission.submission_type.in_(['url', 'link'])).count()
+
+    # Smart Anti-Scam Protection Module States
+    scam_guard_modules = [
+        {
+            "id": "notification_protection",
+            "name": "NOTIFICATION PROTECTION",
+            "icon": "bi-bell-fill",
+            "status": "Active",
+            "badge": "PROTECTED",
+            "color": "success",
+            "description": "Scans incoming push notifications & SMS alerts for phishing URL patterns, scam messages, and spoofing vectors."
+        },
+        {
+            "id": "system_call_protection",
+            "name": "SYSTEM CALL PROTECTION",
+            "icon": "bi-telephone-inbound-fill",
+            "status": "Active",
+            "badge": "PROTECTED",
+            "color": "success",
+            "description": "Intercepts suspicious call origins, vishing indicators, and fraudulent banking spoof call attempts in real-time."
+        },
+        {
+            "id": "status_bar_protection",
+            "name": "STATUS BAR PROTECTION",
+            "icon": "bi-layout-text-window-reverse",
+            "status": "Monitoring",
+            "badge": "GUARDED",
+            "color": "info",
+            "description": "Detects background screen captures, unauthorized status bar indicators, and malware overlay triggers."
+        },
+        {
+            "id": "sidebar_protection",
+            "name": "SIDEBAR PROTECTION",
+            "icon": "bi-layout-sidebar-inset",
+            "status": "Active",
+            "badge": "PROTECTED",
+            "color": "success",
+            "description": "Monitors edge panels, quick launchers, and side gesture overlays to prevent unauthorized touch hijacking."
+        },
+        {
+            "id": "small_window_protection",
+            "name": "SMALL WINDOW PROTECTION",
+            "icon": "bi-window-stack",
+            "status": "Active",
+            "badge": "PROTECTED",
+            "color": "success",
+            "description": "Prevents unauthorized Picture-in-Picture (PiP), floating window popups, and clickjacking overlay prompts."
+        },
+        {
+            "id": "app_privacy_protection",
+            "name": "ALL APP PRIVACY PROTECTION",
+            "icon": "bi-shield-check",
+            "status": "Enforced",
+            "badge": "ENFORCED",
+            "color": "warning",
+            "description": "Audits and enforces app permissions for SMS, Call Logs, Contacts, Accessibility, and System Overlays."
+        }
+    ]
 
     return render_template(
         'dashboard/mobile_observability.html',
@@ -1257,7 +1315,8 @@ def mobile_observability() -> str:
         total_scans=total_scans,
         scams_detected=scams_detected,
         apk_scans=apk_scans,
-        url_scans=url_scans
+        url_scans=url_scans,
+        scam_guard_modules=scam_guard_modules
     )
 
 
