@@ -1,6 +1,7 @@
 /* 
   Sentinel Pulse - Core UI Styling System 
   Theme: Sleek Dark / Cyber Threat Intelligence Console (Azure Sentinel & CrowdStrike Falcon Vibe)
+  High-Contrast & Maximum Text Visibility Edition
 */
 
 :root {
@@ -9,12 +10,12 @@
     --bg-dark-panel: #0d1222;
     --bg-dark-card: #13192f;
     
-    --border-color: rgba(255, 255, 255, 0.08);
-    --border-color-hover: rgba(0, 240, 255, 0.35);
+    --border-color: rgba(255, 255, 255, 0.12);
+    --border-color-hover: rgba(0, 240, 255, 0.45);
     
-    --text-primary: #f3f4f6;
-    --text-secondary: #9ca3af;
-    --text-muted: #6b7280;
+    --text-primary: #ffffff;
+    --text-secondary: #e2e8f0;
+    --text-muted: #cbd5e1;
     
     --accent-glow: #00f0ff;
     --accent-glow-rgb: 0, 240, 255;
@@ -35,6 +36,25 @@ body {
 
 .font-outfit {
     font-family: var(--font-title);
+}
+
+/* Universal High-Contrast & High-Visibility Text Overrides */
+.text-muted,
+.text-secondary,
+.text-body-secondary,
+small,
+.small,
+span.text-muted,
+div.text-muted,
+p.text-muted,
+label.text-muted,
+span.text-secondary,
+label.text-secondary {
+    color: #cbd5e1 !important;
+}
+
+.text-white-50 {
+    color: #e2e8f0 !important;
 }
 
 /* Custom Scrollbar */
@@ -74,7 +94,7 @@ body {
 }
 
 .text-accent-glow {
-    color: var(--accent-glow);
+    color: var(--accent-glow) !important;
     text-shadow: 0 0 10px rgba(var(--accent-glow-rgb), 0.6);
 }
 
@@ -88,7 +108,7 @@ header.navbar {
 .form-control-dark {
     background-color: var(--bg-dark-core) !important;
     border: 1px solid var(--border-color) !important;
-    color: var(--text-primary) !important;
+    color: #ffffff !important;
     padding-left: 2.5rem !important;
     border-radius: 0.5rem;
     transition: all 0.2s ease-in-out;
@@ -98,7 +118,7 @@ header.navbar {
     background-color: var(--bg-dark-core) !important;
     border-color: var(--accent-glow) !important;
     box-shadow: 0 0 8px rgba(var(--accent-glow-rgb), 0.25) !important;
-    color: var(--text-primary) !important;
+    color: #ffffff !important;
 }
 
 .search-box .search-icon {
@@ -106,12 +126,12 @@ header.navbar {
     left: 0.95rem;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-muted);
+    color: #cbd5e1;
 }
 
 /* User & Button Styles */
 .btn-icon {
-    color: var(--text-secondary);
+    color: #e2e8f0;
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -151,7 +171,7 @@ header.navbar {
 }
 
 .nav-pills .nav-link {
-    color: var(--text-secondary);
+    color: #e2e8f0 !important;
     font-weight: 500;
     padding: 0.75rem 1rem;
     border-radius: 0.5rem;
@@ -166,8 +186,8 @@ header.navbar {
 }
 
 .nav-pills .nav-link:hover {
-    color: var(--accent-glow);
-    background-color: rgba(var(--accent-glow-rgb), 0.04);
+    color: var(--accent-glow) !important;
+    background-color: rgba(var(--accent-glow-rgb), 0.08) !important;
 }
 
 .nav-pills .nav-link.active {
@@ -210,6 +230,7 @@ header.navbar {
 
 .status-desc {
     font-size: 0.75rem;
+    color: #cbd5e1 !important;
 }
 
 /* Main Dashboard Elements */
@@ -218,6 +239,7 @@ header.navbar {
     font-weight: 700;
     font-size: 1.75rem;
     letter-spacing: -0.02em;
+    color: #ffffff !important;
 }
 
 .bg-panel {
@@ -231,6 +253,12 @@ header.navbar {
     border-radius: 0.75rem !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.card-title,
+.card-header,
+.card-subtitle {
+    color: #ffffff !important;
 }
 
 .card:hover {
@@ -269,8 +297,8 @@ header.navbar {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    font-weight: 600;
-    color: var(--text-secondary);
+    font-weight: 700;
+    color: #e2e8f0 !important;
     margin: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -299,14 +327,15 @@ header.navbar {
     font-family: var(--font-title);
     font-weight: 700;
     font-size: 2rem;
-    color: var(--text-primary);
+    color: #ffffff !important;
     margin: 0;
     line-height: 1;
 }
 
 .soc-card-kpi-footer {
-    font-size: 0.72rem;
-    color: var(--text-muted);
+    font-size: 0.75rem;
+    color: #cbd5e1 !important;
+    font-weight: 500;
     margin: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -348,7 +377,7 @@ header.navbar {
 }
 
 .soc-scorecard-metric-item {
-    background-color: rgba(255, 255, 255, 0.02);
+    background-color: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--border-color);
     border-radius: 0.35rem;
     padding: 0.4rem 0.6rem;
@@ -403,18 +432,18 @@ header.navbar {
 
 .table-dark {
     background-color: transparent !important;
-    color: var(--text-primary) !important;
+    color: #ffffff !important;
     margin-bottom: 0;
 }
 
 .table-dark th {
-    background-color: rgba(255, 255, 255, 0.02) !important;
+    background-color: rgba(255, 255, 255, 0.04) !important;
     border-bottom: 2px solid var(--border-color) !important;
     font-family: var(--font-title);
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--text-secondary) !important;
+    color: #e2e8f0 !important;
     padding: 1rem 0.75rem !important;
 }
 
@@ -424,6 +453,53 @@ header.navbar {
     padding: 0.85rem 0.75rem !important;
     vertical-align: middle !important;
     font-size: 0.85rem;
+    color: #f1f5f9 !important;
+}
+
+/* Form Controls & Inputs Contrast */
+.form-control,
+.form-select,
+textarea,
+select,
+input {
+    color: #ffffff !important;
+    background-color: var(--bg-dark-core) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea:focus,
+select:focus,
+input:focus {
+    color: #ffffff !important;
+    background-color: var(--bg-dark-core) !important;
+    border-color: var(--accent-glow) !important;
+    box-shadow: 0 0 8px rgba(var(--accent-glow-rgb), 0.25) !important;
+}
+
+::placeholder,
+.form-control::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+}
+
+/* Dropdown menus in dark mode */
+.dropdown-menu-dark,
+.dropdown-menu {
+    background-color: #0d1222 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+}
+
+.dropdown-item {
+    color: #e2e8f0 !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: rgba(0, 240, 255, 0.12) !important;
+    color: #ffffff !important;
 }
 
 /* Custom Alerts, Badges & Pills */
@@ -435,27 +511,27 @@ header.navbar {
 }
 
 .bg-critical {
-    background-color: rgba(239, 68, 68, 0.15) !important;
-    color: #ef4444 !important;
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background-color: rgba(239, 68, 68, 0.2) !important;
+    color: #fca5a5 !important;
+    border: 1px solid rgba(239, 68, 68, 0.4);
 }
 
 .bg-high {
-    background-color: rgba(249, 115, 22, 0.15) !important;
-    color: #f97316 !important;
-    border: 1px solid rgba(249, 115, 22, 0.3);
+    background-color: rgba(249, 115, 22, 0.2) !important;
+    color: #fdba74 !important;
+    border: 1px solid rgba(249, 115, 22, 0.4);
 }
 
 .bg-medium {
-    background-color: rgba(234, 179, 8, 0.15) !important;
-    color: #eab308 !important;
-    border: 1px solid rgba(234, 179, 8, 0.3);
+    background-color: rgba(234, 179, 8, 0.2) !important;
+    color: #fde047 !important;
+    border: 1px solid rgba(234, 179, 8, 0.4);
 }
 
 .bg-low {
-    background-color: rgba(59, 130, 246, 0.15) !important;
-    color: #3b82f6 !important;
-    border: 1px solid rgba(59, 130, 246, 0.3);
+    background-color: rgba(59, 130, 246, 0.2) !important;
+    color: #93c5fd !important;
+    border: 1px solid rgba(59, 130, 246, 0.4);
 }
 
 /* High Resolution Responsive Design */
