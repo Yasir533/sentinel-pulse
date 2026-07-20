@@ -131,6 +131,13 @@ def acknowledge_alert(alert_id: int) -> Response:
         try:
             db.session.commit()
             
+            # Publish Real-time SSE Event
+            try:
+                from app.services.realtime_event_service import RealtimeEventService
+                RealtimeEventService.publish('alert.updated', alert.to_dict(), target_role='Analyst')
+            except Exception:
+                pass
+
             from app.services.audit import AuditService
             AuditService.log('Alert Status Changes', f"Alert {alert.alert_number}", before='New', after='Acknowledged', status='Success')
 
@@ -162,6 +169,12 @@ def investigate_alert(alert_id: int) -> Response:
         try:
             db.session.commit()
             
+            try:
+                from app.services.realtime_event_service import RealtimeEventService
+                RealtimeEventService.publish('alert.updated', alert.to_dict(), target_role='Analyst')
+            except Exception:
+                pass
+
             from app.services.audit import AuditService
             AuditService.log('Alert Status Changes', f"Alert {alert.alert_number}", before='Acknowledged', after='Investigating', status='Success')
 
@@ -193,6 +206,12 @@ def resolve_alert(alert_id: int) -> Response:
         try:
             db.session.commit()
             
+            try:
+                from app.services.realtime_event_service import RealtimeEventService
+                RealtimeEventService.publish('alert.updated', alert.to_dict(), target_role='Analyst')
+            except Exception:
+                pass
+
             from app.services.audit import AuditService
             AuditService.log('Alert Status Changes', f"Alert {alert.alert_number}", before='Investigating', after='Resolved', status='Success')
 

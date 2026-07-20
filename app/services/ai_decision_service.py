@@ -14,14 +14,14 @@ class AIDecisionService:
         reasoning_summary: str,
         user_id: int = None,
         severity: str = 'Medium',
-        engine_type: str = 'Hybrid-Rule-ML',
+        engine_type: str = 'Hybrid Rule & Threat Intel Engine',
         mitre_tactic: str = None,
         mitre_technique: str = None,
         sources_consulted: str = None,
         recommended_action: str = None
     ) -> AIDecision:
         """
-        Create and persist a structured AI/ML decision record for auditability.
+        Create and persist a structured AI decision record for auditability.
         """
         try:
             decision = AIDecision(
@@ -42,6 +42,14 @@ class AIDecisionService:
             )
             db.session.add(decision)
             db.session.commit()
+
+            # Publish Real-time SSE event
+            from app.services.realtime_event_service import RealtimeEventService
+            RealtimeEventService.publish(
+                event_type='ai_decision.completed',
+                payload=decision.to_dict(),
+                target_role='Analyst'
+            )
             return decision
         except Exception as e:
             db.session.rollback()

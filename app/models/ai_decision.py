@@ -12,7 +12,7 @@ class AIDecision(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'), nullable=True, index=True)
     input_type = db.Column(db.String(50), nullable=False, index=True) # e.g. 'url', 'sms', 'apk', 'incident'
     input_value = db.Column(db.Text, nullable=False)
-    engine_type = db.Column(db.String(50), nullable=False, default='Hybrid-Rule-ML')
+    engine_type = db.Column(db.String(50), nullable=False, default='Hybrid Rule & Threat Intel Engine')
     risk_score = db.Column(db.Integer, nullable=False, default=0)
     confidence = db.Column(db.Integer, nullable=False, default=0)
     severity = db.Column(db.String(20), nullable=False, default='Medium') # Low, Medium, High, Critical

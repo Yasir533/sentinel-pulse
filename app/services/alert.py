@@ -112,6 +112,17 @@ class AlertService:
             from app.services.audit import AuditService
             AuditService.log('Alert Generation', f"Alert {alert.alert_number}", after=f"Severity={alert.severity}, Message={alert.message}", status='Success')
 
+            # Publish Real-time SSE Event
+            try:
+                from app.services.realtime_event_service import RealtimeEventService
+                RealtimeEventService.publish(
+                    event_type='alert.created',
+                    payload=alert.to_dict(),
+                    target_role='Analyst'
+                )
+            except Exception:
+                pass
+
             # Trigger notification
             try:
                 from app.services.notification import NotificationService

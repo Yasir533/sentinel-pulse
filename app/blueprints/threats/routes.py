@@ -133,6 +133,13 @@ def new_threat() -> str | Response:
             db.session.add(new_tr)
             db.session.commit()
             
+            # Publish Real-time SSE Event
+            try:
+                from app.services.realtime_event_service import RealtimeEventService
+                RealtimeEventService.publish('threat.created', new_tr.to_dict(), target_role='Analyst')
+            except Exception:
+                pass
+
             from app.services.audit import AuditService
             AuditService.log('Threat Creation', f"Threat {new_tr.ioc_value}", after=f"Type={new_tr.threat_type}, Severity={new_tr.severity}")
 
@@ -263,6 +270,13 @@ def edit_threat(threat_id: int) -> str | Response:
         try:
             db.session.commit()
             
+            # Publish Real-time SSE Event
+            try:
+                from app.services.realtime_event_service import RealtimeEventService
+                RealtimeEventService.publish('threat.updated', threat.to_dict(), target_role='Analyst')
+            except Exception:
+                pass
+
             from app.services.audit import AuditService
             AuditService.log('Threat Update', f"Threat {threat.ioc_value}", after=f"Type={threat.threat_type}, Severity={threat.severity}")
 

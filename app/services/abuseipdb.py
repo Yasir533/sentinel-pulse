@@ -79,6 +79,29 @@ def enrich_ip(threat: Threat) -> AbuseIPDBEnrichment:
         db.session.commit()
         return enrichment
 
+    # 24-Hour Cache Check: Reuse recent successful enrichment for identical IP
+    from datetime import timedelta
+    cached = AbuseIPDBEnrichment.query.join(Threat).filter(
+        Threat.ioc_value == threat.ioc_value,
+        AbuseIPDBEnrichment.status == 'success',
+        AbuseIPDBEnrichment.updated_at >= datetime.utcnow() - timedelta(hours=24)
+    ).first()
+
+    if cached:
+        enrichment.status = 'success'
+        enrichment.abuse_confidence_score = cached.abuse_confidence_score
+        enrichment.country_code = cached.country_code
+        enrichment.country_name = cached.country_name
+        enrichment.isp = cached.isp
+        enrichment.domain = cached.domain
+        enrichment.usage_type = cached.usage_type
+        enrichment.total_reports = cached.total_reports
+        enrichment.last_reported_at = cached.last_reported_at
+        enrichment.raw_data = cached.raw_data
+        enrichment.error_message = None
+        db.session.commit()
+        return enrichment
+
     enrichment.status = 'pending'
     db.session.commit()
 

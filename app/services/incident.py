@@ -85,6 +85,17 @@ def create_incident(
     db.session.add(incident)
     db.session.commit()
 
+    # Publish Real-time SSE Event
+    try:
+        from app.services.realtime_event_service import RealtimeEventService
+        RealtimeEventService.publish(
+            event_type='incident.created',
+            payload=incident.to_dict(),
+            target_role='Analyst'
+        )
+    except Exception:
+        pass
+
     try:
         from app.services.audit import AuditService
         AuditService.log(
@@ -201,6 +212,23 @@ def update_incident(
         incident.resolved_at = None
 
     db.session.commit()
+
+    # Publish Real-time SSE Events
+    try:
+        from app.services.realtime_event_service import RealtimeEventService
+        if old_status != incident.status:
+            if incident.status in ['Resolved', 'Closed']:
+                RealtimeEventService.publish('incident.resolved', incident.to_dict(), target_role='Analyst')
+            else:
+                RealtimeEventService.publish('incident.updated', incident.to_dict(), target_role='Analyst')
+        elif changes:
+            RealtimeEventService.publish('incident.updated', incident.to_dict(), target_role='Analyst')
+
+        if old_assignee_id != incident.assigned_to and incident.assigned_to is not None:
+            # Deliver incident.assigned event to target assigned analyst (object-level authorization)
+            RealtimeEventService.publish('incident.assigned', incident.to_dict(), target_user_id=incident.assigned_to)
+    except Exception:
+        pass
 
     try:
         from app.services.audit import AuditService

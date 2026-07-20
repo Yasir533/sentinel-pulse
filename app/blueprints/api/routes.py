@@ -1,10 +1,11 @@
 import json
-import time
+import queue
 from datetime import datetime
 from flask import Response, jsonify, stream_with_context
+from flask_login import login_required, current_user
 from app.blueprints.api import api_bp
-from app.models.alert import Alert
 from app.models.threat import Threat
+from app.services.realtime_event_service import RealtimeEventService
 
 @api_bp.route('/status', methods=['GET'])
 def get_status():
@@ -25,40 +26,41 @@ def get_threats():
     }), 200
 
 @api_bp.route('/events/stream')
+@login_required
 def event_stream():
     """
-    Server-Sent Events (SSE) stream endpoint for real-time security events,
-    threat alerts, and dashboard updates.
+    Authenticated Server-Sent Events (SSE) stream endpoint for real-time security events,
+    threat alerts, and dashboard updates. Uses same-origin Flask-Login session authentication.
     """
+    user_id = current_user.id
+    role = current_user.role
+
     def generate():
-        last_check = datetime.utcnow()
-        yield f"data: {json.dumps({'type': 'connection', 'status': 'connected', 'timestamp': last_check.isoformat()})}\n\n"
-        
-        # Send initial pulse
-        while True:
-            time.sleep(5)
-            now = datetime.utcnow()
-            
-            # Check for new critical alerts since last check
-            recent_alerts = Alert.query.filter(Alert.created_at >= last_check).all()
-            if recent_alerts:
-                for alert in recent_alerts:
-                    event_payload = {
-                        'type': 'security_alert',
-                        'alert_number': alert.alert_number,
-                        'severity': alert.severity,
-                        'message': alert.message,
-                        'created_at': alert.created_at.isoformat()
-                    }
-                    yield f"data: {json.dumps(event_payload)}\n\n"
-            
-            # Send heartbeat event
-            heartbeat = {
-                'type': 'heartbeat',
-                'timestamp': now.isoformat()
+        listener = RealtimeEventService.register_listener(user_id, role)
+        try:
+            # Connection announcement
+            conn_payload = {
+                'event_type': 'connection',
+                'status': 'connected',
+                'user_id': user_id,
+                'role': role,
+                'timestamp': datetime.utcnow().isoformat() + "Z"
             }
-            yield f"data: {json.dumps(heartbeat)}\n\n"
-            last_check = now
+            yield f"data: {json.dumps(conn_payload)}\n\n"
+
+            while True:
+                try:
+                    # Wait up to 15 seconds for a published event
+                    event_obj = listener['queue'].get(timeout=15)
+                    yield f"data: {json.dumps(event_obj)}\n\n"
+                except queue.Empty:
+                    # Send periodic heartbeat to keep connection alive
+                    heartbeat = {
+                        'event_type': 'heartbeat',
+                        'timestamp': datetime.utcnow().isoformat() + "Z"
+                    }
+                    yield f"data: {json.dumps(heartbeat)}\n\n"
+        finally:
+            RealtimeEventService.unregister_listener(listener)
 
     return Response(stream_with_context(generate()), mimetype='text/event-stream')
-

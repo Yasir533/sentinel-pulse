@@ -67,6 +67,14 @@ class NotificationService:
         )
         db.session.add(notif)
         db.session.commit()
+
+        # Publish Real-time SSE Event (targeted strictly to recipient user ID for object-level privacy)
+        try:
+            from app.services.realtime_event_service import RealtimeEventService
+            RealtimeEventService.publish('notification.created', notif.to_dict(), target_user_id=user_id)
+        except Exception:
+            pass
+
         return notif
 
     @classmethod

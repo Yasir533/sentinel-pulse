@@ -550,9 +550,37 @@
                 }
             }
 
-            // Poll every 3 seconds for instant updates
-            setInterval(pollNotifications, 3000);
-            setInterval(pollRealtimeDashboard, 3000);
+            // Real-time EventSource (SSE Stream) Connection
+            function initSSEStream() {
+                if (!window.EventSource) return;
+                
+                const sseSource = new EventSource('/api/events/stream');
+                
+                sseSource.onmessage = function(event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.event_type && data.event_type !== 'heartbeat' && data.event_type !== 'connection') {
+                            // Instantly refresh dashboard metrics and notification bell on new real-time security events
+                            pollNotifications();
+                            pollRealtimeDashboard();
+                        }
+                    } catch (err) {
+                        console.log('SSE parse error:', err);
+                    }
+                };
+
+                sseSource.onerror = function(err) {
+                    console.log('SSE connection lost, reconnecting in 5s...');
+                    sseSource.close();
+                    setTimeout(initSSEStream, 5000);
+                };
+            }
+
+            initSSEStream();
+
+            // Poll every 10 seconds as secondary fallback
+            setInterval(pollNotifications, 10000);
+            setInterval(pollRealtimeDashboard, 10000);
             
             // Initial poll
             pollNotifications();

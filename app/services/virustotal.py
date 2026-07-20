@@ -1,4 +1,5 @@
 import base64
+from datetime import datetime, timedelta
 import requests
 from flask import current_app
 from app.extensions import db
@@ -80,6 +81,26 @@ def enrich_threat(threat: Threat) -> VTEnrichment:
     if not api_key:
         enrichment.status = 'failed'
         enrichment.error_message = "VirusTotal API Key is not configured."
+        db.session.commit()
+        return enrichment
+
+    # 24-Hour Cache Check: Reuse recent successful enrichment for identical IOC
+    from datetime import timedelta
+    cached = VTEnrichment.query.join(Threat).filter(
+        Threat.ioc_value == threat.ioc_value,
+        VTEnrichment.status == 'success',
+        VTEnrichment.updated_at >= datetime.utcnow() - timedelta(hours=24)
+    ).first()
+
+    if cached:
+        enrichment.status = 'success'
+        enrichment.malicious_count = cached.malicious_count
+        enrichment.suspicious_count = cached.suspicious_count
+        enrichment.harmless_count = cached.harmless_count
+        enrichment.undetected_count = cached.undetected_count
+        enrichment.reputation = cached.reputation
+        enrichment.raw_data = cached.raw_data
+        enrichment.error_message = None
         db.session.commit()
         return enrichment
 

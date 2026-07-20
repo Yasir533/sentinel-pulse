@@ -316,7 +316,16 @@ class AIScamAnalyzer:
             recommended_action=analysis['recommendation']
         )
 
-        # Audit Log submission
+        # Publish Real-time Mobile Security SSE Event
+        try:
+            from app.services.realtime_event_service import RealtimeEventService
+            RealtimeEventService.publish(
+                event_type='mobile_security.detected',
+                payload=submission.to_dict(),
+                target_role='Admin'
+            )
+        except Exception:
+            pass
         AuditService.log(
             action='Mobile Submission',
             entity=f"Submission {submission.id}",
