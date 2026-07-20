@@ -7,6 +7,7 @@ from app.models.incident import Incident
 from app.models.activity_log import ActivityLog
 from app.models.alert import Alert
 from app.models.notification import Notification
+from app.models.ai_decision import AIDecision
 
-__all__ = ['User', 'Threat', 'VTEnrichment', 'AbuseIPDBEnrichment', 'Incident', 'ActivityLog', 'Alert', 'Notification']
+__all__ = ['User', 'Threat', 'VTEnrichment', 'AbuseIPDBEnrichment', 'Incident', 'ActivityLog', 'Alert', 'Notification', 'AIDecision']
 

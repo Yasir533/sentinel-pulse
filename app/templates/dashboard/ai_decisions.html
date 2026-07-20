@@ -1,0 +1,149 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}AI Decision Center | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="page-title font-outfit text-light mb-1">AI Decision Center</h1>
+        <p class="text-secondary small mb-0">Auditable log of machine learning predictions, risk scoring, MITRE mappings, and heuristic reasoning.</p>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card border border-secondary-subtle bg-panel p-3">
+            <span class="text-muted small d-block">Total AI Decisions</span>
+            <span class="fs-4 font-outfit fw-bold text-light">{{ stats.total }}</span>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border border-secondary-subtle bg-panel p-3">
+            <span class="text-muted small d-block">Blocked Threat Verdicts</span>
+            <span class="fs-4 font-outfit fw-bold text-danger">{{ stats.blocks }}</span>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border border-secondary-subtle bg-panel p-3">
+            <span class="text-muted small d-block">Warning Verdicts</span>
+            <span class="fs-4 font-outfit fw-bold text-warning">{{ stats.warns }}</span>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border border-secondary-subtle bg-panel p-3">
+            <span class="text-muted small d-block">Allowed Verdicts</span>
+            <span class="fs-4 font-outfit fw-bold text-success">{{ stats.allows }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="card border border-secondary-subtle bg-panel p-3 mb-4">
+    <form method="GET" action="{{ url_for('dashboard.ai_decisions') }}" class="row g-2 align-items-center">
+        <div class="col-auto">
+            <label class="small text-muted me-1">Severity:</label>
+            <select name="severity" class="form-select form-select-sm bg-dark text-light border-secondary" onchange="this.form.submit()">
+                <option value="">All Severities</option>
+                <option value="Critical" {% if current_severity == 'Critical' %}selected{% endif %}>Critical</option>
+                <option value="High" {% if current_severity == 'High' %}selected{% endif %}>High</option>
+                <option value="Medium" {% if current_severity == 'Medium' %}selected{% endif %}>Medium</option>
+                <option value="Low" {% if current_severity == 'Low' %}selected{% endif %}>Low</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <label class="small text-muted me-1">Verdict:</label>
+            <select name="verdict" class="form-select form-select-sm bg-dark text-light border-secondary" onchange="this.form.submit()">
+                <option value="">All Verdicts</option>
+                <option value="BLOCK" {% if current_verdict == 'BLOCK' %}selected{% endif %}>BLOCK</option>
+                <option value="WARN" {% if current_verdict == 'WARN' %}selected{% endif %}>WARN</option>
+                <option value="ALLOW" {% if current_verdict == 'ALLOW' %}selected{% endif %}>ALLOW</option>
+            </select>
+        </div>
+        {% if current_severity or current_verdict or current_type %}
+        <div class="col-auto">
+            <a href="{{ url_for('dashboard.ai_decisions') }}" class="btn btn-sm btn-outline-secondary">Reset Filters</a>
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Decision Table -->
+<div class="card border border-secondary-subtle bg-panel overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0">
+            <thead>
+                <tr class="text-secondary small border-bottom border-secondary-subtle">
+                    <th>ID</th>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Input Type</th>
+                    <th>Risk / Confidence</th>
+                    <th>Verdict</th>
+                    <th>MITRE Mapping</th>
+                    <th>Reasoning Summary</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in decisions %}
+                <tr>
+                    <td class="text-muted small">#{{ d.id }}</td>
+                    <td class="small text-light">{{ d.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="small text-light">{{ d.user.username if d.user else 'System' }}</td>
+                    <td><span class="badge bg-secondary text-uppercase small">{{ d.input_type }}</span></td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fw-bold {% if d.risk_score >= 80 %}text-danger{% elif d.risk_score >= 50 %}text-warning{% else %}text-success{% endif %}">
+                                {{ d.risk_score }}/100
+                            </span>
+                            <span class="text-muted small">({{ d.confidence }}% conf)</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge {% if d.verdict == 'BLOCK' or d.verdict == 'ESCALATE' %}bg-danger{% elif d.verdict == 'WARN' %}bg-warning text-dark{% else %}bg-success{% endif %}">
+                            {{ d.verdict }}
+                        </span>
+                    </td>
+                    <td class="small text-muted">
+                        {% if d.mitre_technique %}
+                            <code class="text-accent-glow">{{ d.mitre_technique }}</code>
+                        {% else %}
+                            <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td class="small text-secondary" style="max-width: 300px;">
+                        <span class="d-inline-block text-truncate" style="max-width: 280px;" title="{{ d.reasoning_summary }}">
+                            {{ d.reasoning_summary or 'No anomalous heuristics.' }}
+                        </span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="text-center py-4 text-muted">
+                        <i class="bi bi-robot fs-3 d-block mb-2"></i>
+                        No AI decisions logged yet matching criteria.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if pagination.pages > 1 %}
+<div class="d-flex justify-content-center mt-4">
+    <nav>
+        <ul class="pagination pagination-sm mb-0">
+            {% if pagination.has_prev %}
+            <li class="page-item"><a class="page-link bg-dark text-light border-secondary" href="{{ url_for('dashboard.ai_decisions', page=pagination.prev_num, severity=current_severity, verdict=current_verdict) }}">Previous</a></li>
+            {% endif %}
+            <li class="page-item disabled"><span class="page-link bg-dark text-muted border-secondary">Page {{ pagination.page }} of {{ pagination.pages }}</span></li>
+            {% if pagination.has_next %}
+            <li class="page-item"><a class="page-link bg-dark text-light border-secondary" href="{{ url_for('dashboard.ai_decisions', page=pagination.next_num, severity=current_severity, verdict=current_verdict) }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
+{% endblock %}

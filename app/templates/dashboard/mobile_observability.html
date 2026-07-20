@@ -1,0 +1,110 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Mobile Security Observability | Sentinel Pulse{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="page-title font-outfit text-light mb-1">Mobile Security Observability</h1>
+        <p class="text-secondary small mb-0">Admin view monitoring all user mobile scans, SMS phishing checks, QR findings, and APK analysis events.</p>
+    </div>
+</div>
+
+<!-- Stats Bar -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card border border-secondary-subtle bg-panel p-3">
+            <span class="text-muted small d-block">Total Submissions</span>
+            <span class="fs-4 font-outfit fw-bold text-light">{{ total_scans }}</span>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border border-secondary-subtle bg-panel p-3">
+            <span class="text-muted small d-block">Scams Flagged</span>
+            <span class="fs-4 font-outfit fw-bold text-danger">{{ scams_detected }}</span>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border border-secondary-subtle bg-panel p-3">
+            <span class="text-muted small d-block">APK Scans</span>
+            <span class="fs-4 font-outfit fw-bold text-warning">{{ apk_scans }}</span>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border border-secondary-subtle bg-panel p-3">
+            <span class="text-muted small d-block">URL & Link Scans</span>
+            <span class="fs-4 font-outfit fw-bold text-info">{{ url_scans }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Submissions Table -->
+<div class="card border border-secondary-subtle bg-panel overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0">
+            <thead>
+                <tr class="text-secondary small border-bottom border-secondary-subtle">
+                    <th>ID</th>
+                    <th>Date & Time</th>
+                    <th>User</th>
+                    <th>Type</th>
+                    <th>Verdict</th>
+                    <th>Threat Category</th>
+                    <th>Risk Score</th>
+                    <th>Content Preview</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sub in submissions %}
+                <tr>
+                    <td class="text-muted small">#{{ sub.id }}</td>
+                    <td class="small text-light">{{ sub.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="small text-light">{{ sub.user.username if sub.user else 'Anonymous' }}</td>
+                    <td><span class="badge bg-secondary text-uppercase small">{{ sub.submission_type }}</span></td>
+                    <td>
+                        <span class="badge {% if sub.verdict == 'BLOCK' or sub.verdict == 'ESCALATE' %}bg-danger{% elif sub.verdict == 'WARN' %}bg-warning text-dark{% else %}bg-success{% endif %}">
+                            {{ sub.verdict }}
+                        </span>
+                    </td>
+                    <td class="small text-light">{{ sub.threat_category }}</td>
+                    <td>
+                        <span class="fw-bold {% if sub.risk_score >= 80 %}text-danger{% elif sub.risk_score >= 50 %}text-warning{% else %}text-success{% endif %}">
+                            {{ sub.risk_score }}/100
+                        </span>
+                    </td>
+                    <td class="small text-secondary" style="max-width: 250px;">
+                        <span class="d-inline-block text-truncate" style="max-width: 230px;" title="{{ sub.content }}">
+                            {{ sub.content }}
+                        </span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="text-center py-4 text-muted">
+                        <i class="bi bi-phone fs-3 d-block mb-2"></i>
+                        No mobile security scan submissions logged yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if pagination.pages > 1 %}
+<div class="d-flex justify-content-center mt-4">
+    <nav>
+        <ul class="pagination pagination-sm mb-0">
+            {% if pagination.has_prev %}
+            <li class="page-item"><a class="page-link bg-dark text-light border-secondary" href="{{ url_for('dashboard.mobile_observability', page=pagination.prev_num) }}">Previous</a></li>
+            {% endif %}
+            <li class="page-item disabled"><span class="page-link bg-dark text-muted border-secondary">Page {{ pagination.page }} of {{ pagination.pages }}</span></li>
+            {% if pagination.has_next %}
+            <li class="page-item"><a class="page-link bg-dark text-light border-secondary" href="{{ url_for('dashboard.mobile_observability', page=pagination.next_num) }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
+{% endblock %}

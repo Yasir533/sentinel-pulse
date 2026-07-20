@@ -15,7 +15,10 @@ def create_app(config_name=None):
         config_name = os.environ.get('FLASK_ENV', 'development')
     
     # Load configuration
-    app.config.from_object(config_by_name[config_name])
+    config_cls = config_by_name[config_name]
+    app.config.from_object(config_cls)
+    if hasattr(config_cls, 'init_app'):
+        config_cls.init_app(app)
     
     # Ensure instance path directory exists
     try:
@@ -84,32 +87,15 @@ def create_app(config_name=None):
     app.register_blueprint(notifications_bp, url_prefix='/notifications')
     app.register_blueprint(mobile_bp, url_prefix='/mobile')
     
-    # Ensure database tables (like notifications) are created
+    # Ensure database tables exist
     with app.app_context():
         from app.models.notification import Notification
         from app.models.report import Report
         from app.models.audit_log import AuditLog
         from app.models.report_schedule import ReportSchedule
         from app.models.mobile_security import MobileSubmission, ThreatIntel
+        from app.models.ai_decision import AIDecision
         db.create_all()
-        
-        # Ensure SQLite tables have the new columns dynamically
-        if "sqlite" in app.config.get("SQLALCHEMY_DATABASE_URI", ""):
-            try:
-                db.session.execute(db.text("ALTER TABLE users ADD COLUMN last_seen_at DATETIME"))
-                db.session.commit()
-            except Exception:
-                db.session.rollback()
-            try:
-                db.session.execute(db.text("ALTER TABLE users ADD COLUMN failed_login_attempts INTEGER DEFAULT 0 NOT NULL"))
-                db.session.commit()
-            except Exception:
-                db.session.rollback()
-            try:
-                db.session.execute(db.text("ALTER TABLE users ADD COLUMN lockout_until DATETIME"))
-                db.session.commit()
-            except Exception:
-                db.session.rollback()
 
     # 5. Register Error Handlers
     register_error_handlers(app)

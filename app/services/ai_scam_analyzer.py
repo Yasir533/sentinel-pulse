@@ -8,6 +8,7 @@ from app.models.alert import Alert
 from app.services.alert import AlertService
 from app.services.audit import AuditService
 from app.services.notification import NotificationService
+from app.services.ai_decision_service import AIDecisionService
 
 class AIScamAnalyzer:
     @staticmethod
@@ -298,6 +299,22 @@ class AIScamAnalyzer:
         )
         db.session.add(submission)
         db.session.commit()
+
+        # Log AI Decision Record
+        AIDecisionService.log_decision(
+            user_id=user_id,
+            input_type=submission_type,
+            input_value=content,
+            risk_score=analysis['risk_score'],
+            confidence=analysis['confidence'],
+            verdict=analysis['verdict'],
+            severity=analysis['risk_level'],
+            reasoning_summary=analysis['reasoning'],
+            mitre_tactic=analysis['mitre_tactic'],
+            mitre_technique=analysis['mitre_technique'],
+            sources_consulted='ThreatIntelDB, Heuristics, VT/AbuseIPDB',
+            recommended_action=analysis['recommendation']
+        )
 
         # Audit Log submission
         AuditService.log(

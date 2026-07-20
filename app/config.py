@@ -77,11 +77,11 @@ class ProductionConfig(BaseConfig):
     # Ensure production environment has actual environment variables set
     @classmethod
     def init_app(cls, app):
-        # We can add checks here to warn if keys are not explicitly set in the env
-        if os.environ.get('SECRET_KEY') is None:
-            app.logger.warning("SECRET_KEY environment variable is not set. Using auto-generated key.")
-        if os.environ.get('JWT_SECRET_KEY') is None:
-            app.logger.warning("JWT_SECRET_KEY environment variable is not set. Using auto-generated key.")
+        if not os.environ.get('SECRET_KEY'):
+            raise RuntimeError("CRITICAL CONFIGURATION ERROR: SECRET_KEY environment variable is not set for Production.")
+        if not os.environ.get('JWT_SECRET_KEY'):
+            raise RuntimeError("CRITICAL CONFIGURATION ERROR: JWT_SECRET_KEY environment variable is not set for Production.")
+
 
 
 # Map configurations by environment string

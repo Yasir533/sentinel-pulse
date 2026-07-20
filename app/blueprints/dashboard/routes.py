@@ -1202,3 +1202,62 @@ def system_health():
         report_count=report_count,
     )
 
+
+@dashboard_bp.route('/ai-decisions')
+@login_required
+@role_required('Admin', 'Analyst')
+def ai_decisions() -> str:
+    """AI Decision Center for inspecting model/rule engine reasoning and auditing decisions."""
+    from app.services.ai_decision_service import AIDecisionService
+
+    page = request.args.get('page', 1, type=int)
+    severity = request.args.get('severity', None)
+    verdict = request.args.get('verdict', None)
+    input_type = request.args.get('input_type', None)
+
+    pagination = AIDecisionService.get_decisions(
+        page=page,
+        per_page=15,
+        severity=severity,
+        verdict=verdict,
+        input_type=input_type
+    )
+    stats = AIDecisionService.get_stats()
+
+    return render_template(
+        'dashboard/ai_decisions.html',
+        pagination=pagination,
+        decisions=pagination.items,
+        stats=stats,
+        current_severity=severity,
+        current_verdict=verdict,
+        current_type=input_type
+    )
+
+
+@dashboard_bp.route('/mobile-observability')
+@login_required
+@role_required('Admin', 'Analyst')
+def mobile_observability() -> str:
+    """Admin Mobile Security Observability dashboard to inspect user mobile scan events."""
+    from app.models.mobile_security import MobileSubmission
+
+    page = request.args.get('page', 1, type=int)
+    pagination = MobileSubmission.query.order_by(MobileSubmission.created_at.desc()).paginate(page=page, per_page=15, error_out=False)
+    
+    total_scans = MobileSubmission.query.count()
+    scams_detected = MobileSubmission.query.filter(MobileSubmission.verdict.in_(['BLOCK', 'WARN', 'ESCALATE'])).count()
+    apk_scans = MobileSubmission.query.filter_by(submission_type='apk').count()
+    url_scans = MobileSubmission.query.filter(MobileSubmission.submission_type.in_(['url', 'link'])).count()
+
+    return render_template(
+        'dashboard/mobile_observability.html',
+        pagination=pagination,
+        submissions=pagination.items,
+        total_scans=total_scans,
+        scams_detected=scams_detected,
+        apk_scans=apk_scans,
+        url_scans=url_scans
+    )
+
+

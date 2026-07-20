@@ -225,6 +225,20 @@
                                 <span>Reports</span>
                             </a>
                         </li>
+                        {% if current_user.is_authenticated and current_user.role in ['Admin', 'Analyst'] %}
+                        <li class="nav-item">
+                            <a href="{{ url_for('dashboard.ai_decisions') }}" class="nav-link {% if request.path == '/ai-decisions' %}active{% endif %}">
+                                <i class="bi bi-robot"></i>
+                                <span>AI Decision Center</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('dashboard.mobile_observability') }}" class="nav-link {% if request.path == '/mobile-observability' %}active{% endif %}">
+                                <i class="bi bi-phone-vibrate"></i>
+                                <span>Mobile Observability</span>
+                            </a>
+                        </li>
+                        {% endif %}
                         {% if current_user.is_authenticated and current_user.role == 'Admin' %}
                         <li class="nav-item">
                             <a href="{{ url_for('dashboard.manage_users') }}" class="nav-link {% if request.path == '/admin/users' %}active{% endif %}">

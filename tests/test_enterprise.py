@@ -149,7 +149,7 @@ def test_report_schedules_endpoints(client, app, seed_data):
     response_del = client.post(f'/reports/schedules/{sched_id}/delete', follow_redirects=True)
     assert response_del.status_code == 200
     with app.app_context():
-        sched_del = ReportSchedule.query.get(sched_id)
+        sched_del = db.session.get(ReportSchedule, sched_id)
         assert sched_del is None
 
 def test_settings_save_endpoint(client, app, seed_data):
