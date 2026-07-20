@@ -72,8 +72,9 @@ class NotificationService:
         try:
             from app.services.realtime_event_service import RealtimeEventService
             RealtimeEventService.publish('notification.created', notif.to_dict(), target_user_id=user_id)
-        except Exception:
-            pass
+        except Exception as e:
+            if current_app:
+                current_app.logger.warning(f"Failed to publish notification.created SSE event: {e}")
 
         return notif
 

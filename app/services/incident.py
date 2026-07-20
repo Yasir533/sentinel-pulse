@@ -1,4 +1,5 @@
 from datetime import datetime
+from flask import current_app
 from app.extensions import db
 from app.models.incident import Incident
 from app.models.threat import Threat
@@ -93,8 +94,9 @@ def create_incident(
             payload=incident.to_dict(),
             target_role='Analyst'
         )
-    except Exception:
-        pass
+    except Exception as e:
+        if current_app:
+            current_app.logger.warning(f"Failed to publish incident.created SSE event: {e}")
 
     try:
         from app.services.audit import AuditService
@@ -115,8 +117,9 @@ def create_incident(
                 username=creator.username,
                 role=creator.role
             )
-    except Exception:
-        pass
+    except Exception as e:
+        if current_app:
+            current_app.logger.warning(f"Failed to log incident creation audit: {e}")
 
     # Trigger notifications
     try:
@@ -124,8 +127,9 @@ def create_incident(
         NotificationService.create_notification_for_incident(incident)
         if incident.assigned_to:
             NotificationService.create_notification_for_incident_assignment(incident)
-    except Exception:
-        pass
+    except Exception as e:
+        if current_app:
+            current_app.logger.warning(f"Failed to trigger incident notifications: {e}")
 
     # Audit Trail Logging
     # 1. Incident Created
@@ -323,7 +327,7 @@ def delete_incident(incident_id: int, deleter: User):
     if deleter.role != 'Admin':
         raise PermissionError("Access denied. Only administrators can delete incidents.")
 
-    incident = Incident.query.get_or_404(incident_id)
+    incident = db.get_or_404(Incident, incident_id)
     incident_number = incident.incident_number
 
     db.session.delete(incident)

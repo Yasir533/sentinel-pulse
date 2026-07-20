@@ -500,7 +500,7 @@ def system_settings() -> str:
 @role_required('Admin')
 def edit_user(user_id: int) -> Response:
     """Update operator role and active status, with security constraints."""
-    user = User.query.get_or_404(user_id)
+    user = db.get_or_404(User, user_id)
     
     new_role = request.form.get('role', '').strip()
     new_status_str = request.form.get('status', '').strip()
@@ -638,7 +638,7 @@ def create_user() -> str | Response:
 @role_required('Admin')
 def delete_user(user_id: int) -> Response:
     """Admin-only endpoint to delete a platform user."""
-    user = User.query.get_or_404(user_id)
+    user = db.get_or_404(User, user_id)
     
     # Prevent deleting yourself
     if current_user.id == user.id:

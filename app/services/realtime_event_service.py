@@ -38,6 +38,31 @@ class RealtimeEventService:
             if listener in cls._listeners:
                 cls._listeners.remove(listener)
 
+    @staticmethod
+    def _sanitize_and_minimize_payload(payload: dict) -> dict:
+        """
+        Sanitize and minimize SSE event payloads to prevent secret or long payload leakage.
+        Strips sensitive credential keys and truncates long text payloads.
+        """
+        if not isinstance(payload, dict):
+            return {}
+
+        SENSITIVE_KEYS = {
+            'password', 'password_hash', 'secret_key', 'jwt_secret',
+            'api_key', 'token', 'secret', 'access_token', 'refresh_token',
+            'session_id', 'cookie'
+        }
+
+        minimized = {}
+        for k, v in payload.items():
+            if k.lower() in SENSITIVE_KEYS:
+                continue
+            if isinstance(v, str) and len(v) > 200:
+                minimized[k] = v[:200] + '...'
+            else:
+                minimized[k] = v
+        return minimized
+
     @classmethod
     def publish(
         cls,
@@ -50,11 +75,12 @@ class RealtimeEventService:
         Publish a structured security event to authorized SSE listener queues.
         Returns the count of client queues that received the event.
         """
+        clean_payload = cls._sanitize_and_minimize_payload(payload)
         event_obj = {
             'event_id': f"evt_{int(time.time() * 1000)}_{uuid.uuid4().hex[:6]}",
             'event_type': event_type,
             'timestamp': datetime.utcnow().isoformat() + "Z",
-            'payload': payload
+            'payload': clean_payload
         }
 
         delivered_count = 0

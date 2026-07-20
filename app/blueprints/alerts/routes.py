@@ -85,7 +85,7 @@ def list_alerts() -> str:
 @login_required
 def view_alert(alert_id: int) -> str:
     """View details of a specific alert."""
-    alert = Alert.query.get_or_404(alert_id)
+    alert = db.get_or_404(Alert, alert_id)
     
     # Record Activity Log: Alert Viewed
     try:
@@ -121,7 +121,7 @@ def view_alert(alert_id: int) -> str:
 @role_required('Admin', 'Analyst')
 def acknowledge_alert(alert_id: int) -> Response:
     """Acknowledge a system alert."""
-    alert = Alert.query.get_or_404(alert_id)
+    alert = db.get_or_404(Alert, alert_id)
     
     if alert.status == 'New':
         alert.status = 'Acknowledged'
@@ -162,7 +162,7 @@ def acknowledge_alert(alert_id: int) -> Response:
 @role_required('Admin', 'Analyst')
 def investigate_alert(alert_id: int) -> Response:
     """Transition alert status to Investigating."""
-    alert = Alert.query.get_or_404(alert_id)
+    alert = db.get_or_404(Alert, alert_id)
     
     if alert.status == 'Acknowledged':
         alert.status = 'Investigating'
@@ -198,7 +198,7 @@ def investigate_alert(alert_id: int) -> Response:
 @role_required('Admin')
 def resolve_alert(alert_id: int) -> Response:
     """Transition alert status to Resolved."""
-    alert = Alert.query.get_or_404(alert_id)
+    alert = db.get_or_404(Alert, alert_id)
     
     if alert.status == 'Investigating':
         alert.status = 'Resolved'
@@ -235,7 +235,7 @@ def resolve_alert(alert_id: int) -> Response:
 @role_required('Admin')
 def archive_alert(alert_id: int) -> Response:
     """Transition alert status to Archived."""
-    alert = Alert.query.get_or_404(alert_id)
+    alert = db.get_or_404(Alert, alert_id)
     
     if alert.status == 'Resolved':
         alert.status = 'Archived'
@@ -279,7 +279,7 @@ def new_alert() -> str | Response:
             
         try:
             threat_id = int(threat_id_val)
-            threat = Threat.query.get_or_404(threat_id)
+            threat = db.get_or_404(Threat, threat_id)
             
             alert_number = AlertService.generate_next_alert_number()
             alert = Alert(
@@ -325,7 +325,7 @@ def new_alert() -> str | Response:
 @role_required('Admin')
 def delete_alert(alert_id: int) -> Response:
     """Admin-only endpoint to delete a system alert."""
-    alert = Alert.query.get_or_404(alert_id)
+    alert = db.get_or_404(Alert, alert_id)
     try:
         db.session.delete(alert)
         db.session.commit()

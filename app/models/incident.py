@@ -31,5 +31,20 @@ class Incident(db.Model):
     assignee = db.relationship('User', foreign_keys=[assigned_to], backref=db.backref('assigned_incidents', lazy=True))
     creator = db.relationship('User', foreign_keys=[created_by], backref=db.backref('created_incidents', lazy=True))
 
+    def to_dict(self) -> dict:
+        return {
+            'id': self.id,
+            'incident_number': self.incident_number,
+            'threat_id': self.threat_id,
+            'title': self.title,
+            'description': self.description,
+            'severity': self.severity,
+            'status': self.status,
+            'assigned_to': self.assigned_to,
+            'created_by': self.created_by,
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S UTC') if self.created_at else None,
+            'resolved_at': self.resolved_at.strftime('%Y-%m-%d %H:%M:%S UTC') if self.resolved_at else None
+        }
+
     def __repr__(self) -> str:
         return f'<Incident {self.incident_number} - {self.title} ({self.status})>'

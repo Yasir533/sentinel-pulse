@@ -137,7 +137,7 @@ def new_incident(threat_id: int | None):
             flash("An Incident already exists for this Threat.", "warning")
             return redirect(url_for('incidents.view_incident', incident_id=existing_incident.id))
 
-        threat = Threat.query.get_or_404(threat_id)
+        threat = db.get_or_404(Threat, threat_id)
         # Calculate AI Risk / Heuristics info
         overall_risk = calculate_overall_risk(threat)
         summary = generate_summary(threat)
@@ -147,7 +147,7 @@ def new_incident(threat_id: int | None):
         # Retrieve form parameters
         if not threat_id:
             threat_id = int(request.form.get('threat_id'))
-            threat = Threat.query.get_or_404(threat_id)
+            threat = db.get_or_404(Threat, threat_id)
 
         # Prevent duplicate Incident creation on submission
         existing_incident = Incident.query.filter_by(threat_id=threat_id).first()
@@ -209,7 +209,7 @@ def new_incident(threat_id: int | None):
 @login_required
 def view_incident(incident_id: int):
     """View security incident details, linked threat details, and enrichment reports."""
-    incident = Incident.query.get_or_404(incident_id)
+    incident = db.get_or_404(Incident, incident_id)
     threat = incident.threat
 
     # Calculate AI Heuristics / summary information from linked threat
@@ -238,7 +238,7 @@ def view_incident(incident_id: int):
 @role_required('Admin', 'Analyst')
 def edit_incident(incident_id: int):
     """Edit security incident details based on role-based restrictions."""
-    incident = Incident.query.get_or_404(incident_id)
+    incident = db.get_or_404(Incident, incident_id)
     threat = incident.threat
     
     users = User.query.filter(User._role.in_(['Admin', 'Analyst'])).all()

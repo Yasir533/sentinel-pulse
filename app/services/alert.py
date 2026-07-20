@@ -120,15 +120,17 @@ class AlertService:
                     payload=alert.to_dict(),
                     target_role='Analyst'
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                if current_app:
+                    current_app.logger.warning(f"Failed to publish alert.created SSE event: {e}")
 
             # Trigger notification
             try:
                 from app.services.notification import NotificationService
                 NotificationService.create_notification_for_alert(alert)
-            except Exception:
-                pass
+            except Exception as e:
+                if current_app:
+                    current_app.logger.warning(f"Failed to trigger alert notification: {e}")
 
             # Format log layout
             log_msg = (

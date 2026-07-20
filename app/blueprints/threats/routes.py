@@ -194,7 +194,7 @@ def new_threat() -> str | Response:
 @login_required
 def view_threat(threat_id: int) -> str:
     """View details of a specific threat indicators."""
-    threat = Threat.query.get_or_404(threat_id)
+    threat = db.get_or_404(Threat, threat_id)
     from app.services.threat_summary import calculate_overall_risk, generate_summary, generate_recommendation
     overall_risk = calculate_overall_risk(threat)
     summary = generate_summary(threat)
@@ -212,7 +212,7 @@ def view_threat(threat_id: int) -> str:
 @role_required('Admin', 'Analyst')
 def edit_threat(threat_id: int) -> str | Response:
     """Edit existing threat intelligence record."""
-    threat = Threat.query.get_or_404(threat_id)
+    threat = db.get_or_404(Threat, threat_id)
 
     if request.method == 'POST':
         threat_type = request.form.get('threat_type', '').strip()
@@ -333,7 +333,7 @@ def edit_threat(threat_id: int) -> str | Response:
 @role_required('Admin')
 def delete_threat(threat_id: int) -> Response:
     """Delete a threat indicator. Restricted to Admin."""
-    threat = Threat.query.get_or_404(threat_id)
+    threat = db.get_or_404(Threat, threat_id)
     try:
         db.session.delete(threat)
         db.session.commit()
