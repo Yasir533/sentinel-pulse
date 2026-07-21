@@ -134,20 +134,7 @@ def create_app(config_name=None):
 
     @app.context_processor
     def inject_device_mode():
-        from flask import session
-        from flask_login import current_user
-        
-        mode = 'desktop'
-        if current_user and current_user.is_authenticated:
-            if current_user.role == 'Admin':
-                mode = session.get('device_mode', 'desktop')
-            elif current_user.role in ['Analyst', 'Viewer']:
-                mode = 'desktop'
-            else:
-                mode = 'mobile'
-        else:
-            mode = session.get('device_mode', 'desktop')
-        return dict(device_mode=mode)
+        return dict(device_mode='desktop')
 
     @app.before_request
     def update_last_seen():
@@ -162,32 +149,8 @@ def create_app(config_name=None):
 
     @app.before_request
     def enforce_device_mode_restrictions():
-        from flask import request, redirect, url_for, session, current_app
-        from flask_login import current_user
-        
-        if current_app.config.get('TESTING'):
-            return
-        if not request.endpoint:
-            return
-        if request.endpoint in ['static', 'auth.login', 'auth.register', 'auth.logout', 'notifications.poll_notifications', 'dashboard.toggle_device_mode', 'dashboard.realtime_dashboard_api']:
-            return
-        if request.blueprint in ['api', 'auth']:
-            return
-        if not current_user or not current_user.is_authenticated:
-            return
-            
-        mode = 'desktop'
-        if current_user.role == 'Admin':
-            mode = session.get('device_mode', 'desktop')
-        elif current_user.role in ['Analyst', 'Viewer']:
-            mode = 'desktop'
-        else:
-            mode = 'mobile'
-            
-        if mode == 'desktop' and request.blueprint == 'mobile':
-            return redirect(url_for('dashboard.index'))
-        elif mode == 'mobile' and request.blueprint in ['dashboard', 'threats', 'incidents', 'alerts', 'reports']:
-            return redirect(url_for('mobile.dashboard'))
+        # Relaxed: Allow seamless access to all SOC & Mobile features across devices
+        return
 
     @app.before_request
     def check_csrf():

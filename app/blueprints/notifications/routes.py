@@ -103,10 +103,22 @@ def poll_notifications():
     dropdown_html = render_template('notifications/dropdown_items.html', notifications=recent_notifications)
     widget_html = render_template('notifications/widget_items.html', recent_notifications=recent_notifications)
     
+    latest_notif = None
+    if recent_notifications:
+        latest = recent_notifications[0]
+        if latest.status == 'Unread':
+            latest_notif = {
+                'id': latest.id,
+                'title': latest.title,
+                'message': latest.message,
+                'priority': latest.priority
+            }
+
     return jsonify({
         'unread_count': unread_count,
         'dropdown_html': dropdown_html,
-        'widget_html': widget_html
+        'widget_html': widget_html,
+        'latest_notification': latest_notif
     })
 
 @notifications_bp.route('/new', methods=['GET', 'POST'])
