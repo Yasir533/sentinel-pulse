@@ -704,6 +704,105 @@ button.badge:hover {
     border: 1px solid rgba(59, 130, 246, 0.5);
 }
 
+/* Cinematic Movie Intro Overlay Styling */
+#cinematicIntroOverlay {
+    background: radial-gradient(circle at center, #0f172a 0%, #020617 100%) !important;
+}
+
+.cyber-scanlines {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) 1px, transparent 1px, transparent 2px);
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.scary-logo-container {
+    display: inline-block;
+    position: relative;
+    animation: pulseZoomScary 2.2s infinite ease-in-out;
+}
+
+.scary-logo-img {
+    width: 140px;
+    height: 140px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 25px rgba(220, 38, 38, 0.85)) drop-shadow(0 0 50px rgba(0, 240, 255, 0.6));
+    border-radius: 50%;
+}
+
+@keyframes pulseZoomScary {
+    0% { transform: scale(0.95); filter: drop-shadow(0 0 20px rgba(220, 38, 38, 0.6)); }
+    50% { transform: scale(1.08); filter: drop-shadow(0 0 45px rgba(220, 38, 38, 0.95)) drop-shadow(0 0 65px rgba(0, 240, 255, 0.75)); }
+    100% { transform: scale(0.95); filter: drop-shadow(0 0 20px rgba(220, 38, 38, 0.6)); }
+}
+
+.movie-title {
+    font-size: 3.2rem;
+    font-weight: 900;
+    letter-spacing: 0.35em;
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(220, 38, 38, 0.6);
+    margin-right: -0.35em;
+    text-transform: uppercase;
+}
+
+.movie-title .highlight {
+    background: linear-gradient(135deg, #ef4444 0%, #00f0ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.8));
+}
+
+.movie-subtitle {
+    font-size: 0.85rem;
+    letter-spacing: 0.4em;
+    opacity: 0.85;
+    color: #00f0ff !important;
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+}
+
+.progress-bar-container {
+    width: 280px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(0, 240, 255, 0.3);
+}
+
+.progress-bar-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #dc2626 0%, #00f0ff 100%);
+    box-shadow: 0 0 10px #00f0ff;
+    animation: fillProgressCinematic 2.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fillProgressCinematic {
+    0% { width: 0%; }
+    40% { width: 45%; }
+    80% { width: 85%; }
+    100% { width: 100%; }
+}
+
+@media (max-width: 575.98px) {
+    .movie-title {
+        font-size: 2rem !important;
+        letter-spacing: 0.2em !important;
+        margin-right: -0.2em !important;
+    }
+    .movie-subtitle {
+        font-size: 0.7rem !important;
+        letter-spacing: 0.2em !important;
+    }
+    .scary-logo-img {
+        width: 100px !important;
+        height: 100px !important;
+    }
+}
+
 /* High Resolution & Mobile Responsive Design */
 @media (min-width: 1400px) {
     .container-fluid {

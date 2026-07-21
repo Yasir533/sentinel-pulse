@@ -114,7 +114,7 @@ def login() -> str | Response:
                          username=user.username, role=user.role)
 
         flash(f"Welcome back, {user.username}!", "success")
-        return redirect(url_for('dashboard.index'))
+        return redirect(url_for('dashboard.index', show_intro=1))
 
     return render_template('auth/login.html')
 

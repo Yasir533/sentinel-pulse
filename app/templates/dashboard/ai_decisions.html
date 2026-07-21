@@ -4,9 +4,14 @@
 
 {% block content %}
 <div class="d-flex align-items-center justify-content-between mb-4">
-    <div>
-        <h1 class="page-title font-outfit text-light mb-1">AI Decision Center</h1>
-        <p class="text-secondary small mb-0">Auditable log of machine learning predictions, risk scoring, MITRE mappings, and heuristic reasoning.</p>
+    <div class="d-flex align-items-center gap-3">
+        <div class="rounded-circle overflow-hidden p-1 border flex-shrink-0" style="width: 54px; height: 54px; background: rgba(0, 240, 255, 0.1); border-color: rgba(0, 240, 255, 0.4) !important; box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);">
+            <img src="{{ url_for('static', filename='img/ai_decision_logo.png') }}" alt="AI Decision Center Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+        </div>
+        <div>
+            <h1 class="page-title font-outfit text-light mb-1">AI Decision Center</h1>
+            <p class="text-secondary small mb-0">Auditable log of machine learning predictions, risk scoring, MITRE mappings, and heuristic reasoning.</p>
+        </div>
     </div>
 </div>
 

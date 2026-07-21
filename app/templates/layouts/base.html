@@ -50,22 +50,9 @@
         <!-- Header / Top Navbar -->
         <header class="navbar navbar-expand-lg sticky-top border-bottom border-secondary-subtle py-2">
             <div class="container-fluid px-3 px-md-4">
-                <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('dashboard.index') }}">
-                    <div class="brand-logo-icon">
-                        <svg width="30" height="30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 6px var(--accent-glow));">
-                            <defs>
-                                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stop-color="var(--accent-glow, #00f0ff)" />
-                                    <stop offset="100%" stop-color="var(--accent-blue, #0052cc)" />
-                                </linearGradient>
-                            </defs>
-                            <polygon points="50,3 90,26 90,74 50,97 10,74 10,26" stroke="url(#logoGradient)" stroke-width="6" stroke-linejoin="round" fill="rgba(var(--accent-glow-rgb, 0, 240, 255), 0.05)" />
-                            <path d="M50,18 C65,18 73,23 73,35 C73,58 50,82 50,82 C50,82 27,58 27,35 C27,23 35,18 50,18 Z" fill="url(#logoGradient)" fill-opacity="0.15" stroke="url(#logoGradient)" stroke-width="3" />
-                            <path d="M22,50 L38,50 L44,32 L50,68 L56,42 L62,55 L68,50 L78,50" stroke="url(#logoGradient)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
-                            <circle cx="50" cy="30" r="3.5" fill="#ffffff" />
-                            <circle cx="44" cy="32" r="3" fill="var(--accent-glow, #00f0ff)" />
-                            <circle cx="56" cy="42" r="3" fill="var(--accent-glow, #00f0ff)" />
-                        </svg>
+                <a class="navbar-brand d-flex align-items-center gap-2.5" href="{{ url_for('dashboard.index') }}">
+                    <div class="brand-logo-img rounded-circle overflow-hidden p-0.5 border" style="width: 38px; height: 38px; background: rgba(0, 240, 255, 0.1); border-color: rgba(0, 240, 255, 0.4) !important; box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);">
+                        <img src="{{ url_for('static', filename='img/sentinel_pulse_logo.png') }}" alt="Sentinel Pulse Platform Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                     </div>
                     <span class="brand-text">SENTINEL<span class="brand-text-highlight">PULSE</span></span>
                 </a>
@@ -474,6 +461,23 @@
             </div>
         </div>
     </div>
+    <!-- Cinematic Movie-Style Splash Screen Overlay (Plays on Login) -->
+    <div id="cinematicIntroOverlay" class="position-fixed top-0 start-0 w-100 h-100 flex-column align-items-center justify-content-center" style="z-index: 99999; display: none;">
+        <div class="cyber-scanlines"></div>
+        <div class="intro-content text-center p-4 position-relative" style="z-index: 10;">
+            <div class="scary-logo-container mb-4">
+                <img src="{{ url_for('static', filename='img/sentinel_pulse_scary_logo.png') }}" alt="Sentinel Pulse Main Logo" class="scary-logo-img">
+            </div>
+            <h1 class="movie-title font-outfit mb-2">
+                SENTINEL <span class="highlight">PULSE</span>
+            </h1>
+            <p class="movie-subtitle font-outfit mb-4">CYBER THREAT INTELLIGENCE & SMART ANTI-SCAM PLATFORM</p>
+            <div class="progress-bar-container mx-auto mb-3">
+                <div class="progress-bar-fill"></div>
+            </div>
+            <span class="text-secondary small font-outfit" style="font-size: 0.75rem; letter-spacing: 0.15em;">INITIALIZING CYBER DEFENSE CORE...</span>
+        </div>
+    </div>
     {% endif %}
 
     <!-- Footer -->
@@ -561,6 +565,22 @@
                 else if (role === "Viewer") workspace = "Monitoring Dashboard";
                 
                 greetingEl.innerHTML = `<strong>${greeting}, {{ current_user.username }}</strong> <span class="text-secondary ms-2 small d-none d-md-inline">| ${workspace}</span>`;
+            }
+
+            // Cinematic Movie-Style Splash Screen Controller
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('show_intro') === '1') {
+                const overlay = document.getElementById('cinematicIntroOverlay');
+                if (overlay) {
+                    overlay.style.display = 'flex';
+                    setTimeout(function() {
+                        overlay.style.transition = 'opacity 0.6s ease-out';
+                        overlay.style.opacity = '0';
+                        setTimeout(function() {
+                            overlay.style.display = 'none';
+                        }, 600);
+                    }, 2700);
+                }
             }
 
             // Web Push Notification Helper Functions
