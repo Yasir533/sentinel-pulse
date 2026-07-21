@@ -103,6 +103,54 @@ header.navbar {
     background-color: var(--bg-dark-panel);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+}
+
+/* App-Shell Fixed Sidebar Layout (Desktop >= 992px) */
+@media (min-width: 992px) {
+    html, body {
+        height: 100vh !important;
+        max-height: 100vh !important;
+        overflow: hidden !important;
+    }
+
+    #app-root-container {
+        height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+    }
+
+    #app-body-wrapper {
+        flex: 1 1 auto !important;
+        display: flex !important;
+        flex-direction: row !important;
+        overflow: hidden !important;
+        height: calc(100vh - 60px) !important;
+    }
+
+    .sidebar {
+        width: 260px !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        overflow-y: auto !important;
+        flex-shrink: 0 !important;
+        position: sticky !important;
+        top: 0 !important;
+        background-color: var(--bg-dark-panel);
+        border-right: 1px solid var(--border-color);
+    }
+
+    .content-wrapper {
+        height: 100% !important;
+        max-height: 100% !important;
+        overflow-y: auto !important;
+        flex-grow: 1 !important;
+        -webkit-overflow-scrolling: touch;
+    }
 }
 
 .form-control-dark {

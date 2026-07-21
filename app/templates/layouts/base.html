@@ -45,7 +45,7 @@
 <body class="d-flex flex-column h-100 dark-theme {% if current_user.is_authenticated %}{% if current_user.role == 'Admin' %}theme-admin{% elif current_user.role == 'Analyst' %}theme-analyst{% else %}theme-viewer{% endif %}{% endif %}">
 
     <!-- Main Container Grid -->
-    <div class="container-fluid p-0 flex-grow-1 d-flex flex-column">
+    <div class="container-fluid p-0 flex-grow-1 d-flex flex-column" id="app-root-container">
         
         <!-- Header / Top Navbar -->
         <header class="navbar navbar-expand-lg sticky-top border-bottom border-secondary-subtle py-2">
@@ -234,7 +234,7 @@
         </header>
 
         <!-- Sidebar + Content Body -->
-        <div class="flex-grow-1 d-flex flex-row overflow-hidden">
+        <div class="flex-grow-1 d-flex flex-row overflow-hidden" id="app-body-wrapper">
             
             <!-- Sidebar Navigation -->
             <nav class="sidebar border-end border-secondary-subtle d-none d-lg-block flex-shrink-0">
