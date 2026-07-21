@@ -156,20 +156,32 @@ function isSmartphoneDevice() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 }
 
+function removePermissionBannerPermanently() {
+    const banner = document.getElementById('permissionAllowanceBanner');
+    if (banner) {
+        banner.classList.add('d-none');
+        banner.style.setProperty('display', 'none', 'important');
+        try {
+            banner.remove();
+        } catch(e) {
+            banner.style.cssText = 'display: none !important; opacity: 0 !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important;';
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const banner = document.getElementById('permissionAllowanceBanner');
     if (!banner) return;
     
-    // PERMANENT REMOVAL ON LAPTOP / DESKTOP:
-    // If accessing from a laptop or desktop, hide the smartphone allowance banner permanently!
+    // 1. Permanently remove on Laptop / Desktop
     if (!isSmartphoneDevice()) {
-        banner.style.display = 'none';
+        removePermissionBannerPermanently();
         return;
     }
     
-    // Check if permission allowance was already granted or dismissed on smartphone
+    // 2. Permanently remove on Smartphone if user already granted or dismissed
     if (localStorage.getItem('scamguard_permissions_granted') === 'true') {
-        banner.style.display = 'none';
+        removePermissionBannerPermanently();
     }
 });
 
@@ -182,26 +194,12 @@ function allowAllPermissions() {
         Notification.requestPermission();
     }
     
-    const banner = document.getElementById('permissionAllowanceBanner');
-    if (banner) {
-        banner.classList.remove('alert-warning', 'border-warning');
-        banner.classList.add('alert-success', 'border-success');
-        banner.innerHTML = `
-            <div class="d-flex align-items-center gap-3 w-100 justify-content-between">
-                <div class="d-flex align-items-center gap-2">
-                    <i class="bi bi-check-circle-fill text-success fs-4"></i>
-                    <span class="text-light small font-outfit fw-bold">All Smartphone Basic Allowances (SMS, Calls, Push Notifications, App Privacy) Granted Successfully!</span>
-                </div>
-                <button class="btn btn-sm btn-outline-light" onclick="dismissPermissionBanner()">Close</button>
-            </div>
-        `;
-    }
+    removePermissionBannerPermanently();
 }
 
 function dismissPermissionBanner() {
     localStorage.setItem('scamguard_permissions_granted', 'true');
-    const banner = document.getElementById('permissionAllowanceBanner');
-    if (banner) banner.style.display = 'none';
+    removePermissionBannerPermanently();
 }
 
 function toggleModule(name, isChecked) {
