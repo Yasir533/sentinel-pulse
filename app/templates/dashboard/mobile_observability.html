@@ -3,8 +3,8 @@
 {% block title %}SCAM GUARD | Sentinel Pulse{% endblock %}
 
 {% block content %}
-<!-- Permission Prompt Banner / Modal for Smartphone User Allowance -->
-<div class="alert alert-warning border border-warning border-opacity-50 bg-dark shadow-sm rounded-3 p-3 mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3" id="permissionAllowanceBanner">
+<!-- Permission Prompt Banner / Modal for Smartphone User Allowance (Visible ONLY on Smartphone devices) -->
+<div class="alert alert-warning border border-warning border-opacity-50 bg-dark shadow-sm rounded-3 p-3 mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 d-lg-none" id="permissionAllowanceBanner">
     <div class="d-flex align-items-start gap-3">
         <div class="bg-warning text-dark p-2 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px;">
             <i class="bi bi-shield-lock-fill fs-4"></i>
@@ -152,11 +152,24 @@
 {% endif %}
 
 <script>
+function isSmartphoneDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if permission allowance was already granted or dismissed
+    const banner = document.getElementById('permissionAllowanceBanner');
+    if (!banner) return;
+    
+    // PERMANENT REMOVAL ON LAPTOP / DESKTOP:
+    // If accessing from a laptop or desktop, hide the smartphone allowance banner permanently!
+    if (!isSmartphoneDevice()) {
+        banner.style.display = 'none';
+        return;
+    }
+    
+    // Check if permission allowance was already granted or dismissed on smartphone
     if (localStorage.getItem('scamguard_permissions_granted') === 'true') {
-        const banner = document.getElementById('permissionAllowanceBanner');
-        if (banner) banner.style.display = 'none';
+        banner.style.display = 'none';
     }
 });
 
