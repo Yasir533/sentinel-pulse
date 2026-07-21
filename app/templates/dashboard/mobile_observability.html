@@ -45,7 +45,49 @@
     </div>
 </div>
 
-<!-- Smartphone Protection Modules Section -->
+<!-- Scam Guard Feature Card (Matching Reference Image 1 Layout) -->
+<div class="card border border-secondary-subtle bg-panel shadow-sm mb-4 overflow-hidden">
+    <div class="card-body p-4">
+        <!-- Shield Graphic & Header -->
+        <div class="text-center mb-4 py-2">
+            <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-circle bg-success bg-opacity-10 border border-success border-opacity-25 mb-3" style="width: 80px; height: 80px;">
+                <i class="bi bi-shield-lock-fill text-success" style="font-size: 2.5rem;"></i>
+            </div>
+            <h4 class="font-outfit text-light fw-bold mb-1">Safeguard your property</h4>
+            <p class="text-muted small mb-0">Active anti-scam shield and screen protection status</p>
+        </div>
+
+        <!-- Smart Anti-Scam Toggle Box -->
+        <div class="card bg-dark border border-secondary-subtle rounded-3 p-3 mb-3 hover-border-accent" style="cursor: pointer;" onclick="openScamRisksModal()">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="pe-3">
+                    <h6 class="font-outfit text-light fw-bold mb-1 fs-6">Smart anti-scam</h6>
+                    <p class="text-secondary small mb-0" style="font-size: 0.82rem; line-height: 1.3;">
+                        Use the local Smart anti-scam capability to prompt risky behaviors.
+                    </p>
+                </div>
+                <div class="form-check form-switch m-0 flex-shrink-0" onclick="event.stopPropagation();">
+                    <input class="form-check-input" type="checkbox" role="switch" id="smartAntiScamToggle" checked onchange="handleAntiScamToggle(this.checked)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen Sharing Protection Box -->
+        <div class="card bg-dark border border-secondary-subtle rounded-3 p-3 hover-border-accent" style="cursor: pointer;" onclick="openScamRisksModal()">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="font-outfit text-light fw-bold mb-0 fs-6">Screen sharing protection</h6>
+                    <p class="text-secondary small mb-0 mt-0.5" style="font-size: 0.78rem;">Prevent fraudulent remote video & screen control risks</p>
+                </div>
+                <div class="text-secondary flex-shrink-0">
+                    <i class="bi bi-chevron-right fs-5"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Protection Modules Section -->
 <div class="row g-3 mb-4">
     {% for module in scam_guard_modules %}
     <div class="col-12 col-md-6 col-lg-4">
@@ -134,22 +176,36 @@
     </div>
 </div>
 
-<!-- Pagination -->
-{% if pagination.pages > 1 %}
-<div class="d-flex justify-content-center mt-4">
-    <nav>
-        <ul class="pagination pagination-sm mb-0">
-            {% if pagination.has_prev %}
-            <li class="page-item"><a class="page-link bg-dark text-light border-secondary" href="{{ url_for('dashboard.mobile_observability', page=pagination.prev_num) }}">Previous</a></li>
-            {% endif %}
-            <li class="page-item disabled"><span class="page-link bg-dark text-muted border-secondary">Page {{ pagination.page }} of {{ pagination.pages }}</span></li>
-            {% if pagination.has_next %}
-            <li class="page-item"><a class="page-link bg-dark text-light border-secondary" href="{{ url_for('dashboard.mobile_observability', page=pagination.next_num) }}">Next</a></li>
-            {% endif %}
-        </ul>
-    </nav>
+<!-- SCAM RISKS MODAL (Matching Reference Image 2 Layout & Illustration Background) -->
+<div class="modal fade" id="scamRisksModal" tabindex="-1" aria-labelledby="scamRisksModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content text-dark border-0 shadow-lg overflow-hidden" style="background-color: #e6f7f2 !important; border-radius: 16px;">
+            <div class="modal-header border-0 py-3 px-4 d-flex justify-content-between align-items-center" style="background-color: #e6f7f2;">
+                <div>
+                    <h3 class="modal-title font-outfit fw-bold text-dark mb-1" id="scamRisksModalLabel" style="font-size: 1.8rem;">Scam risks</h3>
+                    <p class="text-dark opacity-75 mb-0 font-outfit fs-6" style="font-weight: 500;">
+                        Be alert to asset loss caused by sharing screen or videos
+                    </p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-2 text-center position-relative" style="background-color: #e6f7f2;">
+                <div class="p-2">
+                    <img src="{{ url_for('static', filename='img/scam_risks_background.jpg') }}" alt="Scam Risks Screen Protection" class="img-fluid rounded-3 shadow-sm" style="max-height: 480px; object-fit: contain;">
+                </div>
+            </div>
+            <div class="modal-footer border-0 justify-content-center gap-2 pb-4" style="background-color: #e6f7f2;">
+                <button type="button" class="btn btn-success font-outfit fw-bold px-4 py-2" onclick="enableAntiScamProtection()">
+                    <i class="bi bi-shield-check me-1"></i> Enable Protection
+                </button>
+                <button type="button" class="btn btn-outline-dark font-outfit fw-semibold px-3 py-2" onclick="promptNotificationFromModal()">
+                    <i class="bi bi-bell-fill me-1"></i> Allow Notifications
+                </button>
+                <button type="button" class="btn btn-secondary font-outfit px-3 py-2" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
-{% endif %}
 
 <script>
 function isSmartphoneDevice() {
@@ -189,7 +245,6 @@ function allowAllPermissions() {
     localStorage.setItem('scamguard_permissions_granted', 'true');
     localStorage.setItem('sentinel_notif_prompt_handled', 'true');
     
-    // Request browser notification permission if available
     if ('Notification' in window && Notification.permission === 'default') {
         Notification.requestPermission();
     }
@@ -202,13 +257,57 @@ function dismissPermissionBanner() {
     removePermissionBannerPermanently();
 }
 
+function openScamRisksModal() {
+    const modalEl = document.getElementById('scamRisksModal');
+    if (modalEl) {
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    }
+}
+
+function handleAntiScamToggle(isChecked) {
+    if (isChecked) {
+        openScamRisksModal();
+    }
+}
+
+function enableAntiScamProtection() {
+    localStorage.setItem('scamguard_permissions_granted', 'true');
+    const modalEl = document.getElementById('scamRisksModal');
+    if (modalEl) {
+        const modalInst = bootstrap.Modal.getInstance(modalEl);
+        if (modalInst) modalInst.hide();
+    }
+    removePermissionBannerPermanently();
+}
+
+function promptNotificationFromModal() {
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                try {
+                    new Notification("Sentinel Pulse Anti-Scam Active", {
+                        body: "Smart anti-scam screen & video sharing protection is active.",
+                        icon: "/static/icons/shield.png"
+                    });
+                } catch(e) {}
+            }
+        });
+    }
+    const modalEl = document.getElementById('scamRisksModal');
+    if (modalEl) {
+        const modalInst = bootstrap.Modal.getInstance(modalEl);
+        if (modalInst) modalInst.hide();
+    }
+}
+
 function toggleModule(name, isChecked) {
     const status = isChecked ? 'ENABLED' : 'DISABLED';
     console.log(`Scam Guard Module [${name}] set to ${status}`);
 }
 
 function triggerScamGuardScan() {
-    alert('Scam Guard: Local smart audit initiated across SMS, System Calls, Status Bar, Sidebar, and App Privacy.');
+    openScamRisksModal();
 }
 </script>
 {% endblock %}
