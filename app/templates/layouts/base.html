@@ -567,21 +567,20 @@
                 greetingEl.innerHTML = `<strong>${greeting}, {{ current_user.username }}</strong> <span class="text-secondary ms-2 small d-none d-md-inline">| ${workspace}</span>`;
             }
 
-            // Cinematic Movie-Style Splash Screen Controller
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('show_intro') === '1') {
-                const overlay = document.getElementById('cinematicIntroOverlay');
-                if (overlay) {
-                    overlay.style.display = 'flex';
+            // Cinematic Movie-Style Splash Screen Controller (Triggers on Login)
+            {% if session.pop('play_intro', False) or request.args.get('show_intro') == '1' %}
+            const overlay = document.getElementById('cinematicIntroOverlay');
+            if (overlay) {
+                overlay.style.display = 'flex';
+                setTimeout(function() {
+                    overlay.style.transition = 'opacity 0.7s ease-out';
+                    overlay.style.opacity = '0';
                     setTimeout(function() {
-                        overlay.style.transition = 'opacity 0.6s ease-out';
-                        overlay.style.opacity = '0';
-                        setTimeout(function() {
-                            overlay.style.display = 'none';
-                        }, 600);
-                    }, 2700);
-                }
+                        overlay.style.display = 'none';
+                    }, 700);
+                }, 2800);
             }
+            {% endif %}
 
             // Web Push Notification Helper Functions
             window.markNotifPromptHandled = function() {

@@ -1,6 +1,6 @@
 from datetime import datetime
 import re
-from flask import render_template, redirect, url_for, flash, request, Response
+from flask import render_template, redirect, url_for, flash, request, Response, session
 from flask_login import login_user, logout_user, login_required, current_user
 from app.blueprints.auth import auth_bp
 from app.models.user import User
@@ -113,8 +113,9 @@ def login() -> str | Response:
         AuditService.log('User Login', user.username, status='Success',
                          username=user.username, role=user.role)
 
+        session['play_intro'] = True
         flash(f"Welcome back, {user.username}!", "success")
-        return redirect(url_for('dashboard.index', show_intro=1))
+        return redirect(url_for('dashboard.index'))
 
     return render_template('auth/login.html')
 
