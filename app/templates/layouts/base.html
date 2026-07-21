@@ -524,15 +524,16 @@
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('form').forEach(function(form) {
             form.addEventListener('submit', function(e) {
-                if (!form.checkValidity()) return;
+                if (e.defaultPrevented || !form.checkValidity()) return;
+                // Skip forms with confirm dialogs or explicit noSpinner data attribute
+                if (form.getAttribute('onsubmit')?.includes('confirm') || form.dataset.noSpinner !== undefined) {
+                    return;
+                }
                 const btn = form.querySelector('[type="submit"]');
                 if (btn && !btn.dataset.noSpinner) {
-                    btn.disabled = true;
                     const originalHtml = btn.innerHTML;
                     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Loading...';
-                    // Re-enable after 15s failsafe
                     setTimeout(function() {
-                        btn.disabled = false;
                         btn.innerHTML = originalHtml;
                     }, 15000);
                 }

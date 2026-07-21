@@ -111,9 +111,9 @@
                                     </button>
                                 </form>
                                 {% endif %}
-                                <form action="{{ url_for('notifications.delete_notification', notification_id=notif.id) }}" method="POST" class="m-0" onsubmit="return confirm('Are you sure you want to delete this notification?');">
+                                <form action="{{ url_for('notifications.delete_notification', notification_id=notif.id) }}" method="POST" class="m-0" onsubmit="return confirm('Are you sure you want to delete this notification?');" data-no-spinner="true">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-outline-danger btn-xs px-2 py-0.5" style="font-size: 0.7rem;">
+                                    <button type="submit" class="btn btn-outline-danger btn-xs px-2 py-0.5" style="font-size: 0.7rem;" data-no-spinner="true">
                                         <i class="bi bi-trash3 me-1"></i>Delete
                                     </button>
                                 </form>
