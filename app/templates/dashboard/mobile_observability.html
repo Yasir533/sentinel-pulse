@@ -152,22 +152,41 @@
 {% endif %}
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if permission allowance was already granted or dismissed
+    if (localStorage.getItem('scamguard_permissions_granted') === 'true') {
+        const banner = document.getElementById('permissionAllowanceBanner');
+        if (banner) banner.style.display = 'none';
+    }
+});
+
 function allowAllPermissions() {
+    localStorage.setItem('scamguard_permissions_granted', 'true');
+    localStorage.setItem('sentinel_notif_prompt_handled', 'true');
+    
+    // Request browser notification permission if available
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+    
     const banner = document.getElementById('permissionAllowanceBanner');
-    banner.classList.remove('alert-warning', 'border-warning');
-    banner.classList.add('alert-success', 'border-success');
-    banner.innerHTML = `
-        <div class="d-flex align-items-center gap-3 w-100 justify-content-between">
-            <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-check-circle-fill text-success fs-4"></i>
-                <span class="text-light small font-outfit fw-bold">All Smartphone Basic Allowances (SMS, Calls, Push Notifications, App Privacy) Granted Successfully!</span>
+    if (banner) {
+        banner.classList.remove('alert-warning', 'border-warning');
+        banner.classList.add('alert-success', 'border-success');
+        banner.innerHTML = `
+            <div class="d-flex align-items-center gap-3 w-100 justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                    <span class="text-light small font-outfit fw-bold">All Smartphone Basic Allowances (SMS, Calls, Push Notifications, App Privacy) Granted Successfully!</span>
+                </div>
+                <button class="btn btn-sm btn-outline-light" onclick="dismissPermissionBanner()">Close</button>
             </div>
-            <button class="btn btn-sm btn-outline-light" onclick="dismissPermissionBanner()">Close</button>
-        </div>
-    `;
+        `;
+    }
 }
 
 function dismissPermissionBanner() {
+    localStorage.setItem('scamguard_permissions_granted', 'true');
     const banner = document.getElementById('permissionAllowanceBanner');
     if (banner) banner.style.display = 'none';
 }

@@ -59,21 +59,6 @@ def dashboard():
     ).count()
     
     security_score = calculate_user_security_score(current_user.id)
-    
-    # Populate default ThreatIntel records if empty for demo purposes
-    if ThreatIntel.query.count() == 0:
-        try:
-            db.session.add_all([
-                ThreatIntel(intel_type='domain', intel_value='secure-hdfc-kyc.com', classification='Fake Bank Scam'),
-                ThreatIntel(intel_type='phone', intel_value='+18005550199', classification='Impersonation Campaign'),
-                ThreatIntel(intel_type='url', intel_value='http://fedex-parcel-charge.net/login', classification='Fake Courier Phishing'),
-                ThreatIntel(intel_type='email', intel_value='service@paypal-claims-support.com', classification='Credential Phishing'),
-                ThreatIntel(intel_type='hash', intel_value='8519962a9c13cfc1d1a646c2d829962a229a4aef5cfc8a1cfd56d11a2f2bb3a9', classification='Trojan Horse APK')
-            ])
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-
     recent_activity = submissions[:6]
 
     # Real 4-week risk trend: count submissions per week for the past 4 weeks

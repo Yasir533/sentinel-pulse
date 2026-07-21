@@ -167,143 +167,67 @@
                         </div>
                     </div>
 
-                    <!-- Full Navigation Grid visible inside collapsed menu on Mobile Devices (< 992px) -->
+                    <!-- Clean Smartphone Mobile Navigation Menu (< 992px) -->
                     <div class="d-lg-none mt-3 pt-3 border-top border-secondary border-opacity-50">
                         <div class="px-1 mb-2 text-uppercase text-muted fw-bold font-outfit" style="font-size: 0.7rem; letter-spacing: 0.05em;">
-                            <i class="bi bi-compass text-accent-glow me-1"></i> SOC Operations Navigation
+                            <i class="bi bi-shield-lock-fill text-warning me-1"></i> Smartphone Scam Guard & Security
                         </div>
-                        <div class="row g-2 mb-3">
+                        <div class="row g-2 mb-2">
                             <div class="col-6">
-                                <a href="{{ url_for('dashboard.index') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
-                                    <i class="bi bi-speedometer2 text-accent-glow fs-5"></i>
-                                    <span class="small font-outfit fw-semibold">Dashboard</span>
+                                <a href="{{ url_for('dashboard.mobile_observability') }}" class="mobile-nav-card p-2.5 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-warning border-opacity-25">
+                                    <i class="bi bi-shield-check text-warning fs-4"></i>
+                                    <span class="small font-outfit fw-bold text-warning">Scam Guard</span>
                                 </a>
                             </div>
                             <div class="col-6">
-                                <a href="{{ url_for('threats.list_threats') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
-                                    <i class="bi bi-shield-slash text-danger fs-5"></i>
-                                    <span class="small font-outfit fw-semibold">Threat Intel</span>
-                                </a>
-                            </div>
-                            <div class="col-6">
-                                <a href="{{ url_for('incidents.list_incidents') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
-                                    <i class="bi bi-exclamation-triangle text-warning fs-5"></i>
-                                    <span class="small font-outfit fw-semibold">Incidents</span>
-                                </a>
-                            </div>
-                            <div class="col-6">
-                                <a href="{{ url_for('alerts.list_alerts') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
-                                    <i class="bi bi-bell text-info fs-5"></i>
-                                    <span class="small font-outfit fw-semibold">Alerts</span>
-                                </a>
-                            </div>
-                            <div class="col-6">
-                                <a href="{{ url_for('reports.list_reports') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
-                                    <i class="bi bi-file-earmark-bar-graph text-primary fs-5"></i>
-                                    <span class="small font-outfit fw-semibold">Reports</span>
-                                </a>
-                            </div>
-                            {% if current_user.is_authenticated and current_user.role in ['Admin', 'Analyst'] %}
-                            <div class="col-6">
-                                <a href="{{ url_for('dashboard.ai_decisions') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
-                                    <i class="bi bi-robot text-accent-glow fs-5"></i>
-                                    <span class="small font-outfit fw-semibold">AI Decisions</span>
-                                </a>
-                            </div>
-                            <div class="col-6">
-                                <a href="{{ url_for('dashboard.mobile_observability') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
-                                    <i class="bi bi-shield-lock-fill text-success fs-5"></i>
-                                    <span class="small font-outfit fw-semibold">Scam Guard</span>
-                                </a>
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="px-1 mb-2 text-uppercase text-muted fw-bold font-outfit" style="font-size: 0.7rem; letter-spacing: 0.05em;">
-                            <i class="bi bi-phone text-accent-glow me-1"></i> Mobile Security Suite
-                        </div>
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <a href="{{ url_for('mobile.dashboard') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
-                                    <i class="bi bi-phone-vibrate text-accent-glow fs-5"></i>
+                                <a href="{{ url_for('mobile.dashboard') }}" class="mobile-nav-card p-2.5 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
+                                    <i class="bi bi-phone-vibrate text-accent-glow fs-4"></i>
                                     <span class="small font-outfit fw-semibold">Mobile Hub</span>
                                 </a>
                             </div>
                             <div class="col-6">
-                                <a href="{{ url_for('mobile.scan_sms') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
-                                    <i class="bi bi-chat-left-text text-warning fs-5"></i>
+                                <a href="{{ url_for('mobile.scan_sms') }}" class="mobile-nav-card p-2.5 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
+                                    <i class="bi bi-chat-left-text text-info fs-5"></i>
                                     <span class="small font-outfit fw-semibold">SMS Security</span>
                                 </a>
                             </div>
                             <div class="col-6">
-                                <a href="{{ url_for('mobile.scan_apk') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
+                                <a href="{{ url_for('mobile.scan_apk') }}" class="mobile-nav-card p-2.5 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
                                     <i class="bi bi-file-earmark-binary text-danger fs-5"></i>
                                     <span class="small font-outfit fw-semibold">APK Scanner</span>
                                 </a>
                             </div>
                             <div class="col-6">
-                                <a href="{{ url_for('mobile.scan_link') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
-                                    <i class="bi bi-link-45deg text-info fs-5"></i>
+                                <a href="{{ url_for('mobile.scan_link') }}" class="mobile-nav-card p-2.5 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
+                                    <i class="bi bi-link-45deg text-accent-glow fs-5"></i>
                                     <span class="small font-outfit fw-semibold">URL Scanner</span>
                                 </a>
                             </div>
                             <div class="col-6">
-                                <a href="{{ url_for('mobile.scan_qr') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
+                                <a href="{{ url_for('mobile.scan_qr') }}" class="mobile-nav-card p-2.5 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
                                     <i class="bi bi-qr-code-scan text-success fs-5"></i>
                                     <span class="small font-outfit fw-semibold">QR Scanner</span>
                                 </a>
                             </div>
                             <div class="col-6">
-                                <a href="{{ url_for('mobile.scan_whatsapp') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
+                                <a href="{{ url_for('mobile.scan_whatsapp') }}" class="mobile-nav-card p-2.5 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
                                     <i class="bi bi-whatsapp text-success fs-5"></i>
                                     <span class="small font-outfit fw-semibold">WhatsApp Guard</span>
                                 </a>
                             </div>
                             <div class="col-6">
-                                <a href="{{ url_for('mobile.scan_email') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
+                                <a href="{{ url_for('mobile.scan_email') }}" class="mobile-nav-card p-2.5 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
                                     <i class="bi bi-envelope text-primary fs-5"></i>
                                     <span class="small font-outfit fw-semibold">Email Scanner</span>
                                 </a>
                             </div>
-                            <div class="col-6">
-                                <a href="{{ url_for('mobile.device_health') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
+                            <div class="col-12">
+                                <a href="{{ url_for('mobile.device_health') }}" class="mobile-nav-card p-2.5 rounded d-flex align-items-center justify-content-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
                                     <i class="bi bi-heart-pulse text-danger fs-5"></i>
-                                    <span class="small font-outfit fw-semibold">Device Health</span>
+                                    <span class="small font-outfit fw-semibold">Device Health & Risk Score</span>
                                 </a>
                             </div>
                         </div>
-
-                        {% if current_user.is_authenticated and current_user.role == 'Admin' %}
-                        <div class="px-1 mb-2 text-uppercase text-muted fw-bold font-outfit" style="font-size: 0.7rem; letter-spacing: 0.05em;">
-                            <i class="bi bi-gear text-accent-glow me-1"></i> Admin Console
-                        </div>
-                        <div class="row g-2 mb-2">
-                            <div class="col-6">
-                                <a href="{{ url_for('dashboard.manage_users') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
-                                    <i class="bi bi-people text-info fs-5"></i>
-                                    <span class="small font-outfit fw-semibold">Users</span>
-                                </a>
-                            </div>
-                            <div class="col-6">
-                                <a href="{{ url_for('dashboard.system_settings') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
-                                    <i class="bi bi-sliders text-warning fs-5"></i>
-                                    <span class="small font-outfit fw-semibold">Settings</span>
-                                </a>
-                            </div>
-                            <div class="col-6">
-                                <a href="{{ url_for('dashboard.list_audit_logs') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
-                                    <i class="bi bi-shield-check text-success fs-5"></i>
-                                    <span class="small font-outfit fw-semibold">Audit Logs</span>
-                                </a>
-                            </div>
-                            <div class="col-6">
-                                <a href="{{ url_for('dashboard.system_health') }}" class="mobile-nav-card p-2 rounded d-flex align-items-center gap-2 text-decoration-none text-light border border-secondary border-opacity-25">
-                                    <i class="bi bi-activity text-danger fs-5"></i>
-                                    <span class="small font-outfit fw-semibold">System Health</span>
-                                </a>
-                            </div>
-                        </div>
-                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -643,8 +567,14 @@
                 localStorage.setItem('sentinel_notif_prompt_handled', 'true');
             };
 
+            function isSmartphoneDevice() {
+                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+            }
+
             function checkAndPromptNotificationPermission() {
                 if (!('Notification' in window)) return;
+                // STRICT REQUIREMENT: Only prompt for push notifications on Smartphone devices, NEVER on Laptop/Desktop!
+                if (!isSmartphoneDevice()) return;
                 
                 const promptHandled = localStorage.getItem('sentinel_notif_prompt_handled') === 'true';
                 if (Notification.permission === 'default' && !promptHandled) {
