@@ -238,7 +238,7 @@ class ExportService:
         elif entity_type == 'audit_logs':
             records = AuditLog.query.all()
             headers = ["Audit Date & Time", "Username", "Operator Role", "Remote IP", "Action Executed", "Target Entity", "Execution status"]
-            rows = [[l.timestamp, l.username, l.role, l.ip_address, l.action, l.entity, l.status] for l in records]
+            rows = [[log.timestamp, log.username, log.role, log.ip_address, log.action, log.entity, log.status] for log in records]
         else:
             headers, rows = [], []
         return headers, rows

@@ -105,11 +105,11 @@ def test_threat_correlation_signatures(auth_client, app):
 
     with app.app_context():
         # Scan URL first time
-        sub1 = AIScamAnalyzer.process_submission(user_id, 'url', 'http://repeat-phish-domain.com')
+        AIScamAnalyzer.process_submission(user_id, 'url', 'http://repeat-phish-domain.com')
         assert ThreatIntel.query.filter_by(intel_value='http://repeat-phish-domain.com').first() is None
 
         # Scan URL second time -> triggers correlation and logs it in ThreatIntel
-        sub2 = AIScamAnalyzer.process_submission(user_id, 'url', 'http://repeat-phish-domain.com')
+        AIScamAnalyzer.process_submission(user_id, 'url', 'http://repeat-phish-domain.com')
         intel = ThreatIntel.query.filter_by(intel_value='http://repeat-phish-domain.com').first()
         assert intel is not None
         assert intel.intel_type == 'url'

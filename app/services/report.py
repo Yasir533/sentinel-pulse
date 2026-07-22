@@ -44,8 +44,7 @@ class ReportService:
         Gathers dynamic security statistics and saves a new Report record in the database.
         """
         # Fetch creator user
-        creator = db.session.get(User, creator_id)
-        creator_name = creator.username if creator else "System"
+        db.session.get(User, creator_id)
 
         # 1. Fetch statistics
         total_threats = Threat.query.count()

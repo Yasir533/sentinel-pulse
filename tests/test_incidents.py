@@ -82,7 +82,7 @@ def test_incident_creation_and_escalation(client, app, seed_users, seed_threat):
         # Check Activity Log was populated
         logs = ActivityLog.query.order_by(ActivityLog.timestamp.desc()).limit(2).all()
         assert len(logs) > 0
-        log_messages = [l.message for l in logs]
+        log_messages = [log.message for log in logs]
         assert any(incident.incident_number in msg for msg in log_messages)
         assert any("created" in msg for msg in log_messages)
 

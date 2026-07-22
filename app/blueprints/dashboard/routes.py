@@ -97,11 +97,16 @@ def admin_dashboard() -> str:
     risk_brackets = {'0-20': 0, '21-40': 0, '41-60': 0, '61-80': 0, '81-100': 0}
     for (s,) in scores_query:
         if s is not None:
-            if s <= 20: risk_brackets['0-20'] += 1
-            elif s <= 40: risk_brackets['21-40'] += 1
-            elif s <= 60: risk_brackets['41-60'] += 1
-            elif s <= 80: risk_brackets['61-80'] += 1
-            else: risk_brackets['81-100'] += 1
+            if s <= 20:
+                risk_brackets['0-20'] += 1
+            elif s <= 40:
+                risk_brackets['21-40'] += 1
+            elif s <= 60:
+                risk_brackets['41-60'] += 1
+            elif s <= 80:
+                risk_brackets['61-80'] += 1
+            else:
+                risk_brackets['81-100'] += 1
 
     # Mean Resolution Time Analytics (Incident resolution cycle)
     resolved_closed_incidents = Incident.query.filter(Incident.resolved_at.isnot(None)).all()
@@ -574,7 +579,7 @@ def edit_user(user_id: int) -> Response:
             else:
                 flash("Account deactivated successfully.", "success")
                 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
         flash("An error occurred while updating the operator details.", "danger")
         
@@ -1021,7 +1026,7 @@ def export_entity(entity_type: str, format_type: str) -> Response:
             query = query.filter(AuditLog.action == action)
         records = query.order_by(AuditLog.timestamp.desc()).all()
         headers = ["Audit Date & Time", "Username", "Operator Role", "Remote IP", "Action Executed", "Target Entity", "Execution status"]
-        rows = [[l.timestamp, l.username, l.role, l.ip_address, l.action, l.entity, l.status] for l in records]
+        rows = [[log.timestamp, log.username, log.role, log.ip_address, log.action, log.entity, log.status] for log in records]
         
     else:
         abort(400)

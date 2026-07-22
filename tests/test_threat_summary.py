@@ -100,6 +100,7 @@ def test_threat_summary_logic_medium_abuse(app, seed_user):
         assert risk["label"] == "MEDIUM"
         assert risk["badge"] == "warning"
         assert "mixed intelligence results" in summary
+        assert "Monitor network activity" in recs
 
 def test_threat_summary_logic_high_vt(app, seed_user):
     """Test HIGH risk triggered by VirusTotal malicious count >= 20."""
@@ -157,6 +158,7 @@ def test_threat_summary_logic_high_abuse(app, seed_user):
         assert risk["label"] == "HIGH"
         assert risk["badge"] == "danger"
         assert "strongly associated with malicious activity" in summary
+        assert "Block the IOC" in recs
 
 def test_details_rendering_summary_card(client, app, seed_user):
     """Test threat details page renders AI Threat Summary card correctly."""

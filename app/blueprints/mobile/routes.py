@@ -121,7 +121,7 @@ def submit_threat():
             screenshot_path = f"/static/uploads/{filename_secured}"
             screenshot_file.save(os.path.join(uploads_dir, filename_secured))
 
-        sub = AIScamAnalyzer.process_submission(
+        AIScamAnalyzer.process_submission(
             user_id=current_user.id,
             submission_type=submission_type,
             content=content,
