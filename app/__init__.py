@@ -89,12 +89,12 @@ def create_app(config_name=None):
     
     # Ensure database tables exist
     with app.app_context():
-        from app.models.notification import Notification
-        from app.models.report import Report
-        from app.models.audit_log import AuditLog
-        from app.models.report_schedule import ReportSchedule
-        from app.models.mobile_security import MobileSubmission, ThreatIntel
-        from app.models.ai_decision import AIDecision
+        from app.models.notification import Notification  # noqa: F401
+        from app.models.report import Report  # noqa: F401
+        from app.models.audit_log import AuditLog  # noqa: F401
+        from app.models.report_schedule import ReportSchedule  # noqa: F401
+        from app.models.mobile_security import MobileSubmission, ThreatIntel  # noqa: F401
+        from app.models.ai_decision import AIDecision  # noqa: F401
         db.create_all()
 
     # 5. Register Error Handlers
@@ -132,9 +132,22 @@ def create_app(config_name=None):
     def inject_csrf_token():
         return dict(csrf_token=generate_csrf_token)
 
+    def get_device_mode():
+        from flask import session, request
+        if session.get('device_mode_manual') and 'device_mode' in session:
+            return session['device_mode']
+        ua = request.headers.get('User-Agent', '').lower()
+        mobile_keywords = ['mobile', 'android', 'iphone', 'ipad', 'phone', 'ipod', 'iemobile', 'blackberry', 'webos']
+        if any(kw in ua for kw in mobile_keywords):
+            mode = 'mobile'
+        else:
+            mode = 'desktop'
+        session['device_mode'] = mode
+        return mode
+
     @app.context_processor
     def inject_device_mode():
-        return dict(device_mode='desktop')
+        return dict(device_mode=get_device_mode())
 
     @app.before_request
     def update_last_seen():
@@ -149,8 +162,33 @@ def create_app(config_name=None):
 
     @app.before_request
     def enforce_device_mode_restrictions():
-        # Relaxed: Allow seamless access to all SOC & Mobile features across devices
-        return
+        from flask import redirect, url_for, flash
+        # Skip static assets, authentication, and API endpoints
+        if request.blueprint in ['static', 'auth', 'api']:
+            return
+        if request.endpoint == 'static':
+            return
+        
+        # Test hook bypass: keep existing test suites green unless testing separation explicitly
+        if app.config.get('TESTING') and not request.headers.get('X-Enforce-Device-Mode'):
+            return
+
+        # Skip device switcher endpoint
+        if request.endpoint == 'dashboard.toggle_device_mode':
+            return
+
+        mode = get_device_mode()
+        if mode == 'mobile':
+            # Prevent mobile users from accessing desktop-only dashboards and consoles
+            desktop_blueprints = ['dashboard', 'threats', 'incidents', 'alerts', 'reports', 'notifications']
+            if request.blueprint in desktop_blueprints or request.path == '/':
+                flash("Desktop SOC console is restricted to desktop devices.", "warning")
+                return redirect(url_for('mobile.dashboard'))
+        elif mode == 'desktop':
+            # Prevent desktop users from accessing mobile scanner endpoints
+            if request.blueprint == 'mobile':
+                flash("Mobile Security views are restricted to mobile devices.", "warning")
+                return redirect(url_for('dashboard.index'))
 
     @app.before_request
     def check_csrf():

@@ -2,7 +2,6 @@ import pytest
 from app.models.user import User
 from app.models.threat import Threat, VTEnrichment, AbuseIPDBEnrichment
 from app.models.alert import Alert
-from app.models.incident import Incident
 from app.extensions import db
 from app.services.alert import AlertService
 

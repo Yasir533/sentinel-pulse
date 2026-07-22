@@ -1,5 +1,5 @@
 import base64
-from datetime import datetime, timedelta
+from datetime import datetime
 import requests
 from flask import current_app
 from app.extensions import db
@@ -57,7 +57,7 @@ def lookup_ioc_on_vt(ioc_type: str, ioc_value: str) -> dict:
     if response.status_code == 200:
         return response.json()
     elif response.status_code == 404:
-        raise FileNotFoundError(f"IOC not found in VirusTotal database.")
+        raise FileNotFoundError("IOC not found in VirusTotal database.")
     elif response.status_code == 429:
         raise ConnectionRefusedError("VirusTotal API rate limit exceeded.")
     elif response.status_code == 401:
@@ -127,7 +127,7 @@ def enrich_threat(threat: Threat) -> VTEnrichment:
         
     except Exception as e:
         current_app.logger.error(f"VirusTotal ERROR: {e}")
-    enrichment.status = 'failed'
-    enrichment.error_message = str(e)
-    db.session.commit()
-    return enrichment
+        enrichment.status = 'failed'
+        enrichment.error_message = str(e)
+        db.session.commit()
+        return enrichment

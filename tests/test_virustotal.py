@@ -1,6 +1,5 @@
-import pytest
 from unittest.mock import patch, MagicMock
-from app.models.threat import Threat, VTEnrichment
+from app.models.threat import Threat
 from app.services.virustotal import get_virustotal_api_key, lookup_ioc_on_vt, enrich_threat
 from app.extensions import db
 

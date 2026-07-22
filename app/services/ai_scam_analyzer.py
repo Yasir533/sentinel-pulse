@@ -1,6 +1,4 @@
 import re
-from datetime import datetime
-from flask import current_app
 from app.extensions import db
 from app.models.mobile_security import MobileSubmission, ThreatIntel
 from app.models.threat import Threat

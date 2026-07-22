@@ -34,4 +34,4 @@ This report summarizes the design, files, pipelines, and verification results of
   - Ingestion pipeline flow (Threat/Alert/Notification triggers).
   - Scanners rendering states.
   - Threat correlation signature triggers.
-- **Test execution results:** All **81 tests passed** successfully.
+- **Test execution results:** All **96 tests passed** successfully.

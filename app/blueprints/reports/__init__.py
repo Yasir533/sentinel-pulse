@@ -2,4 +2,4 @@ from flask import Blueprint
 
 reports_bp = Blueprint('reports', __name__)
 
-from app.blueprints.reports import routes
+from app.blueprints.reports import routes as routes  # noqa: E402

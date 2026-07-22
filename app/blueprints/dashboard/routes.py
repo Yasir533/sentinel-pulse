@@ -680,6 +680,7 @@ def toggle_device_mode() -> Response:
     mode = request.form.get('mode', 'desktop').strip()
     if mode in ['desktop', 'mobile']:
         session['device_mode'] = mode
+        session['device_mode_manual'] = True
         flash(f"Switched to {mode.capitalize()} Mode.", "success")
     else:
         flash("Invalid device mode selected.", "danger")

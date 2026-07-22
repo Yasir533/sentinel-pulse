@@ -1,11 +1,36 @@
 import json
 import queue
 from datetime import datetime
-from flask import Response, jsonify, stream_with_context
+from functools import wraps
+from flask import Response, jsonify, stream_with_context, request, current_app
 from flask_login import login_required, current_user
 from app.blueprints.api import api_bp
 from app.models.threat import Threat
 from app.services.realtime_event_service import RealtimeEventService
+
+def api_key_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        api_key = request.headers.get('X-API-Key')
+        if not api_key:
+            auth_header = request.headers.get('Authorization')
+            if auth_header and auth_header.startswith('Bearer '):
+                api_key = auth_header.split(' ', 1)[1]
+        
+        # Fallback to query parameter
+        if not api_key:
+            api_key = request.args.get('api_key')
+            
+        expected_key = current_app.config.get('SENTINEL_API_KEY') or 'sentinel_pulse_api_key_2026'
+        
+        if not api_key or api_key != expected_key:
+            return jsonify({
+                "status": "error",
+                "message": "Unauthorized. A valid X-API-Key header or Bearer token is required."
+            }), 401
+            
+        return f(*args, **kwargs)
+    return decorated
 
 @api_bp.route('/status', methods=['GET'])
 def get_status():
@@ -17,6 +42,7 @@ def get_status():
     }), 200
 
 @api_bp.route('/threats', methods=['GET'])
+@api_key_required
 def get_threats():
     """API route to fetch threat intelligence data."""
     threats = Threat.query.order_by(Threat.created_at.desc()).limit(50).all()

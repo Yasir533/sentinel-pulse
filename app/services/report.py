@@ -145,9 +145,9 @@ class ReportService:
         elif report_type == 'Notification Report':
             title = "Notification Report"
             summary = (
-                f"This report details broadcast notification statistics. Alert updates and incident assignments "
-                f"have successfully generated system-wide broadcasts. Multi-channel recipient routing remains "
-                f"fully functional across the analyst registries."
+                "This report details broadcast notification statistics. Alert updates and incident assignments "
+                "have successfully generated system-wide broadcasts. Multi-channel recipient routing remains "
+                "fully functional across the analyst registries."
             )
             recommendations = [
                 "Verify correct role assignment to prevent notification leaks.",
@@ -177,9 +177,9 @@ class ReportService:
         elif report_type == 'Audit Report':
             title = "Security Audit Report"
             summary = (
-                f"This SOC Audit report documents operational logs and change registry records. "
-                f"Actions tracked include threat adjustments, user role revisions, settings updates, "
-                f"and export executions, aligning with ISO/IEC 27001 requirements."
+                "This SOC Audit report documents operational logs and change registry records. "
+                "Actions tracked include threat adjustments, user role revisions, settings updates, "
+                "and export executions, aligning with ISO/IEC 27001 requirements."
             )
             recommendations = [
                 "Regularly inspect the audit logs for unauthorized user settings alterations.",
@@ -451,7 +451,7 @@ class ReportService:
         story = []
 
         # 1. Header Title Block
-        story.append(Paragraph(f"Sentinel Pulse Platform", ParagraphStyle('Sub', fontName='Helvetica-Bold', fontSize=10, textColor=colors.HexColor('#64748b'), spaceAfter=5)))
+        story.append(Paragraph("Sentinel Pulse Platform", ParagraphStyle('Sub', fontName='Helvetica-Bold', fontSize=10, textColor=colors.HexColor('#64748b'), spaceAfter=5)))
         story.append(Paragraph(report.title.upper(), title_style))
         story.append(Spacer(1, 10))
 

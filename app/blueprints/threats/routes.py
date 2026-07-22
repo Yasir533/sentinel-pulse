@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import render_template, redirect, url_for, flash, request, abort, Response, current_app
+from flask import render_template, redirect, url_for, flash, request, Response, current_app
 from flask_login import login_required, current_user
 from app.blueprints.threats import threats_bp
 from app.models.threat import Threat

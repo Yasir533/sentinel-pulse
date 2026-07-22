@@ -10,11 +10,20 @@ from app.utils import role_required
 # Simple regex for email validation
 EMAIL_REGEX = re.compile(r"^[^@]+@[^@]+\.[^@]+$")
 
+def get_landing_url():
+    mode = session.get('device_mode')
+    if not mode:
+        ua = request.headers.get('User-Agent', '').lower()
+        mobile_keywords = ['mobile', 'android', 'iphone', 'ipad', 'phone', 'ipod', 'iemobile', 'blackberry', 'webos']
+        mode = 'mobile' if any(kw in ua for kw in mobile_keywords) else 'desktop'
+        session['device_mode'] = mode
+    return 'mobile.dashboard' if mode == 'mobile' else 'dashboard.index'
+
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register() -> str | Response:
     """Handle new operator registration."""
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard.index'))
+        return redirect(url_for(get_landing_url()))
 
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
@@ -70,7 +79,7 @@ def register() -> str | Response:
 def login() -> str | Response:
     """Handle operator authentication and session creation."""
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard.index'))
+        return redirect(url_for(get_landing_url()))
 
     if request.method == 'POST':
         username_or_email = request.form.get('username_or_email', '').strip()
@@ -115,7 +124,7 @@ def login() -> str | Response:
 
         session['play_intro'] = True
         flash(f"Welcome back, {user.username}!", "success")
-        return redirect(url_for('dashboard.index'))
+        return redirect(url_for(get_landing_url()))
 
     return render_template('auth/login.html')
 

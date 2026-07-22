@@ -1,14 +1,11 @@
 import pytest
-from datetime import datetime
 from app.models.user import User
 from app.models.threat import Threat
 from app.models.alert import Alert
-from app.models.incident import Incident
 from app.models.notification import Notification
 from app.extensions import db
 from app.services.notification import NotificationService
 from app.services.incident import create_incident, update_incident
-from app.services.alert import AlertService
 
 @pytest.fixture
 def seed_users(app):

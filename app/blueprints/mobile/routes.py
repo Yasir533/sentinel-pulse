@@ -1,10 +1,9 @@
 import os
-from flask import render_template, redirect, url_for, request, flash, jsonify, current_app
+from flask import render_template, redirect, url_for, request, flash, current_app
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from app.extensions import db
 from app.blueprints.mobile import mobile_bp
-from app.models.mobile_security import MobileSubmission, ThreatIntel
+from app.models.mobile_security import MobileSubmission
 from app.services.ai_scam_analyzer import AIScamAnalyzer
 
 def calculate_user_security_score(user_id: int) -> int:

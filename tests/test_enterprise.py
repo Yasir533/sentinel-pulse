@@ -2,7 +2,6 @@ import pytest
 from app.models.user import User
 from app.models.threat import Threat
 from app.models.alert import Alert
-from app.models.incident import Incident
 from app.models.audit_log import AuditLog
 from app.models.report_schedule import ReportSchedule
 from app.extensions import db

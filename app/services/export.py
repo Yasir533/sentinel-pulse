@@ -6,7 +6,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
 # ReportLab Imports
 from reportlab.lib.pagesizes import letter, landscape
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 
@@ -144,7 +144,7 @@ class ExportService:
         )
 
         story = []
-        story.append(Paragraph(f"SENTINEL PULSE REGISTRY", ParagraphStyle('Sub', fontName='Helvetica-Bold', fontSize=8, textColor=colors.HexColor('#64748b'))))
+        story.append(Paragraph("SENTINEL PULSE REGISTRY", ParagraphStyle('Sub', fontName='Helvetica-Bold', fontSize=8, textColor=colors.HexColor('#64748b'))))
         story.append(Paragraph(title.upper(), title_style))
         story.append(Paragraph(f"Export Date: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}", meta_style))
 

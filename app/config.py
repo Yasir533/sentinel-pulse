@@ -52,6 +52,9 @@ class BaseConfig:
     # CORS Configuration
     CORS_RESOURCES = {r"/api/*": {"origins": "*"}}
 
+    # Sentinel API Key for Public Endpoint Protection
+    SENTINEL_API_KEY = os.environ.get('SENTINEL_API_KEY', 'sentinel_pulse_api_key_2026')
+
 
 class DevelopmentConfig(BaseConfig):
     """Development configuration."""
@@ -74,6 +77,15 @@ class ProductionConfig(BaseConfig):
     TESTING = False
     SESSION_COOKIE_SECURE = True
     
+    # Restrict CORS origins in production
+    CORS_RESOURCES = {
+        r"/api/*": {
+            "origins": [
+                o.strip() for o in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',') if o.strip()
+            ]
+        }
+    }
+    
     # Ensure production environment has actual environment variables set
     @classmethod
     def init_app(cls, app):
@@ -81,6 +93,15 @@ class ProductionConfig(BaseConfig):
             raise RuntimeError("CRITICAL CONFIGURATION ERROR: SECRET_KEY environment variable is not set for Production.")
         if not os.environ.get('JWT_SECRET_KEY'):
             raise RuntimeError("CRITICAL CONFIGURATION ERROR: JWT_SECRET_KEY environment variable is not set for Production.")
+            
+        # Ensure database is PostgreSQL in production
+        db_uri = app.config.get('SQLALCHEMY_DATABASE_URI', '')
+        if not db_uri or not db_uri.startswith(('postgresql://', 'postgresql+psycopg2://')):
+            raise RuntimeError(
+                "CRITICAL CONFIGURATION ERROR: PostgreSQL database is required in Production. "
+                "The DATABASE_URL environment variable must be set to a valid PostgreSQL URI starting with "
+                "'postgresql://' or 'postgresql+psycopg2://'."
+            )
 
 
 

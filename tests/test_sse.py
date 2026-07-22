@@ -1,4 +1,3 @@
-import pytest
 from app.models.user import User
 from app.extensions import db
 from app.services.realtime_event_service import RealtimeEventService

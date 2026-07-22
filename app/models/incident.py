@@ -17,10 +17,10 @@ class Incident(db.Model):
     description = db.Column(db.Text, nullable=True)
     severity = db.Column(db.String(20), nullable=False, default='Medium')
     status = db.Column(db.String(30), nullable=False, default='Open')
-    
+
     assigned_to = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
     created_by = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
-    
+
     resolution_notes = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)

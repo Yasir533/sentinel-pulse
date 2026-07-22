@@ -240,7 +240,7 @@ class NotificationService:
         """
         if alert.severity in ['High', 'Critical']:
             title = f"New Alert: {alert.alert_number}"
-            message = alert.message or f"Telemetry indicates high risk security anomaly."
+            message = alert.message or "Telemetry indicates high risk security anomaly."
             return cls.broadcast_notification(
                 title=title,
                 message=message,
@@ -306,7 +306,7 @@ class NotificationService:
         """
         Create a notification when an Admin changes a user's role.
         """
-        title = f"Security Role Changed"
+        title = "Security Role Changed"
         message = f"Your operator security role has been changed from '{old_role}' to '{new_role}'."
         return cls.broadcast_notification(
             title=title,

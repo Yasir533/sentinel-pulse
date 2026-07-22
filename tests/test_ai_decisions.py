@@ -1,6 +1,4 @@
-import pytest
 from app.models.user import User
-from app.models.ai_decision import AIDecision
 from app.services.ai_decision_service import AIDecisionService
 from app.extensions import db
 

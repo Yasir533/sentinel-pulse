@@ -1,9 +1,7 @@
 import pytest
-import io
 from app.models.user import User
 from app.models.threat import Threat
 from app.models.alert import Alert
-from app.models.incident import Incident
 from app.models.report import Report
 from app.extensions import db
 from app.services.report import ReportService
