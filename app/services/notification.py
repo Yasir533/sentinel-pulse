@@ -230,7 +230,7 @@ class NotificationService:
         """
         Get recent notifications for a user (newest first).
         """
-        return Notification.query.filter_by(user_id=user_id).order_by(Notification.created_at.desc()).limit(limit).all()
+        return Notification.query.filter_by(user_id=user_id).order_by(Notification.created_at.desc(), Notification.id.desc()).limit(limit).all()
 
     # Automatic Event Creation Hooks
     @classmethod
